@@ -348,7 +348,7 @@ textarea{font:inherit;border:2px solid #d9d0b8;border-radius:10px;padding:8px 12
   <div id="park" hidden><div id="parkSz"><div id="parkIn"><div id="parkBg"></div><div id="parkMap"></div><div id="token" aria-hidden="true"><i>🧑‍🦽</i></div></div></div></div>
 
   <div class="legend" id="legend"></div>
-  <p class="foot">過橋的離島是遊樂園，點入口或上方「遊樂園」按鈕進場，8 個關卡依序解鎖，「講師模式」可開放全部關卡。城市裡有圖釘的 24 棟建築可以進入任務，滑鼠移上去會顯示名稱，完成後屋頂會換上類別顏色。用 ＋ － 可以放大縮小，放大後可拖曳移動畫面。20 個職業情境中，標示「勞動部案例」的 3 格取自勞動部 2026 年 6 月新聞稿，其餘為教學示意情境。五大類別的對應為教學用途，實際改善方式與補助金額由專業人員訪視評估後核定。進度只存在這台裝置的瀏覽器，不蒐集個人資料。</p>
+  <p class="foot">遊樂園：點入口或上方「遊樂園」按鈕進場，8 個關卡依序解鎖，「講師模式」輸入講師密碼後可開放全部關卡。另一座島嶼是城市，有圖釘的 24 棟建築可以進入任務，滑鼠移上去會顯示名稱，完成後屋頂會換上類別顏色。用 ＋ － 可以放大縮小，放大後可拖曳移動畫面。20 個職業情境中，標示「勞動部案例」的取自勞動部公布的職務再設計案例，其餘為教學示意情境。五大類別的對應為教學用途，實際改善方式與補助金額由專業人員訪視評估後核定。</p>
 </div>
 
 <div id="modal"></div>
@@ -1284,7 +1284,7 @@ function fitPark(){
 }
 window.onPanelClose=function(){renderHud();if(view==='park'){renderPark();parkGuide()}};
 window.addEventListener('resize',function(){if(view==='park')fitPark()});
-$('#bUnlock').addEventListener('click',function(){unlockAll=!unlockAll;this.classList.toggle('on',unlockAll);this.textContent=unlockAll?'講師模式：全部開放':'講師模式';renderPark()});
+$('#bUnlock').addEventListener('click',function(){askTeacher()});
 $('#vPark').addEventListener('click',function(){setView('park')});
 
 /* ================= 遊樂園小遊戲 ================= */
@@ -1475,6 +1475,8 @@ openStory=function(i){
    部署 Google Apps Script 後，把網址貼在 LOG_ENDPOINT 的引號裡。
    留空時只記在這台裝置，不會上傳。 */
 var LOG_ENDPOINT='https://script.google.com/macros/s/AKfycbw7mKDQWSko4gRlhDHXLTlLd_ZUA4u7Xpw3kyoSdPtsfR2-ZFSld_9sBfldRzrKjqjl9Q/exec';
+/* 講師模式密碼：有設定 LOG_ENDPOINT 時，用 Code.gs 裡的講師密碼檢查；沒有設定時，用下面這組密碼 */
+var OFFLINE_TEACHER_PASS='1151118';
 var GAME='',LQ='jr-log-q';
 if(!S.sid){S.sid='S'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);save()}
 try{var URLC=new URLSearchParams(location.search).get('c');if(URLC&&URLC!==S.cls){S.cls=URLC.slice(0,30);save()}}catch(e){}
@@ -1518,10 +1520,32 @@ startQuiz=tagGame(startQuiz,'心理測驗');
 finish=(function(f){return function(id,st){LOG({ev:'stars',stars:st,x:id});return f(id,st)}})(finish);
 parkDone=(function(f){return function(id,st){LOG({ev:'stars',stars:st,x:id});return f(id,st)}})(parkDone);
 
+/* ================= 講師模式（需要密碼） ================= */
+function setUnlock(v){
+ unlockAll=v;var b=$('#bUnlock');b.classList.toggle('on',v);b.textContent=v?'講師模式：全部開放':'講師模式';
+ try{sessionStorage.setItem('jr-teach',v?'1':'')}catch(e){}
+ if(view==='park'){renderPark();parkGuide()}
+}
+function askTeacher(){
+ if(unlockAll){setUnlock(false);return}
+ openPanel('<div class="eyebrow">講師專用</div><h2>🔒 講師模式</h2><p>輸入講師密碼後，會開放遊樂園全部關卡。</p><div class="reg"><label for="tPw">講師密碼</label><input type="password" id="tPw" autocomplete="off"></div><div class="row"><button class="btn go" id="tGo">確認</button></div><div id="fb" aria-live="polite"></div>');
+ function ok(){closePanel();setUnlock(true)}
+ function bad(m){$('#fb').innerHTML='<div class="fb bad">'+m+'</div>';$('#tGo').disabled=false;$('#tPw').select()}
+ function go(){
+  var pw=$('#tPw').value;if(!pw){bad('請輸入講師密碼。');return}
+  $('#tGo').disabled=true;$('#fb').innerHTML='<div class="fb">檢查中…</div>';
+  if(!LOG_ENDPOINT){if(pw===OFFLINE_TEACHER_PASS)ok();else bad('密碼不正確。');return}
+  fetch(LOG_ENDPOINT+'?key='+encodeURIComponent(pw)+'&c=__check__').then(function(r){return r.json()}).then(function(d){if(d&&d.error)bad('密碼不正確。');else ok()}).catch(function(){bad('無法連線檢查密碼，請確認網路後再試一次。')});
+ }
+ $('#tGo').addEventListener('click',go);
+ $('#tPw').addEventListener('keydown',function(e){if(e.key==='Enter')go()});
+}
+try{if(sessionStorage.getItem('jr-teach')==='1'){unlockAll=true;$('#bUnlock').classList.add('on');$('#bUnlock').textContent='講師模式：全部開放'}}catch(e){}
+
 /* ================= 進島報到 ================= */
 function intro(){
  openPanel('<div class="eyebrow">職務再設計宣導互動課程</div><h2 style="font-size:28px">歡迎登島</h2>'+
-  '<p>這座島有一座城市和一座遊樂園。登島前先報到，再做 5 題小測驗，看看你是哪一型職場改造師。</p>'+
+  '<p>這是一座有百工百業的群島，群島中包含遊樂園。登島前先報到，再做 5 題小測驗，看看你是哪一型職場改造師。</p>'+
   '<div class="reg"><label for="rgN">請輸入你的大名</label><input type="text" id="rgN" maxlength="12" value="'+esc(S.name||'')+'" placeholder="例如：王小明"></div>'+
   '<div class="row"><button class="btn go" id="rgGo">報到，開始測驗</button></div><div id="fb" aria-live="polite"></div>',true);
  $('#rgGo').addEventListener('click',function(){

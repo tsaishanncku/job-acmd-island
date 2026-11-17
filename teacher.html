@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>職務再設計資源島 講師後台</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* 版面：上方設定列，下方依「總覽 → 關卡 → 題目 → 學員 → 提問」由大到小 */
+  --bg:#f3f6f7; --card:#ffffff; --ink:#12313a; --muted:#5d7780; --line:#dde5e8;
+  --accent:#1f8f82; --accent-soft:#d9f0ec; --warn:#b4570f; --warn-soft:#fdeedd;
+  --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 48px;display:grid;gap:16px}
+header{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between}
+h1{margin:0;font-size:26px;font-weight:900;text-wrap:balance}
+h2{margin:0 0 10px;font-size:17px}
+.sub{color:var(--muted);font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.set{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
+.set label{font-size:12px;font-weight:700;color:var(--muted);display:grid;gap:3px}
+input,textarea{font:inherit;border:1px solid #c9d4d8;border-radius:8px;padding:7px 10px;width:100%;color:var(--ink);background:#fff}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+button{font:inherit;cursor:pointer;border:1px solid #c9d4d8;background:#fff;border-radius:8px;padding:7px 14px;font-weight:700;color:var(--ink)}
+button.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #ffb703;outline-offset:1px}
+.msg{font-size:13px;color:var(--muted)}
+.msg.err{color:#b3261e;font-weight:700}
+.demo{background:var(--warn-soft);color:var(--warn);font-weight:700;border-radius:8px;padding:6px 12px;font-size:13px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.kpi b{display:block;font-size:30px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.2}
+.kpi span{font-size:13px;color:var(--muted)}
+.two{display:grid;grid-template-columns:3fr 2fr;gap:16px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-size:12px;color:var(--muted);text-align:left;font-weight:700;border-bottom:1px solid var(--line);padding:6px 8px}
+td{border-bottom:1px solid var(--line);padding:7px 8px;vertical-align:middle}
+td.n{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.bar{position:relative;height:14px;background:#edf2f3;border-radius:4px;min-width:90px}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:4px}
+.bar.low i{background:var(--warn)}
+.chip{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:1px 8px;background:var(--warn-soft);color:var(--warn);white-space:nowrap}
+.scroll{overflow-x:auto}
+.q{border-top:1px solid var(--line);padding:10px 0;display:grid;gap:6px}
+.q:first-of-type{border-top:0}
+.q .meta{font-size:12px;color:var(--muted)}
+.q .ans{background:var(--accent-soft);border-radius:8px;padding:6px 10px;font-size:14px}
+.empty{color:var(--muted);font-size:14px;padding:6px 0}
+details summary{cursor:pointer;font-weight:700}
+@media (max-width:820px){.kpis{grid-template-columns:repeat(2,1fr)}.two,.set{grid-template-columns:1fr}}
+
+.live{position:fixed;inset:0;z-index:50;background:#0f2a33;color:#fff;display:flex;flex-direction:column;padding:20px 28px;gap:14px;overflow:auto}
+.live[hidden]{display:none}
+.lvTop{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.lvTop b{font-size:18px;margin-right:auto}
+.lvTop select{font:inherit;font-size:15px;border-radius:8px;padding:7px 10px;max-width:min(560px,100%);border:1px solid #4b6b75;background:#16384300;color:#fff;background:#163843}
+.lvTop button{background:#163843;color:#fff;border-color:#4b6b75}
+.lvGame{font-size:16px;color:#9fd8cc;font-weight:700;letter-spacing:.06em}
+.lvQ{font-size:clamp(24px,3.4vw,40px);font-weight:900;line-height:1.3;margin:4px 0 6px;text-wrap:balance}
+.lvMeta{display:flex;gap:28px;flex-wrap:wrap;font-size:18px;color:#cfe3e8}
+.lvMeta b{font-size:34px;color:#fff;font-variant-numeric:tabular-nums;margin-right:4px}
+.lvBars{display:grid;gap:16px;margin-top:10px}
+.lvRow{display:grid;grid-template-columns:minmax(160px,34%) 1fr 150px;gap:14px;align-items:center;font-size:20px}
+.lvRow .lb{font-weight:700;line-height:1.35}
+.lvRow .ck{display:inline-block;margin-left:8px;font-size:14px;background:#2fbf9f;color:#0f2a33;border-radius:999px;padding:1px 10px;font-weight:900;vertical-align:middle}
+.lvRow .tr{height:34px;background:#1d4652;border-radius:6px;overflow:hidden}
+.lvRow .tr i{display:block;height:100%;background:#8aa6ae;border-radius:0 6px 6px 0;transition:width .8s cubic-bezier(.3,.8,.3,1)}
+.lvRow.ok .tr i{background:#2fbf9f}
+.lvRow .v{font-variant-numeric:tabular-nums;font-size:22px;font-weight:700;text-align:right}
+.lvFoot{margin-top:auto;font-size:13px;color:#9db7be;display:flex;gap:16px;flex-wrap:wrap}
+.lvEmpty{font-size:22px;color:#cfe3e8;margin-top:40px}
+@media (max-width:720px){.lvRow{grid-template-columns:1fr 90px}.lvRow .tr{grid-column:1/-1;order:3}}
+@media (prefers-reduced-motion:reduce){.lvRow .tr i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>職務再設計資源島　講師後台</h1><div class="sub" id="upd">尚未讀取資料</div></div>
+    <span class="demo" id="demoTag" hidden>目前顯示的是示範資料，不是真實學員</span>
+  </header>
+
+  <section class="card" aria-labelledby="hSet">
+    <h2 id="hSet">連線設定</h2>
+    <div class="set">
+      <label for="cfU">資料網址（Apps Script 網頁應用程式網址）<input id="cfU" type="url" placeholder="https://script.google.com/macros/s/…/exec"></label>
+      <label for="cfK">講師密碼<input id="cfK" type="password" autocomplete="off"></label>
+      <label for="cfC">場次代碼（空白＝全部場次）<input id="cfC" type="text" placeholder="例如 A01"></label>
+    </div>
+    <div class="row">
+      <button class="pri" id="bLoad">讀取資料</button>
+      <button id="bDemo">看示範資料</button>
+      <label class="msg"><input type="checkbox" id="cfAuto" style="width:auto"> 每 30 秒自動更新</label>
+      <button id="bCsv">複製 CSV</button>
+      <button class="pri" id="bLive">📺 即時投影</button>
+      <span class="msg" id="msg" aria-live="polite"></span>
+    </div>
+    <details style="margin-top:10px"><summary>產生學員連結</summary>
+      <div class="row"><input id="cfSite" type="url" placeholder="學員頁網址，例如 https://帳號.github.io/job-redesign-island/" style="flex:1"><button id="bLink">產生並複製</button></div>
+      <p class="msg" id="linkOut"></p>
+    </details>
+  </section>
+
+  <section class="kpis" aria-label="總覽">
+    <div class="kpi"><b id="kP">–</b><span>參與學員</span></div>
+    <div class="kpi"><b id="kA">–</b><span>作答次數</span></div>
+    <div class="kpi"><b id="kR">–</b><span>第一次就答對的比例</span></div>
+    <div class="kpi"><b id="kQ">–</b><span>待回覆提問</span></div>
+  </section>
+
+  <div class="two">
+    <section class="card" aria-labelledby="hG"><h2 id="hG">各關卡完成情況</h2><div class="scroll" id="tG"></div></section>
+    <section class="card" aria-labelledby="hT"><h2 id="hT">心理測驗類型</h2><div id="tT"></div></section>
+  </div>
+
+  <section class="card" aria-labelledby="hW"><h2 id="hW">最需要加強的題目</h2><p class="msg">依第一次作答計算，至少 3 人作答的題目才列入，答對率由低到高。</p><div class="scroll" id="tW"></div></section>
+
+  <div class="two">
+    <section class="card" aria-labelledby="hS"><h2 id="hS">學員進度</h2><div class="scroll" id="tS"></div></section>
+    <section class="card" aria-labelledby="hQ"><h2 id="hQ">學員提問</h2><div id="tQ"></div></section>
+  </div>
+</div>
+
+<div class="live" id="live" hidden role="dialog" aria-modal="true" aria-label="即時投影">
+  <div class="lvTop"><b>📺 即時作答</b>
+    <label for="lvSel" class="msg" style="color:#cfe3e8">顯示題目</label><select id="lvSel"></select>
+    <button id="lvFs">全螢幕</button><button id="lvX">關閉</button></div>
+  <div id="lvBody"></div>
+  <div class="lvFoot"><span id="lvUpd"></span><span>每 5 秒自動更新　依每位學員第一次作答計算　沒有人選過的選項不會顯示</span></div>
+</div>
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s)};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var CFG='jr-teacher-cfg',DATA=null,timer=null;
+function cfg(){try{return JSON.parse(localStorage.getItem(CFG)||'{}')}catch(e){return {}}}
+function saveCfg(){try{localStorage.setItem(CFG,JSON.stringify({u:$('#cfU').value.trim(),c:$('#cfC').value.trim(),site:$('#cfSite').value.trim()}))}catch(e){}}
+var c0=cfg();$('#cfU').value=c0.u||'';$('#cfC').value=c0.c||'';$('#cfSite').value=c0.site||'';
+function say(t,err){var m=$('#msg');m.textContent=t;m.className='msg'+(err?' err':'')}
+var COLS=['t','cls','sid','name','ev','game','q','a','ok','stars','x'];
+function rowsToObj(v){return (v||[]).slice(1).map(function(r){var o={};COLS.forEach(function(k,i){o[k]=r[i]});return o})}
+function isTrue(v){return v===true||v==='TRUE'||v==='true'}
+function hasOk(v){return v!==''&&v!=null}
+
+function load(quiet){
+  var u=$('#cfU').value.trim(),k=$('#cfK').value,c=$('#cfC').value.trim();saveCfg();
+  if(!u){say('請先貼上資料網址，或按「看示範資料」。',true);return}
+  if(!quiet)say('讀取中…');
+  fetch(u+'?key='+encodeURIComponent(k)+(c?'&c='+encodeURIComponent(c):'')).then(function(r){return r.json()}).then(function(d){
+    if(d.error){say(d.error,true);return}
+    DATA={recs:rowsToObj(d.records),qs:(d.questions||[]).slice(1),qrows:(d.questionRows||[]).slice(1),demo:false};render();if(!quiet)say('已讀取 '+DATA.recs.length+' 筆紀錄。');
+  }).catch(function(){say('讀取失敗。請確認資料網址正確、Apps Script 已部署為「所有人」可存取。',true);if(quiet)$('#lvUpd').textContent='更新失敗，稍後會再試一次';});
+}
+
+function render(){
+  var R=DATA.recs;$('#demoTag').hidden=!DATA.demo;
+  $('#upd').textContent='資料更新：'+new Date().toLocaleTimeString('zh-TW')+(DATA.demo?'（示範）':'')+($('#cfC').value.trim()?'　場次 '+$('#cfC').value.trim():'　全部場次');
+  var people={},stars={},games={},first={},quiz={};
+  R.forEach(function(r){
+    if(!r.sid)return;
+    var p=people[r.sid]||(people[r.sid]={name:r.name,cls:r.cls,last:r.t,games:{}});
+    if(r.name)p.name=r.name;if(String(r.t)>String(p.last))p.last=r.t;
+    if(r.ev==='stars'&&r.game){var s=+r.stars||0;if(!(p.games[r.game]>=s))p.games[r.game]=s}
+    if(r.ev==='quiz')quiz[r.sid]=r.a;
+    if(r.ev==='answer'&&hasOk(r.ok)){var key=r.game+'\u0001'+r.q+'\u0001'+r.sid;if(!first[key]||String(r.t)<String(first[key].t))first[key]=r}
+  });
+  var ids=Object.keys(people),answers=R.filter(function(r){return r.ev==='answer'}).length;
+  var fa=Object.keys(first).map(function(k){return first[k]}),okN=fa.filter(function(r){return isTrue(r.ok)}).length;
+  var pend=DATA.qs.filter(function(q){return !q[5]}).length;
+  $('#kP').textContent=ids.length;$('#kA').textContent=answers;$('#kR').textContent=fa.length?Math.round(okN/fa.length*100)+'%':'–';$('#kQ').textContent=pend;
+
+  /* 關卡 */
+  ids.forEach(function(id){var g=people[id].games;Object.keys(g).forEach(function(k){var x=games[k]||(games[k]={n:0,sum:0});x.n++;x.sum+=g[k]})});
+  var gk=Object.keys(games).sort(function(a,b){return order(a)-order(b)||a.localeCompare(b)});
+  $('#tG').innerHTML=gk.length?'<table><thead><tr><th>遊戲</th><th>完成人數</th><th></th><th>平均星數</th></tr></thead><tbody>'+gk.map(function(k){var x=games[k],pc=ids.length?x.n/ids.length:0;
+    return '<tr><td>'+esc(k)+'</td><td class="n">'+x.n+' / '+ids.length+'</td><td style="width:34%"><div class="bar" title="'+esc(k)+'：'+x.n+' 人完成"><i style="width:'+(pc*100).toFixed(1)+'%"></i></div></td><td class="n">'+(x.sum/x.n).toFixed(1)+' ★</td></tr>'}).join('')+'</tbody></table>':'<p class="empty">還沒有學員完成任何關卡。</p>';
+
+  /* 心理測驗 */
+  var qc={};Object.keys(quiz).forEach(function(id){qc[quiz[id]]=(qc[quiz[id]]||0)+1});
+  var qk=Object.keys(qc).sort(function(a,b){return qc[b]-qc[a]}),qmax=Math.max.apply(null,qk.map(function(k){return qc[k]}).concat([1]));
+  $('#tT').innerHTML=qk.length?'<table><tbody>'+qk.map(function(k){return '<tr><td>'+esc(k)+'</td><td style="width:50%"><div class="bar" title="'+esc(k)+'：'+qc[k]+' 人"><i style="width:'+(qc[k]/qmax*100).toFixed(1)+'%"></i></div></td><td class="n">'+qc[k]+' 人</td></tr>'}).join('')+'</tbody></table>':'<p class="empty">還沒有人完成心理測驗。</p>';
+
+  /* 題目 */
+  var qs={};fa.forEach(function(r){var k=r.game+'\u0001'+r.q,x=qs[k]||(qs[k]={g:r.game,q:r.q,n:0,ok:0,wrong:{}});x.n++;if(isTrue(r.ok))x.ok++;else x.wrong[r.a]=(x.wrong[r.a]||0)+1});
+  var ql=Object.keys(qs).map(function(k){return qs[k]}).filter(function(x){return x.n>=3}).sort(function(a,b){return a.ok/a.n-b.ok/b.n}).slice(0,15);
+  $('#tW').innerHTML=ql.length?'<table><thead><tr><th>遊戲</th><th>題目</th><th>作答人數</th><th>答對率</th><th></th><th>最常見的錯誤答案</th></tr></thead><tbody>'+ql.map(function(x){
+    var r=x.ok/x.n,w=Object.keys(x.wrong).sort(function(a,b){return x.wrong[b]-x.wrong[a]})[0];
+    return '<tr><td>'+esc(x.g)+'</td><td>'+esc(x.q)+'</td><td class="n">'+x.n+'</td><td class="n">'+Math.round(r*100)+'%'+(r<.6?' <span class="chip">⚠ 需加強</span>':'')+'</td><td style="width:16%"><div class="bar'+(r<.6?' low':'')+'" title="答對 '+x.ok+' / '+x.n+'"><i style="width:'+(r*100).toFixed(1)+'%"></i></div></td><td>'+(w?esc(w)+'（'+x.wrong[w]+' 人）':'—')+'</td></tr>'}).join('')+'</tbody></table>':'<p class="empty">作答人數還不夠，至少 3 人作答同一題才會列出。</p>';
+
+  /* 學員 */
+  var sl=ids.map(function(id){var p=people[id],g=p.games,n=Object.keys(g).length,s=0;Object.keys(g).forEach(function(k){s+=g[k]});return {name:p.name||'（未報到）',cls:p.cls,n:n,s:s,last:p.last,role:quiz[id]||''}}).sort(function(a,b){return b.s-a.s});
+  $('#tS').innerHTML=sl.length?'<table><thead><tr><th>姓名</th><th>場次</th><th>測驗類型</th><th>完成遊戲</th><th>星數</th><th>最後活動</th></tr></thead><tbody>'+sl.map(function(x){return '<tr><td>'+esc(x.name)+'</td><td>'+esc(x.cls)+'</td><td>'+esc(x.role)+'</td><td class="n">'+x.n+'</td><td class="n">'+x.s+'</td><td class="n">'+tm(x.last)+'</td></tr>'}).join('')+'</tbody></table>':'<p class="empty">還沒有學員報到。</p>';
+
+  /* 提問 */
+  var ql2=DATA.qs.map(function(q,i){return {q:q,row:DATA.qrows[i]}}).reverse();
+  $('#tQ').innerHTML=ql2.length?ql2.map(function(x){var q=x.q;return '<div class="q"><div class="meta">'+tm(q[0])+'　'+esc(q[3]||'未填姓名')+(q[1]?'　場次 '+esc(q[1]):'')+'</div><div>'+esc(q[4])+'</div>'+
+    (q[5]?'<div class="ans">回覆：'+esc(q[5])+'</div>':'<div class="row" style="margin-top:0"><input type="text" id="rp'+x.row+'" placeholder="輸入回覆，學員可在諮詢服務台看到" style="flex:1"><button data-row="'+x.row+'">回覆</button></div>')+'</div>'}).join(''):'<p class="empty">還沒有學員提問。</p>';
+  if(!$('#live').hidden)renderLive();
+  $('#tQ').querySelectorAll('button[data-row]').forEach(function(b){b.addEventListener('click',function(){reply(b.dataset.row)})});
+}
+var ORDER=['心理測驗','售票口','旋轉木馬','摩天輪','雲霄飛車','故事劇場','射擊攤','糖果屋','城堡','城市'];
+function order(g){for(var i=0;i<ORDER.length;i++)if(String(g).indexOf(ORDER[i])===0)return i;return 99}
+function tm(t){if(!t)return '';var d=new Date(t);return isNaN(d)?esc(t):d.toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}
+
+function reply(row){
+  var v=$('#rp'+row).value.trim();if(!v)return;
+  if(DATA.demo){DATA.qs[DATA.qrows.indexOf(+row)][5]=v;render();say('示範資料：已在畫面上加入回覆。');return}
+  var u=$('#cfU').value.trim();
+  fetch(u,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({mode:'reply',key:$('#cfK').value,row:+row,answer:v})})
+   .then(function(){say('已送出回覆，重新讀取中…');setTimeout(load,1500)}).catch(function(){say('回覆送出失敗，請稍後再試。',true)});
+}
+
+
+/* ===== 即時投影 ===== */
+var liveT=null,liveKeys='';
+function liveData(){
+  var first={},latest={};
+  DATA.recs.forEach(function(r){
+    if(r.ev!=='answer'||!r.q)return;
+    var qk=r.game+'\u0001'+r.q,k=qk+'\u0001'+r.sid;
+    if(!first[k]||String(r.t)<String(first[k].t))first[k]=r;
+    if(!latest[qk]||String(r.t)>String(latest[qk]))latest[qk]=r.t;
+  });
+  var qs={};Object.keys(first).forEach(function(k){var r=first[k],qk=r.game+'\u0001'+r.q,x=qs[qk]||(qs[qk]={g:r.game,q:r.q,n:0,ok:0,graded:false,ans:{},right:{}});
+    x.n++;x.ans[r.a]=(x.ans[r.a]||0)+1;if(hasOk(r.ok)){x.graded=true;if(isTrue(r.ok)){x.ok++;x.right[r.a]=1}}});
+  return {qs:qs,latest:latest};
+}
+function renderLive(){
+  var sel=$('#lvSel'),body=$('#lvBody');
+  $('#lvUpd').textContent='更新時間 '+new Date().toLocaleTimeString('zh-TW')+(DATA&&DATA.demo?'（示範資料）':'');
+  if(!DATA){body.innerHTML='<p class="lvEmpty">請先按「讀取資料」或「看示範資料」。</p>';return}
+  var L=liveData(),keys=Object.keys(L.qs).sort(function(a,b){return order(L.qs[a].g)-order(L.qs[b].g)||a.localeCompare(b)});
+  var cur=sel.value||'__auto';
+  if(keys.join('|')!==liveKeys){liveKeys=keys.join('|');
+    sel.innerHTML='<option value="__auto">跟著最新作答的題目</option>'+keys.map(function(k){var x=L.qs[k];return '<option value="'+esc(k)+'">'+esc(x.g+'　'+x.q)+'</option>'}).join('');
+    sel.value=keys.indexOf(cur)>=0?cur:'__auto';}
+  var k=sel.value;
+  if(k==='__auto'){k=null;Object.keys(L.latest).forEach(function(q){if(!k||String(L.latest[q])>String(L.latest[k]))k=q})}
+  var x=k&&L.qs[k];
+  if(!x){body.innerHTML='<p class="lvEmpty">還沒有學員作答。學員開始玩之後，這裡會自動出現。</p>';return}
+  var ans=Object.keys(x.ans).sort(function(a,b){return (x.right[b]?1:0)-(x.right[a]?1:0)||x.ans[b]-x.ans[a]});
+  var old={};body.querySelectorAll('.lvRow').forEach(function(r){old[r.dataset.a]=r.querySelector('.tr i').style.width});
+  var same=body.dataset.k===k;
+  body.dataset.k=k;
+  body.innerHTML='<div class="lvGame">'+esc(x.g)+'</div><h2 class="lvQ">'+esc(x.q)+'</h2>'+
+    '<div class="lvMeta"><span><b>'+x.n+'</b>人作答</span>'+(x.graded?'<span><b>'+Math.round(x.ok/x.n*100)+'%</b>第一次就答對</span>':'<span>這一題沒有標準答案</span>')+'</div>'+
+    '<div class="lvBars">'+ans.map(function(a){var c=x.ans[a],pc=c/x.n*100;
+      return '<div class="lvRow'+(x.right[a]?' ok':'')+'" data-a="'+esc(a)+'"><div class="lb">'+esc(a)+(x.right[a]?'<span class="ck">✓ 正確答案</span>':'')+'</div><div class="tr" title="'+esc(a)+'：'+c+' 人"><i style="width:'+(same&&old[a]?old[a]:'0%')+'" data-w="'+pc.toFixed(1)+'%"></i></div><div class="v">'+c+' 人　'+Math.round(pc)+'%</div></div>'}).join('')+'</div>';
+  requestAnimationFrame(function(){requestAnimationFrame(function(){body.querySelectorAll('.tr i').forEach(function(i){i.style.width=i.dataset.w})})});
+}
+function demoTick(){
+  var sel=$('#lvSel').value,b=null;
+  if(sel&&sel!=='__auto'){var p=sel.split('\u0001');DEMOBANK.forEach(function(x){if(x[0]===p[0]&&x[1]===p[1])b=x})}
+  if(!b)b=DEMOBANK[Math.floor(Math.random()*DEMOBANK.length)];
+  var n=1+Math.floor(Math.random()*3);
+  for(var i=0;i<n;i++){var ok=Math.random()<b[3];liveSeq++;DATA.recs.push({t:new Date().toISOString(),cls:'A01',sid:'L'+liveSeq,name:'新學員'+liveSeq,ev:'answer',game:b[0],q:b[1],a:ok?b[2]:b[4],ok:ok})}
+}
+var liveSeq=0;
+function openLive(){
+  $('#live').hidden=false;liveKeys='';renderLive();$('#lvX').focus();
+  clearInterval(liveT);liveT=setInterval(function(){if(!DATA)return;if(DATA.demo){demoTick();render()}else load(true)},5000);
+}
+function closeLive(){$('#live').hidden=true;clearInterval(liveT);if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(function(){});$('#bLive').focus()}
+$('#bLive').addEventListener('click',openLive);
+$('#lvX').addEventListener('click',closeLive);
+$('#lvSel').addEventListener('change',renderLive);
+$('#lvFs').addEventListener('click',function(){var el=$('#live');if(document.fullscreenElement){document.exitFullscreen().catch(function(){})}else if(el.requestFullscreen){el.requestFullscreen().catch(function(){$('#lvUpd').textContent='這個瀏覽器不允許全螢幕，請按 F11'})}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!$('#live').hidden&&!document.fullscreenElement)closeLive()});
+$('#bLoad').addEventListener('click',function(){load()});
+$('#bDemo').addEventListener('click',function(){DATA=demo();render();say('目前顯示示範資料。')});
+$('#cfAuto').addEventListener('change',function(){clearInterval(timer);if(this.checked)timer=setInterval(function(){if(DATA&&!DATA.demo)load()},30000)});
+$('#bCsv').addEventListener('click',function(){
+  if(!DATA){say('請先讀取資料。',true);return}
+  var head=['時間','場次','學員代號','暱稱','類型','遊戲','題目','作答','正確','星數','備註'];
+  var csv=[head].concat(DATA.recs.map(function(r){return COLS.map(function(k){return r[k]})})).map(function(row){return row.map(function(v){v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}).join(',')}).join('\n');
+  navigator.clipboard.writeText(csv).then(function(){say('已複製 '+DATA.recs.length+' 筆紀錄，可直接貼到試算表。')},function(){say('瀏覽器不允許複製，請直接開 Google 試算表查看。',true)});
+});
+$('#bLink').addEventListener('click',function(){
+  var s=$('#cfSite').value.trim(),c=$('#cfC').value.trim();saveCfg();
+  if(!s){$('#linkOut').textContent='請先填學員頁網址。';return}
+  var l=s.split('?')[0]+(c?'?c='+encodeURIComponent(c):'');$('#linkOut').textContent=l;
+  navigator.clipboard.writeText(l).catch(function(){});
+});
+
+/* 示範資料：24 位虛構學員 */
+var DEMOBANK=[
+    ['售票口｜選票','選票：聽障求職者要去面試，需要手語翻譯','雙人票',.55,'本人票'],
+    ['售票口｜選票','選票：坐輪椅的行政人員，需要電動升降辦公桌','雙人票',.48,'雇主票'],
+    ['售票口｜選票','選票：58 歲的中高齡者，工作上需要就業輔具','雙人票',.62,'本人票'],
+    ['摩天輪｜文件裝車廂','文件：經醫療院所診斷為失智症、未領身障證明的員工','正確',.42,'少了失智症診斷證明'],
+    ['摩天輪｜文件裝車廂','文件：在學校任職、領有身心障礙證明的職員','正確',.71,'多選了國民身分證影本'],
+    ['雲霄飛車｜流程軌道','流程第 4 站','審查核定',.58,'執行改善'],
+    ['雲霄飛車｜流程軌道','流程第 6 站','請款核銷',.8,'追蹤輔導'],
+    ['射擊攤｜資格射擊','射擊：44 歲　無身心障礙','（不該射擊）',.66,'射擊'],
+    ['糖果屋｜補助判斷','糖果屋：家用電動按摩椅（理由）','主要在職場以外的地方使用',.5,'和工作障礙無關'],
+    ['糖果屋｜補助判斷','糖果屋：電動堆高機（理由）','有成本更低、一樣有效的方案',.46,'和工作障礙無關'],
+    ['糖果屋｜補助判斷','糖果屋：防滑地墊（要補助嗎）','補助',.83,'不補助'],
+    ['城堡｜守門問答','55 歲員工的職務再設計，向誰申請？','公立就業服務機構',.69,'縣市政府勞工主管機關'],
+    ['城堡｜守門問答','申請 5 千元以下的簡易就業輔具，流程有什麼不同？','可以免訪視、免開審查會',.77,'和其他案件完全一樣']
+];
+function demo(){
+  var names=['小安','阿哲','美玲','志明','小雯','淑芬','小樂','阿滿','小宇','建宏','秀琴','阿德','怡君','文雄','小芸','家豪','老陳','佩君','國雄','阿福','小美','大偉','欣怡','俊傑'];
+  var roles=['輔具達人','設備工程師','空間設計師','條件協調員','流程魔法師'];
+  var bank=DEMOBANK;
+  var games=['售票口｜選票','旋轉木馬｜翻牌配對','摩天輪｜文件裝車廂','雲霄飛車｜流程軌道','故事劇場｜謝幕問答','射擊攤｜資格射擊','糖果屋｜補助判斷','城堡｜守門問答'];
+  var recs=[],seed=7,base=Date.now()-3600e3;
+  function rnd(){seed=(seed*9301+49297)%233280;return seed/233280}
+  names.forEach(function(n,i){
+    var sid='D'+i,t=base+i*40e3,reach=3+Math.floor(rnd()*6);
+    function add(o){t+=20e3+rnd()*40e3;o.t=new Date(t).toISOString();o.sid=sid;o.name=n;o.cls='A01';recs.push(o)}
+    add({ev:'join',game:'報到'});add({ev:'quiz',game:'心理測驗',a:roles[Math.floor(rnd()*5)]});
+    games.slice(0,reach).forEach(function(g){
+      bank.filter(function(b){return b[0]===g}).forEach(function(b){var ok=rnd()<b[3];add({ev:'answer',game:g,q:b[1],a:ok?b[2]:b[4],ok:ok})});
+      add({ev:'stars',game:g,stars:1+Math.floor(rnd()*3)});
+    });
+  });
+  var qs=[[new Date(base+9e5).toISOString(),'A01','D3','志明','自營作業者可以申請嗎？',''],[new Date(base+14e5).toISOString(),'A01','D8','小宇','輔具壞掉了可以再申請嗎？',''],[new Date(base+6e5).toISOString(),'A01','D1','阿哲','雇主不同意，我可以自己申請嗎？','可以，身心障礙者本人也能申請，課堂上會再說明。']];
+  return {recs:recs,qs:qs,qrows:[2,3,4],demo:true};
+}
+})();
+</script>
+</body>
+</html>

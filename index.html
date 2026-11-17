@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>職務再設計資源島</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* 版面：海面上一座等角格狀島，每格一個職業；上方儀表，下方圖例，遊戲在彈出面板進行 */
+  --sea:#0f5c73; --sea-deep:#0a4356; --foam:#e6f4f1; --ink:#12313a; --paper:#fffaf0;
+  --sun:#ffb703; --coral:#e8603c; --muted:#5d7780;
+  --A:#1f8f82; --B:#d9583a; --C:#b97f00; --D:#6a5ccc; --E:#2f78c4;
+  --display:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--body);color:var(--ink);background:var(--sea);min-height:100vh;line-height:1.6;overflow-x:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:var(--E)}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.sea{position:fixed;inset:0;z-index:0;background:linear-gradient(#2a86d0 0,#63b9f0 13%,#cdeeff 25%,#57c6d2 25.2%,#259bb0 42%,#0f5c73 74%,#0a4356 100%);overflow:hidden}
+.sun{position:absolute;left:44%;top:22px;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle at 40% 38%,#fff6b0,#ffd84d 60%,#ffb703);box-shadow:0 0 0 14px rgba(255,226,120,.28),0 0 0 30px rgba(255,226,120,.14),0 0 70px 24px rgba(255,220,110,.6);animation:sunp 5s ease-in-out infinite}
+@keyframes sunp{50%{box-shadow:0 0 0 20px rgba(255,226,120,.3),0 0 0 44px rgba(255,226,120,.12),0 0 90px 34px rgba(255,220,110,.7)}}
+.rot{transform-box:fill-box;transform-origin:center;animation:spin 16s linear infinite}
+.bobv{animation:bob 1.6s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+button.bld svg.art *{pointer-events:auto;cursor:pointer}
+header h1,header .sub{text-shadow:0 2px 6px rgba(0,40,80,.45)}
+.wave{position:absolute;left:-10%;width:120%;height:2px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.28) 0 40px,transparent 40px 110px);animation:drift 14s linear infinite}
+.wave:nth-child(2){top:44%;animation-duration:19s;opacity:.6}
+.wave:nth-child(1){top:33%}
+.wave:nth-child(3){top:58%;animation-duration:23s;animation-direction:reverse}
+.wave:nth-child(4){top:78%;animation-duration:17s;opacity:.5}
+.wave:nth-child(5){top:92%;animation-duration:26s;animation-direction:reverse}
+@keyframes drift{to{transform:translateX(110px)}}
+.cloud{position:absolute;top:4%;left:-20%;width:150px;height:40px;border-radius:40px;background:#fff;opacity:.95;animation:cloud 70s linear infinite;filter:drop-shadow(0 6px 6px rgba(0,60,110,.15))}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud::before{width:66px;height:66px;left:22px;top:-34px}.cloud::after{width:50px;height:50px;left:76px;top:-22px}
+.cloud.c2{top:13%;transform:scale(.7);animation-duration:95s;animation-delay:-40s}
+.cloud.c3{top:8%;transform:scale(.55);animation-duration:120s;animation-delay:-80s;opacity:.85}
+@keyframes cloud{to{left:120%}}
+.boat{position:absolute;bottom:10%;left:-10%;font-size:30px;animation:sail 48s linear infinite}
+@keyframes sail{0%{transform:translateX(0) rotate(-3deg)}50%{transform:translateX(60vw) rotate(3deg)}100%{transform:translateX(125vw) rotate(-3deg)}}
+
+.app{position:relative;z-index:1;max-width:1700px;margin:0 auto;padding:16px 16px 40px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;color:#fff}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(26px,5vw,40px);margin:0;line-height:1.15;text-wrap:balance}
+.sub{margin:2px 0 0;opacity:.85;font-size:14px}
+.hud{display:flex;gap:8px;flex-wrap:wrap}
+.hud div{background:rgba(10,60,90,.38);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:6px 12px;min-width:86px}
+.hud b{display:block;font-size:20px;font-variant-numeric:tabular-nums;line-height:1.2}
+.hud span{font-size:12px;opacity:.85}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px;align-items:center}
+.btn{border:0;border-radius:999px;padding:8px 16px;background:var(--paper);font-weight:700;font-size:14px;box-shadow:0 2px 0 rgba(0,0,0,.25);transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn.on{background:var(--sun)}
+.btn.ghost{background:rgba(10,60,90,.38);color:#fff;border:1px solid rgba(255,255,255,.35);box-shadow:none}
+.btn.go{background:var(--coral);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.guide{display:flex;gap:10px;align-items:center;color:#fff;font-size:14px;margin-left:auto}
+.guide i{font-style:normal;font-size:26px;animation:bob 2.4s ease-in-out infinite}
+.guide span{background:rgba(10,60,90,.45);padding:6px 12px;border-radius:14px 14px 14px 2px}
+@keyframes bob{50%{transform:translateY(-5px)}}
+
+.stagewrap{position:relative;margin-top:4px;overflow:auto;max-height:90vh;scrollbar-width:thin}
+.stagewrap.pan{cursor:grab}
+#sizer{position:relative;margin:0 auto}
+.stage{position:absolute;left:0;top:0;width:1250px;height:880px;transform-origin:0 0}
+.stage svg.ground,.stage svg.over{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.stage svg.over{z-index:148}
+.stage svg.over.o2{z-index:252}
+.bld{position:absolute;width:80px;border:0;background:none;padding:0;pointer-events:none;transition:transform .2s}
+.bld svg{display:block;overflow:visible}
+button.bld polygon{pointer-events:auto;cursor:pointer}
+button.bld:hover,button.bld:focus-visible{transform:translateY(-6px)}
+button.bld:focus-visible{outline:none;filter:drop-shadow(0 0 6px var(--sun))}
+.stage.intro .bld{animation:drop .7s cubic-bezier(.2,1.4,.4,1) backwards}
+.bld.pop{animation:rise .8s cubic-bezier(.2,1.6,.4,1)}
+@keyframes drop{from{transform:translateY(-140px);opacity:0}}
+@keyframes rise{0%{transform:translateY(26px) scale(.9)}60%{transform:translateY(-14px) scale(1.06)}}
+.pin{position:absolute;left:-20px;width:120px;display:flex;flex-direction:column;align-items:center;animation:bob 2.2s ease-in-out infinite}
+.pin b{width:34px;height:34px;border-radius:50%;background:#fff;border:3px solid var(--coral);display:grid;place-items:center;font-size:19px;font-weight:400;line-height:1;box-shadow:0 2px 4px rgba(0,0,0,.35);pointer-events:auto;cursor:pointer}
+.bld:hover,.bld:focus-visible,.flat:hover{z-index:900!important}
+.pin small,.tip em{opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s}
+.bld:hover .pin small,.bld:focus-visible .pin small,.has:hover .tip em{opacity:1;transform:none}
+.tip{position:absolute;left:-20px;width:120px;text-align:center;pointer-events:none;font-size:12px;letter-spacing:0;line-height:1.5}
+.tip em{display:inline-block;font-style:normal;font-weight:700;background:rgba(18,49,58,.9);color:#fff;border-radius:6px;padding:0 7px;white-space:nowrap}
+.bld.has polygon,.flat.has{pointer-events:auto}
+.pin small{background:rgba(255,255,255,.97);border-radius:6px;padding:0 6px;font-size:12px;box-shadow:0 1px 3px rgba(0,0,0,.3);font-weight:700;white-space:nowrap;margin-top:2px;line-height:1.5;color:var(--ink);pointer-events:auto;cursor:pointer}
+.pin.done b{border-color:var(--pc)}
+.pin.done small{background:var(--sun)}
+.pin.info b{border-color:#2f78c4;background:#fff3c9;animation:glow 1.6s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 0 8px rgba(255,183,3,.6)}}
+.pin.info small{opacity:1;transform:none;background:#2f78c4;color:#fff}
+.panel.wide{width:min(880px,100%)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 12px}
+.tab{border:2px solid #d9d0b8;background:#fff;border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.osec{border-radius:16px;padding:12px 14px 14px;margin:10px 0}
+.osec h3{margin:0 0 8px;font-size:17px;font-weight:500}
+.osec.emp{background:#f4bcbb}.osec.emp h3{color:#7a1f1f}
+.osec.pub{background:#a0d8d8}.osec.pub h3{color:#1f4f55}
+.ogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.ocard{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;text-decoration:none;border-radius:14px;padding:12px 10px;font-size:15px;line-height:1.4;min-height:56px;transition:transform .15s,box-shadow .15s}
+.ocard:hover{transform:translateY(-3px);box-shadow:0 4px 10px rgba(0,0,0,.18)}
+.osec.emp .ocard{background:#faeaec;color:#8c2f39}
+.osec.pub .ocard{background:#dff3fb;color:#24535c}
+.ocard img{width:72px;height:72px;object-fit:contain}
+.oph{font-size:11px;border:1px dashed currentColor;border-radius:8px;padding:10px 6px;opacity:.7}
+.oapply{background:#f0913f;color:#fff;text-decoration:none}
+.doors{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.door{border:3px solid #d9d0b8;background:#fff;border-radius:16px;padding:14px;font-size:34px;line-height:1.2;display:grid;gap:2px;justify-items:center;transition:transform .15s}
+.door:hover{transform:translateY(-3px)}
+.door b{font-size:17px}.door small{font-size:12px;color:var(--muted)}
+.door.on{border-color:var(--coral);background:#fdeee9}
+.wl{list-style:none;padding:0;margin:10px 0;display:grid;gap:8px}
+.wl li{background:#fff;border-left:6px solid var(--E);border-radius:10px;padding:8px 12px;font-size:14px;animation:up .3s backwards}
+.wl li b{display:block;font-size:15px}
+details.doc{background:#fff;border:2px solid #d9d0b8;border-radius:12px;padding:8px 14px;margin:8px 0}
+details.doc summary{font-weight:700;cursor:pointer}
+details.doc ul{margin:4px 0;padding-left:20px}
+.route{display:flex;gap:4px;margin:10px 0}
+.route i{flex:1;text-align:center;font-style:normal;font-size:12px;font-weight:700;line-height:1.3;padding:6px 2px;border-radius:8px;background:#e3dccb}
+.route i.on{background:var(--coral);color:#fff}.route i.past{background:#cfeee8}
+.stepbox{background:#fff;border-radius:14px;padding:14px 16px;border:2px solid #d9d0b8;min-height:130px}
+.stepbox h3{margin:2px 0 6px;font-size:22px}
+.imgs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.imgs img,.ph{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px}
+.ph{display:grid;place-items:center;text-align:center;background:repeating-linear-gradient(45deg,#efe7d2 0 12px,#f6f0df 12px 24px);border:2px dashed #cfc5aa;color:var(--muted);font-size:13px;padding:8px}
+.sec{margin:8px 0}.sec h4{margin:0 0 2px;font-size:13px;letter-spacing:.1em;color:var(--coral)}
+.sec p{margin:0}.sec ul{margin:0;padding-left:20px}
+@media (max-width:520px){.doors,.imgs{grid-template-columns:1fr}.route i{font-size:10px}}
+.flat{position:absolute;width:80px;text-align:center;font-size:21px;line-height:1;pointer-events:none;letter-spacing:-3px}
+.flat.big{font-size:38px}
+.sign{position:absolute;left:0;width:80px;text-align:center;font-size:15px;line-height:1;pointer-events:none}
+.walker{position:absolute;left:0;top:0;font-size:26px;line-height:1;pointer-events:none;will-change:transform}
+.walker i{display:block;font-style:normal;animation:step .45s ease-in-out infinite alternate}
+.walker.bus{font-size:31px}
+@keyframes step{to{transform:translateY(-2px)}}
+.ship{position:absolute;font-size:26px;line-height:1;pointer-events:none;animation:bob 3.2s ease-in-out infinite}
+.smoke{position:absolute;width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.75);animation:smoke 3s linear infinite}
+@keyframes smoke{from{transform:translate(0,0) scale(.6);opacity:.8}to{transform:translate(12px,-34px) scale(2.2);opacity:0}}
+.beacon{position:absolute;width:10px;height:10px;border-radius:50%;background:#fff3a0;box-shadow:0 0 14px 6px rgba(255,240,150,.8);animation:blink 1.6s infinite}
+@keyframes blink{50%{opacity:.2}}
+
+.list{display:grid;gap:14px}
+.list h3{color:#fff;margin:6px 0 0;font-size:15px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.card{background:var(--paper);border:0;border-radius:14px;padding:12px;text-align:left;display:flex;gap:10px;align-items:center;border-left:8px solid var(--tint);transition:transform .15s}
+.card:hover{transform:translateY(-3px)}
+.card i{font-style:normal;font-size:26px}
+.card b{display:block;font-size:14px}
+.card small{color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 12px;font-size:13px;font-weight:700;color:#fff;background:var(--c)}
+.foot{color:rgba(255,255,255,.8);font-size:12px;margin-top:14px;max-width:70ch}
+.foot a{color:#fff}
+[hidden]{display:none!important}
+
+.veil{position:fixed;inset:0;z-index:10;background:rgba(6,40,52,.62);display:flex;align-items:center;justify-content:center;padding:16px;animation:fade .25s}
+@keyframes fade{from{opacity:0}}
+.panel{background:var(--paper);border-radius:22px;width:min(620px,100%);max-height:92vh;overflow:auto;padding:22px 22px 20px;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:up .35s cubic-bezier(.2,1.2,.4,1);position:relative}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+.panel h2{font-family:var(--display);font-weight:900;font-size:24px;margin:0 0 6px;line-height:1.25;text-wrap:balance}
+.panel p{margin:6px 0}
+.x{position:absolute;right:12px;top:10px;border:0;background:none;font-size:22px;line-height:1;padding:6px 10px;border-radius:8px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--coral)}
+.dots{display:flex;gap:6px;margin:8px 0 12px}
+.dots i{flex:1;height:6px;border-radius:6px;background:#e3dccb;transition:background .3s}
+.dots i.on{background:var(--coral)}
+.who{display:flex;gap:12px;align-items:center;background:#f3ecd9;border-radius:14px;padding:10px 14px;margin:8px 0}
+.who i{font-style:normal;font-size:38px}
+.q{font-weight:700;font-size:17px;margin:14px 0 8px}
+.opts{display:grid;gap:8px}
+.opt{border:2px solid #d9d0b8;background:#fff;border-radius:14px;padding:10px 14px;text-align:left;transition:transform .12s,border-color .2s,background .2s}
+.opt:hover:not(:disabled){transform:translateX(4px);border-color:var(--ink)}
+.opt.ok{border-color:var(--A);background:#dff3ef;animation:pulse .4s}
+.opt.no{border-color:var(--coral);background:#fbe3db;animation:shake .35s}
+.opt.pick{border-color:var(--ink);background:#fff3c9}
+@keyframes pulse{50%{transform:scale(1.03)}}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fb{border-radius:12px;padding:10px 14px;margin-top:10px;font-size:14px;background:#eef6f4;border-left:6px solid var(--A)}
+.fb.bad{background:#fdeee9;border-color:var(--coral)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.stars{font-size:30px;letter-spacing:4px;color:var(--sun);text-shadow:0 2px 0 rgba(0,0,0,.15)}
+.stars span{display:inline-block;animation:starin .5s backwards cubic-bezier(.2,1.8,.4,1)}
+.stars span:nth-child(2){animation-delay:.15s}.stars span:nth-child(3){animation-delay:.3s}
+.stars .off{color:#d9d0b8}
+@keyframes starin{from{transform:scale(0) rotate(-90deg)}}
+.ba{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch;margin:10px 0}
+.ba div{border-radius:12px;padding:10px 12px;font-size:14px;background:#f3ecd9}
+.ba div:last-child{background:#dff3ef}
+.ba b{display:block;font-size:12px;color:var(--muted)}
+.ba span{align-self:center;font-size:20px}
+.tag{font-size:11px;font-weight:700;border-radius:6px;padding:1px 8px;background:#e3dccb;color:var(--ink)}
+.tag.off{background:#cfe8ff}
+.meter{height:16px;border-radius:10px;background:#e3dccb;overflow:hidden;margin:6px 0}
+.meter i{display:block;height:100%;background:var(--A);transition:width .3s,background .3s}
+.meter i.over{background:var(--coral)}
+.num{font-variant-numeric:tabular-nums;font-weight:700}
+.slots{display:grid;gap:6px;margin:8px 0;counter-reset:s}
+.slot{counter-increment:s;border:2px dashed #cfc5aa;border-radius:12px;padding:8px 12px;min-height:42px;font-weight:700;display:flex;gap:10px;align-items:center}
+.slot::before{content:counter(s);background:var(--ink);color:#fff;border-radius:50%;width:24px;height:24px;display:grid;place-items:center;font-size:13px;flex:none}
+.slot.fill{border-style:solid;border-color:var(--A);background:#dff3ef;animation:pulse .4s}
+.pool{display:flex;flex-wrap:wrap;gap:8px}
+.pool .opt{padding:6px 14px;border-radius:999px}
+.cert{border:3px double var(--ink);border-radius:16px;padding:18px;text-align:center;background:linear-gradient(#fffdf6,#fbf1d6);margin:10px 0}
+.cert h3{font-size:22px;margin:4px 0;font-weight:900}
+.cert .seal{display:inline-grid;place-items:center;width:74px;height:74px;border-radius:50%;border:3px solid var(--coral);color:var(--coral);font-weight:900;transform:rotate(-12deg);animation:stamp .5s .2s backwards cubic-bezier(.2,1.8,.4,1);font-size:13px;line-height:1.2}
+@keyframes stamp{from{transform:scale(3) rotate(-40deg);opacity:0}}
+input[type=text]{font:inherit;border:2px solid #d9d0b8;border-radius:10px;padding:8px 12px;width:100%;background:#fff;color:var(--ink)}
+.links{display:grid;gap:8px;margin:10px 0}
+.links a{display:block;background:#fff;border:2px solid #d9d0b8;border-radius:12px;padding:10px 14px;text-decoration:none;color:var(--ink);font-weight:700}
+.links a small{display:block;font-weight:400;color:var(--muted);word-break:break-all}
+#confetti{position:fixed;inset:0;z-index:20;pointer-events:none}
+@media (max-width:520px){.guide{margin-left:0;width:100%}.ba{grid-template-columns:1fr}.ba span{justify-self:center;transform:rotate(90deg)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.park #wrap,.park #list,.park #zIn,.park #zOut,.park .legend{display:none!important}
+#bUnlock{display:none}.park #bUnlock{display:inline-block}
+#park{position:relative;margin-top:8px;overflow-x:auto;padding-bottom:6px}
+#parkSz{position:relative;margin:0 auto;border-radius:24px;overflow:hidden;box-shadow:0 16px 44px rgba(0,30,50,.45);border:5px solid rgba(255,255,255,.85)}
+#parkIn{position:absolute;left:0;top:0;width:1000px;height:600px;transform-origin:0 0}
+#parkBg,#parkBg svg,#parkMap svg.pth{position:absolute;left:0;top:0}
+.cl{animation:cl 14s ease-in-out infinite alternate}.cl.b{animation-duration:20s;animation-delay:-6s}
+@keyframes cl{to{transform:translateX(46px)}}
+.stn{position:absolute;width:0;height:0;border:0;background:none;padding:0;color:#fff}
+.stn .pic{position:absolute;display:block;transition:transform .2s;transform-origin:50% 92%;cursor:pointer}
+.stn:hover .pic{transform:scale(1.07)}
+.stn .glow{position:absolute;left:-70px;top:-22px;width:140px;height:44px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,214,90,.95),rgba(255,214,90,0) 70%);display:none}
+.stn.cur .glow{display:block;animation:glw 1.3s ease-in-out infinite}
+@keyframes glw{50%{transform:scale(1.25);opacity:.55}}
+.stn .no,.stn .mk{font-style:normal;position:absolute}
+.stn .no{width:30px;height:30px;border-radius:50%;background:var(--coral);color:#fff;font-size:15px;font-weight:900;display:grid;place-items:center;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.3)}
+.stn .mk{font-size:24px;line-height:1}
+.stn .lab{position:absolute;top:2px;left:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.stn .lab b{font-size:15px;background:#12313a;border-radius:8px;padding:1px 10px;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.25)}
+.stn .lab small{font-size:12px;white-space:nowrap;background:rgba(255,255,255,.94);color:#12313a;border-radius:6px;padding:0 7px;margin-top:2px;font-weight:700}
+.stn.lock .pic svg{filter:grayscale(.75) brightness(1.04)}
+.stn.done .lab b{background:#1f8f82}
+.stn:focus-visible{outline:none}.stn:focus-visible .lab b{outline:3px solid var(--sun)}
+.stn.nope .pic{animation:shake .35s}
+.deco{position:absolute;font-size:30px;line-height:1;pointer-events:none}
+.deco.fl{animation:float 5s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-14px) rotate(4deg)}}
+#token{position:absolute;font-size:36px;line-height:1;pointer-events:none;transition:left .9s cubic-bezier(.5,0,.2,1),top .9s cubic-bezier(.5,0,.2,1);z-index:900;filter:drop-shadow(0 3px 2px rgba(0,0,0,.3))}
+#token i{display:block;font-style:normal;animation:step .45s ease-in-out infinite alternate}
+.cta{background:linear-gradient(90deg,#fff3c9,#ffe1ec);border:2px dashed var(--coral);border-radius:14px;padding:10px 14px;margin:8px 0 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.cta b{font-size:15px}
+.mhud{display:flex;gap:16px;font-size:14px;margin:6px 0 10px}.mhud b{font-size:18px;font-variant-numeric:tabular-nums;color:var(--coral)}
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mc{aspect-ratio:5/3;border:0;background:none;padding:0;perspective:700px}
+.mi{position:relative;display:block;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+.mc.show .mi,.mc.ok .mi{transform:rotateY(180deg)}
+.mf,.mb{position:absolute;inset:0;border-radius:12px;display:grid;place-items:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;padding:4px 6px;text-align:center}
+.mf{background:repeating-linear-gradient(45deg,#e8609a 0 10px,#f08ab5 10px 20px);font-size:28px;border:3px solid #fff;box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.mb{transform:rotateY(180deg);font-size:13px;font-weight:700;line-height:1.3;border:3px solid}
+.mb.a{background:#fff3e9;border-color:var(--coral);color:#8c2f39;font-size:16px}
+.mb.b{background:#e6f6f3;border-color:var(--A);color:#12313a}
+.mc.ok .mb{box-shadow:0 0 0 3px var(--sun);animation:pulse .4s}
+.cabs{display:flex;gap:8px;margin:6px 0}.cabs i{font-style:normal;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:900;background:#e3dccb;border:3px solid #fff;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.cabs i.on{background:var(--sun)}.cabs i.ok{background:var(--A);color:#fff}
+.docs{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.docs .opt{padding:7px 12px;border-radius:10px;font-size:14px}
+.docs .opt::before{content:"📄 "}
+.docs .opt.miss{border-style:dashed;border-color:var(--C);background:#fff8dc}
+.trk{width:100%;height:auto;background:linear-gradient(#cdeeff,#eaf8ff);border-radius:14px;border:3px solid #fff;box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.curtain{position:relative;height:64px;border-radius:12px;overflow:hidden;background:#2a1a3a;display:grid;place-items:center;color:#ffd166;font-weight:900;font-size:18px;margin-bottom:8px}
+.curtain i{position:absolute;top:0;bottom:0;width:50%;background:repeating-linear-gradient(90deg,#b8322a 0 14px,#8f231d 14px 28px);animation:curL 1.2s .2s forwards cubic-bezier(.6,0,.3,1)}
+.curtain i:first-child{left:0}.curtain i:nth-child(2){right:0;animation-name:curR}
+@keyframes curL{to{transform:translateX(-82%)}}@keyframes curR{to{transform:translateX(82%)}}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}
+.match .opt{text-align:center}
+.shoot{position:relative;height:310px;border-radius:14px;overflow:hidden;background:linear-gradient(#fff3d6,#f1dfb6);border:4px solid #b8322a;cursor:crosshair;touch-action:manipulation}
+.shoot::before{content:"";position:absolute;left:0;right:0;top:0;height:20px;background:repeating-linear-gradient(90deg,#e8603c 0 22px,#fff 22px 44px);z-index:3;border-bottom:3px solid #b8322a}
+.shoot .lane{position:absolute;left:0;right:0;height:5px;background:#c9a66b}
+.tg{position:absolute;left:0;width:124px;border:0;background:none;padding:0;cursor:crosshair;z-index:2}
+.tg .bd{display:grid;place-items:center;width:58px;height:58px;margin:0 auto;border-radius:50%;background:radial-gradient(circle,#e8603c 0 18%,#fff 18% 38%,#e8603c 38% 58%,#fff 58% 78%,#e8603c 78%);box-shadow:0 3px 4px rgba(0,0,0,.25);font-size:26px;color:#fff;font-weight:900}
+.tg .tx{display:block;background:#fff8e6;border:2px solid #8a6b4a;border-radius:6px;font-size:12px;font-weight:700;line-height:1.25;padding:2px 4px;margin-top:-5px;color:#12313a}
+.tg.hit .bd{background:#1f8f82}.tg.bad .bd{background:#7b7b7b}
+.tg.hit,.tg.bad{pointer-events:none;transition:opacity .35s,transform .35s;opacity:0;transform:scale(1.3)}
+.shoot .start{position:absolute;inset:0;display:grid;place-items:center;z-index:5;background:rgba(255,243,214,.85)}
+@media (max-width:520px){.mb{font-size:10px}.mb.a{font-size:12px}.mgrid{gap:5px}}
+.reg{display:grid;gap:4px;margin:10px 0}.reg label{font-weight:700;font-size:14px;margin-top:6px}
+.note{font-size:13px;color:var(--muted);background:#f3ecd9;border-radius:10px;padding:8px 12px}
+textarea{font:inherit;border:2px solid #d9d0b8;border-radius:10px;padding:8px 12px;width:100%;background:#fff;color:var(--ink);resize:vertical}
+.tix{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+.tkt{position:relative;border:0;border-radius:12px;padding:16px 10px;color:#fff;display:grid;gap:2px;text-align:center;box-shadow:0 3px 0 rgba(0,0,0,.25);transition:transform .15s;
+ -webkit-mask:radial-gradient(circle 9px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;
+ mask:radial-gradient(circle 9px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat}
+.tkt b{font-size:19px}.tkt small{font-size:12px;opacity:.95}
+.tkt.emp{background:linear-gradient(135deg,#e8609a,#c94a82)}.tkt.self{background:linear-gradient(135deg,#2f9c95,#237a75)}.tkt.both{background:linear-gradient(135deg,#f0a030,#d9802a)}
+.tkt:hover:not(:disabled){transform:translateY(-3px) rotate(-1deg)}
+.tkt.ok{outline:4px solid var(--sun);animation:pulse .4s}.tkt.no{filter:grayscale(1);opacity:.55;animation:shake .35s}
+.tkt:disabled{cursor:default}
+.crit{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;font-weight:700;margin:6px 0}
+.crit span{background:#efe7ff;color:#4b3c9e;border-radius:999px;padding:2px 9px}
+.jarbox{display:flex;gap:14px;align-items:center;margin:8px 0}
+.jar{width:84px;min-height:92px;border:4px solid #b7dff0;border-top-width:10px;border-radius:14px 14px 26px 26px;background:linear-gradient(90deg,rgba(255,255,255,.7),rgba(220,245,255,.5));display:flex;flex-wrap:wrap-reverse;align-content:flex-start;justify-content:center;padding:4px;font-size:20px;line-height:1}
+.jar i{font-style:normal;animation:drop .5s cubic-bezier(.2,1.4,.4,1)}
+.candy{display:flex;gap:12px;align-items:center;background:#fff;border:3px solid #f29bb6;border-radius:16px;padding:10px 14px;margin:6px 0}
+.candy>span{font-size:40px}.candy b{font-size:19px}
+#yn .btn.on{outline:3px solid var(--ink)}
+.opt .tag{background:#efe7ff;color:#4b3c9e}
+.ctab{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}
+.ctab th,.ctab td{border-bottom:1px solid #e3dccb;padding:5px 6px;text-align:left}
+.myq{padding-left:20px;font-size:14px}
+@media (max-width:520px){.tix{grid-template-columns:1fr}}
+.stn.desk .lab small{display:none}
+</style>
+</head>
+<body>
+<div class="sea" aria-hidden="true"><div class="wave"></div><div class="wave"></div><div class="wave"></div><div class="wave"></div><div class="wave"></div><div class="sun"></div><div class="cloud"></div><div class="cloud c2"></div><div class="cloud c3"></div><div class="boat">⛵</div></div>
+
+<div class="app">
+  <header>
+    <div>
+      <h1>職務再設計資源島</h1>
+      <p class="sub">離島遊樂園學申請，本島城市做改造</p>
+    </div>
+    <div class="hud" aria-live="polite">
+      <div><b id="hStars">0</b><span>星星 / 87</span></div>
+      <div><b id="hDone">0/24</b><span>完成格數</span></div>
+      <div><b id="hIdx">0%</b><span>資源指數</span></div>
+    </div>
+  </header>
+
+  <div class="bar">
+    <button class="btn on" id="vIso">城市</button>
+    <button class="btn" id="vList">清單</button>
+    <button class="btn go" id="vPark">🎡 遊樂園</button>
+    <button class="btn ghost" id="zOut" aria-label="縮小城市">－</button>
+    <button class="btn ghost" id="zIn" aria-label="放大城市">＋</button>
+    <button class="btn" id="bUnlock">講師模式</button>
+    <button class="btn ghost" id="bTour">上課導覽</button>
+    <button class="btn ghost" id="bDesk">💬 諮詢台</button>
+    <button class="btn ghost" id="bPort">資源港</button>
+    <button class="btn ghost" id="bCert">改造師證書</button>
+    <button class="btn ghost" id="bQuiz">重做測驗</button>
+    <div class="guide"><i>🧭</i><span id="guide">點有圖釘的建築，開始改造</span></div>
+  </div>
+
+  <div class="stagewrap" id="wrap"><div id="sizer"><div class="stage" id="stage"></div></div></div>
+  <div class="list" id="list" hidden></div>
+  <div id="park" hidden><div id="parkSz"><div id="parkIn"><div id="parkBg"></div><div id="parkMap"></div><div id="token" aria-hidden="true"><i>🧑‍🦽</i></div></div></div></div>
+
+  <div class="legend" id="legend"></div>
+  <p class="foot">過橋的離島是遊樂園，點入口或上方「遊樂園」按鈕進場，8 個關卡依序解鎖，「講師模式」可開放全部關卡。城市裡有圖釘的 24 棟建築可以進入任務，滑鼠移上去會顯示名稱，完成後屋頂會換上類別顏色。用 ＋ － 可以放大縮小，放大後可拖曳移動畫面。20 個職業情境中，標示「勞動部案例」的 3 格取自勞動部 2026 年 6 月新聞稿，其餘為教學示意情境。五大類別的對應為教學用途，實際改善方式與補助金額由專業人員訪視評估後核定。進度只存在這台裝置的瀏覽器，不蒐集個人資料。</p>
+</div>
+
+<div id="modal"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+
+var CATS={
+ A:{n:'提供就業輔具',d:'為排除工作障礙，提供就業相關所需的輔具。',role:'輔具達人',icon:'🦾',desc:'你相信「對的工具」能讓人發揮實力。看到有人卡關，你第一個想到的是有沒有合手的輔具。'},
+ B:{n:'改善工作設備或機具',d:'為提高工作效能，改善工作使用的設備或機具。',role:'設備工程師',icon:'🛠️',desc:'機器不合手就改機器。你習慣動手調整設備，讓它來配合使用的人。'},
+ C:{n:'改善職場工作環境',d:'調整與工作有關的空間、動線、照明等環境。',role:'空間設計師',icon:'🏗️',desc:'你對光線、動線、空間很敏銳。環境順了，人自然就順了。'},
+ D:{n:'改善工作條件',d:'彈性工作與工時安排，以及手語翻譯、聽打服務、視力協助、職場人力協助。',role:'條件協調員',icon:'🤝',desc:'你擅長傾聽和安排。彈性的時間與適時的人力協助，是你的拿手處方。'},
+ E:{n:'調整工作方法',d:'透過工作分析，重新安排步驟、分派適當的工作。',role:'流程魔法師',icon:'🪄',desc:'你喜歡把複雜的事拆開重組。換個做法，同一份工作就變得做得來。'}
+};
+var CATCOL={A:'#1f8f82',B:'#d9583a',C:'#b97f00',D:'#6a5ccc',E:'#2f78c4'};
+var IND=[
+ {n:'製造工坊',t:'#f4b9a7'},{n:'辦公科技',t:'#b9d4f4'},{n:'服務街區',t:'#f6dfa0'},
+ {n:'醫療照顧',t:'#bfe5d4'},{n:'在地生活',t:'#d4c7f0'},{n:'資源地標',t:'#ffd166'}
+];
+var GOV='縣市政府勞工主管機關', PES='公立就業服務機構';
+/* w: gov = 身心障礙者與四類未領證明對象；pes = 中高齡與高齡者 */
+var JOBS=[
+ // 製造
+ {id:'m1',e:'🔩',n:'精密組裝員',who:'小安，智能障礙',w:'gov',bar:'組裝步驟多，光靠口頭說明記不住順序。',fix:'用平板把組裝流程做成圖像化引導',bad:'把文字說明書再多印一份給他',cat:'E',aft:'可以獨立完成作業，錯誤率幾乎為零。',off:1},
+ {id:'m2',e:'🏭',n:'廠房工程師',who:'阿哲，重度聽障',w:'gov',bar:'廠房噪音大，傳統助聽器聽不清主管指示。',fix:'高階降噪助聽器搭配無線調頻系統',bad:'請主管講話再大聲一點',cat:'A',aft:'主管的語音直接傳入耳中，聽得清楚，也能和同事聊天。',off:1},
+ {id:'m3',e:'📦',n:'倉儲理貨員',who:'國雄，58 歲',w:'pes',bar:'整天彎腰搬重箱，腰和膝蓋負擔很大。',fix:'導入油壓升降台車與搬運推車',bad:'請他多貼幾塊痠痛貼布',cat:'B',aft:'搬運省力，降低受傷風險。'},
+ {id:'m4',e:'🔍',n:'品檢員',who:'美玲，55 歲，有老花',w:'pes',bar:'檢驗檯光線昏暗，小零件的瑕疵看不清。',fix:'加強檢驗檯照明並減少反光',bad:'請她瞇著眼多看幾次',cat:'C',aft:'看得清楚，檢驗速度與準確度都回來了。'},
+ // 辦公
+ {id:'o1',e:'🗂️',n:'行政人員',who:'佩君，下肢障礙，使用輪椅',w:'gov',bar:'辦公桌高度和輪椅不合，每 30 分鐘就得停下來休息。',fix:'電動升降辦公桌與減壓坐墊',bad:'請同事分擔她全部的工作',cat:'B',aft:'連續工作時間從 30 分鐘延長到 2 小時，也能承擔更多業務。',off:1},
+ {id:'o2',e:'💻',n:'程式設計師',who:'志明，低視能',w:'gov',bar:'螢幕上的程式碼字太小，看不清楚。',fix:'螢幕放大與語音報讀軟體',bad:'把他調去不用看螢幕的雜務',cat:'A',aft:'能自己閱讀與撰寫程式，不必請人代看。'},
+ {id:'o3',e:'🎧',n:'客服專員',who:'小雯，經診斷有精神疾病，未領身障證明',w:'gov',bar:'長時間連續接線，壓力累積後容易疲勞。',fix:'彈性工時，並安排固定的休息時段',bad:'要她下班後自己多運動紓壓',cat:'D',aft:'工作節奏穩定下來，出勤也更穩定。'},
+ {id:'o4',e:'🧮',n:'會計',who:'淑芬，62 歲',w:'pes',bar:'報表數字又小又密，核對時常看錯行。',fix:'提供擴視放大鏡等視覺輔具',bad:'規定她每張報表核對三遍',cat:'A',aft:'數字看得清楚，核對不再吃力。'},
+ // 服務
+ {id:'s1',e:'☕',n:'咖啡吧台手',who:'小樂，聽障',w:'gov',bar:'聽不到客人口頭點餐。',fix:'改用點餐單與平板點餐，出餐用叫號燈',bad:'讓他只待在後場洗杯子',cat:'E',aft:'可以獨立站吧台，直接服務客人。'},
+ {id:'s2',e:'🧹',n:'清潔人員',who:'阿滿姨，67 歲',w:'pes',bar:'提水桶、彎腰擦拭都很吃力。',fix:'輕量長柄清潔工具與附輪水桶車',bad:'縮短她的工時並減薪',cat:'B',aft:'不必彎腰提重，體力負擔減輕。'},
+ {id:'s3',e:'🛏️',n:'旅館房務員',who:'小宇，符合特教法身心障礙情事，未領身障證明',w:'gov',bar:'整理一間房的步驟很多，常漏掉幾項。',fix:'圖卡檢核表，把流程拆成固定小段',bad:'每次漏做就口頭再提醒一次',cat:'E',aft:'照著圖卡逐項完成，不再漏項。'},
+ {id:'s4',e:'🛒',n:'賣場門市人員',who:'建宏，肢體障礙，使用輪椅',w:'gov',bar:'櫃檯入口有門檻，貨架走道太窄。',fix:'加設斜坡並拓寬動線',bad:'請同事每次把他抬進櫃檯',cat:'C',aft:'可以自己進出櫃檯與賣場。'},
+ // 醫療照顧
+ {id:'h1',e:'🧑‍🦽',n:'照顧服務員',who:'秀琴，60 歲',w:'pes',bar:'幫長輩移位時全靠腰力。',fix:'移位機與移位滑墊',bad:'規定她每天下班去做重訓',cat:'B',aft:'移位省力又安全，腰部負擔下降。'},
+ {id:'h2',e:'💆',n:'按摩師',who:'阿德，視覺障礙',w:'gov',bar:'預約登記與排班表都是紙本，無法閱讀。',fix:'提供視力協助，由專人協助閱讀與登記',bad:'不讓他接需要預約的客人',cat:'D',aft:'預約與排班不再漏接。'},
+ {id:'h3',e:'🏥',n:'醫院櫃台人員',who:'怡君，聽障',w:'gov',bar:'晨會討論很快，跟不上內容。',fix:'會議提供聽打服務或手語翻譯',bad:'會後請她自己去問同事重點',cat:'D',aft:'能即時掌握會議內容並參與討論。'},
+ {id:'h4',e:'💊',n:'藥局助理',who:'文雄，經診斷為早期失智症，未領身障證明',w:'gov',bar:'補貨與盤點時，容易忘記做到哪一步。',fix:'步驟檢核清單與顏色標籤，工作分段完成',bad:'請他用心把流程背起來',cat:'E',aft:'照清單逐步完成，可以繼續留任。'},
+ // 在地
+ {id:'f1',e:'🌾',n:'農場作業員',who:'阿水伯，63 歲',w:'pes',bar:'長時間蹲著採收，膝蓋受不了。',fix:'坐式採收作業車',bad:'要他蹲累了站起來甩甩腿',cat:'B',aft:'坐著採收，膝蓋不再疼痛。'},
+ {id:'f2',e:'🥐',n:'烘焙助手',who:'小芸，智能障礙',w:'gov',bar:'看不懂電子秤上的克數。',fix:'改用定量杯與顏色刻度來秤料',bad:'不讓她碰材料，只負責洗烤盤',cat:'E',aft:'可以自己備料，參與整個製作流程。'},
+ {id:'f3',e:'🧑‍🏫',n:'補習班老師',who:'家豪，單側聽損，未領身障證明',w:'gov',bar:'教室回音大，聽不清學生提問。',fix:'加裝吸音材並調整座位配置',bad:'請學生上課不要發問',cat:'C',aft:'聽得清楚提問，課堂互動恢復。'},
+ {id:'f4',e:'🌙',n:'大樓保全',who:'老陳，66 歲',w:'pes',bar:'夜間巡邏的樓梯昏暗又濕滑。',fix:'加強樓梯照明、加裝防滑條與扶手',bad:'夜巡時自備手電筒、小心走',cat:'C',aft:'夜巡安全，跌倒風險下降。'}
+];
+var BADPOOL=['請他自己想辦法克服','調去不用做事的位置','請他提早退休','減薪來反映產能'];
+var MARKS=[
+ {id:'L1',e:'💰',n:'十萬元金庫',game:'budget'},
+ {id:'L2',e:'⚓',n:'流程碼頭',game:'order'},
+ {id:'L3',e:'🗼',n:'資格燈塔',game:'elig'},
+ {id:'L4',e:'🏛️',n:'服務窗口',game:'win'}
+];
+var TILES=[],view='iso';
+JOBS.forEach(function(j,i){TILES.push({id:j.id,e:j.e,n:j.n,ind:Math.floor(i/4),job:j})});
+MARKS.forEach(function(m){TILES.push({id:m.id,e:m.e,n:m.n,ind:5,mark:m})});
+var TOTAL=TILES.length*3+15;
+
+/* ---------- state ---------- */
+var KEY='jr-hybrid-v1';
+var S={role:null,done:{},name:'',park:{}};
+try{var raw=localStorage.getItem(KEY);if(raw){var o=JSON.parse(raw);if(o&&typeof o==='object'){S.role=o.role||null;S.done=o.done||{};S.name=o.name||'';S.park=o.park||{};S.sid=o.sid||'';S.cls=o.cls||''}}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function totalStars(){var t=0;for(var k in S.done)t+=S.done[k];['p1','p2','p3','p4','p5'].forEach(function(k){t+=Math.min(3,+S.park[k]||0)});return t}
+function doneCount(){return Object.keys(S.done).length}
+
+/* ---------- 插畫元件（原創造型，畫在 120x120 的框內，地面線在 y=110） ---------- */
+function rp(x,y,w,h,f,o){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+f+'"'+(o||'')+'/>'}
+function pg(p,f,o){return '<polygon points="'+p+'" fill="'+f+'"'+(o||'')+'/>'}
+function ci(x,y,r,f,o){return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+f+'"'+(o||'')+'/>'}
+var SHADOW='<ellipse cx="60" cy="110" rx="50" ry="8" fill="rgba(0,40,30,.22)"/>';
+var ART={
+ castle:function(){
+  var s=SHADOW,x;
+  s+=rp(12,50,18,60,'#f4ead8')+rp(21,50,9,60,'#e3d6bd')+rp(90,50,18,60,'#f4ead8')+rp(99,50,9,60,'#e3d6bd');
+  s+=pg('8,50 21,20 34,50','#2f9c95')+pg('21,20 34,50 21,50','#237a75')+pg('86,50 99,20 112,50','#2f9c95')+pg('99,20 112,50 99,50','#237a75');
+  s+=rp(28,64,64,46,'#fbf4e6')+rp(60,64,32,46,'#eadfca');
+  for(x=28;x<90;x+=9)s+=rp(x,58,6,7,x<60?'#fbf4e6':'#eadfca');
+  s+=rp(34,40,12,26,'#fbf4e6')+rp(40,40,6,26,'#eadfca')+pg('30,40 40,22 50,40','#e8609a')+pg('40,22 50,40 40,40','#c94a82');
+  s+=rp(74,40,12,26,'#fbf4e6')+rp(80,40,6,26,'#eadfca')+pg('70,40 80,22 90,40','#e8609a')+pg('80,22 90,40 80,40','#c94a82');
+  s+=rp(50,28,20,40,'#fffaf0')+rp(60,28,10,40,'#efe4cf')+pg('45,28 60,6 75,28','#2f9c95')+pg('60,6 75,28 60,28','#237a75');
+  s+='<line x1="60" y1="6" x2="60" y2="-4" stroke="#7a5a3a" stroke-width="1.5"/>'+pg('60,-4 71,-1 60,2','#ffb703');
+  s+='<line x1="21" y1="20" x2="21" y2="12" stroke="#7a5a3a" stroke-width="1.2"/>'+pg('21,12 29,14 21,16','#e8603c')+'<line x1="99" y1="20" x2="99" y2="12" stroke="#7a5a3a" stroke-width="1.2"/>'+pg('99,12 107,14 99,16','#e8603c');
+  s+='<path d="M50,110 V92 a10,10 0 0 1 20,0 V110 Z" fill="#7a4e2d"/><path d="M53,110 V93 a7,7 0 0 1 14,0 V110 Z" fill="#5a3518"/>';
+  s+='<rect x="56" y="36" width="8" height="13" rx="4" fill="#5aa0e0"/>'+'<rect x="36" y="76" width="7" height="11" rx="3.5" fill="#5aa0e0"/><rect x="77" y="76" width="7" height="11" rx="3.5" fill="#4a8cc8"/><rect x="18" y="62" width="6" height="10" rx="3" fill="#5aa0e0"/><rect x="96" y="62" width="6" height="10" rx="3" fill="#4a8cc8"/><rect x="37" y="46" width="5" height="8" rx="2.5" fill="#5aa0e0"/><rect x="77" y="46" width="5" height="8" rx="2.5" fill="#4a8cc8"/>';
+  return s;
+ },
+ ferris:function(){
+  var s=SHADOW,i,a,cols=['#e8603c','#ffb703','#2f9c95','#6a5ccc'];
+  s+='<line x1="60" y1="56" x2="34" y2="110" stroke="#5d6f86" stroke-width="5" stroke-linecap="round"/><line x1="60" y1="56" x2="86" y2="110" stroke="#7d8fa6" stroke-width="5" stroke-linecap="round"/>';
+  s+='<g class="rot"><circle cx="60" cy="56" r="46" fill="none" stroke="#e8609a" stroke-width="4"/><circle cx="60" cy="56" r="32" fill="none" stroke="#f6b8d2" stroke-width="2"/>';
+  for(i=0;i<8;i++){a=i*Math.PI/4;s+='<line x1="60" y1="56" x2="'+(60+46*Math.cos(a)).toFixed(1)+'" y2="'+(56+46*Math.sin(a)).toFixed(1)+'" stroke="#f6b8d2" stroke-width="2"/>'}
+  for(i=0;i<8;i++){a=i*Math.PI/4;s+=ci((60+46*Math.cos(a)).toFixed(1),(56+46*Math.sin(a)).toFixed(1),6.5,cols[i%4],' stroke="#fff" stroke-width="1.5"')}
+  s+='</g>'+ci(60,56,7,'#ffb703',' stroke="#fff" stroke-width="2"')+rp(26,106,68,6,'#8a6b4a',' rx="3"');
+  return s;
+ },
+ carousel:function(){
+  var s=SHADOW,i,cols=['#e8603c','#fff3d6'];
+  s+='<ellipse cx="60" cy="104" rx="46" ry="9" fill="#b9814f"/><ellipse cx="60" cy="100" rx="46" ry="9" fill="#e7b97f"/>';
+  s+=rp(57,40,6,62,'#c9a23a');
+  for(i=0;i<5;i++){var x=22+i*19;s+='<line x1="'+x+'" y1="50" x2="'+x+'" y2="98" stroke="#c9a23a" stroke-width="2"/>'}
+  s+='<g class="bobv">'+'<ellipse cx="32" cy="80" rx="8" ry="5" fill="#fff"/>'+ci(38,75,3.5,'#fff')+'<ellipse cx="88" cy="82" rx="8" ry="5" fill="#ffd9e6"/>'+ci(94,77,3.5,'#ffd9e6')+'</g>';
+  s+='<g class="bobv" style="animation-delay:-.8s"><ellipse cx="60" cy="86" rx="9" ry="5.5" fill="#cfe8ff"/>'+ci(67,81,4,'#cfe8ff')+'</g>';
+  for(i=0;i<8;i++){var x0=12+i*12;s+=pg(x0+',50 '+(x0+12)+',50 60,18',cols[i%2])}
+  for(i=0;i<8;i++)s+=ci(18+i*12,51,6,i%2?'#e8603c':'#ffb703');
+  s+=ci(60,17,5,'#ffb703')+'<line x1="60" y1="12" x2="60" y2="2" stroke="#7a5a3a" stroke-width="1.5"/>'+pg('60,2 70,5 60,8','#2f9c95');
+  return s;
+ },
+ coaster:function(){
+  var d='M4,104 C16,104 22,28 42,28 S60,98 76,88 S94,34 116,62',s=SHADOW,i;
+  for(i=0;i<7;i++){var x=14+i*15,top=[80,40,34,78,86,60,52][i];s+='<line x1="'+x+'" y1="'+top+'" x2="'+x+'" y2="110" stroke="#9aa7b5" stroke-width="2.5"/>'}
+  s+='<line x1="14" y1="92" x2="104" y2="92" stroke="#b8c2cc" stroke-width="1.5"/>';
+  s+='<path d="'+d+'" fill="none" stroke="#b8322a" stroke-width="7" stroke-linecap="round"/><path d="'+d+'" fill="none" stroke="#f08a6c" stroke-width="2.5" stroke-linecap="round"/>';
+  s+='<g><rect x="-9" y="-9" width="18" height="9" rx="3" fill="#ffb703" stroke="#fff" stroke-width="1"/><circle cx="-4" cy="-10" r="3" fill="#12313a"/><circle cx="4" cy="-10" r="3" fill="#12313a"/><animateMotion dur="5s" repeatCount="indefinite" rotate="auto" path="'+d+'"/></g>';
+  return s;
+ },
+ tent:function(){
+  var s=SHADOW,i;
+  for(i=0;i<8;i++){var x=18+i*10.5;s+=pg(x+',64 '+(x+10.5)+',64 '+(x+10.5+(i-3.5)*.6)+',110 '+(x+(i-4.5)*.6)+',110',i%2?'#fff3d6':'#d9372a')}
+  for(i=0;i<8;i++){var x1=12+i*12;s+=pg(x1+',66 '+(x1+12)+',66 60,22',i%2?'#fff3d6':'#e8603c')}
+  for(i=0;i<8;i++)s+=ci(18+i*12,67,6,i%2?'#ffb703':'#fff3d6');
+  s+=pg('50,110 60,78 70,110','#5a1f1a')+'<line x1="60" y1="22" x2="60" y2="6" stroke="#7a5a3a" stroke-width="1.5"/>'+pg('60,6 74,10 60,14','#ffb703');
+  return s;
+ },
+ booth:function(){
+  var s=SHADOW;
+  s+=rp(14,46,14,64,'#e8609a')+rp(21,46,7,64,'#c94a82')+rp(92,46,14,64,'#e8609a')+rp(99,46,7,64,'#c94a82');
+  s+=pg('10,46 21,28 32,46','#ffb703')+pg('88,46 99,28 110,46','#ffb703');
+  s+='<path d="M14,58 Q60,14 106,58 L106,46 Q60,2 14,46 Z" fill="#2f9c95"/><path d="M14,58 Q60,14 106,58" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="1 6" stroke-linecap="round"/>';
+  s+='<text x="60" y="37" font-size="12" font-weight="900" text-anchor="middle" fill="#fff">入口</text>';
+  s+=rp(44,78,32,32,'#fff3d6')+rp(60,78,16,32,'#ecdcb6')+rp(49,84,22,12,'#5aa0e0',' rx="2"')+pg('40,78 60,64 80,78','#e8603c');
+  return s;
+ },
+ stall:function(){
+  var s=SHADOW,i;
+  s+=rp(22,70,76,40,'#fff3d6')+rp(60,70,38,40,'#ecdcb6')+rp(22,92,76,18,'#2f78c4');
+  for(i=0;i<8;i++)s+=pg((16+i*11)+',52 '+(27+i*11)+',52 '+(26+i*10.4)+',72 '+(17+i*10.4)+',72',i%2?'#fff':'#e8603c');
+  s+=rp(14,46,92,7,'#b8322a',' rx="3"');
+  s+=ci(60,82,11,'#fff')+ci(60,82,8,'#e8603c')+ci(60,82,5,'#fff')+ci(60,82,2.2,'#e8603c');
+  s+=ci(36,84,5,'#ffb703')+ci(84,84,5,'#6a5ccc');
+  return s;
+ },
+ candy:function(){
+  var s=SHADOW,i;
+  s+=rp(28,64,64,46,'#ffc2d4')+rp(60,64,32,46,'#f29bb6');
+  s+=pg('20,66 60,26 100,66','#8a5a3a')+pg('60,26 100,66 60,66','#6e4428');
+  for(i=0;i<7;i++)s+=ci(26+i*11.4,66,6,'#fff');
+  s+='<path d="M52,110 V92 a8,8 0 0 1 16,0 V110 Z" fill="#b8322a"/>'+ci(64,100,1.6,'#ffb703');
+  s+=ci(40,82,6,'#fff')+ci(40,82,3.5,'#5aa0e0')+ci(80,82,6,'#fff')+ci(80,82,3.5,'#4a8cc8');
+  s+='<line x1="104" y1="110" x2="104" y2="74" stroke="#fff" stroke-width="3"/>'+ci(104,66,11,'#e8609a')+'<path d="M104,66 m-7,0 a7,7 0 1 1 7,7 a4,4 0 1 1 -4,-4" fill="none" stroke="#fff" stroke-width="2.2"/>';
+  s+='<line x1="16" y1="110" x2="16" y2="80" stroke="#fff" stroke-width="3"/>'+ci(16,73,9,'#ffb703')+'<path d="M16,73 m-5.5,0 a5.5,5.5 0 1 1 5.5,5.5" fill="none" stroke="#fff" stroke-width="2"/>';
+  return s;
+ },
+ bridge:function(){
+  var s='<ellipse cx="60" cy="108" rx="54" ry="7" fill="rgba(80,190,220,.55)"/>';
+  s+='<path d="M6,96 Q60,40 114,96" fill="none" stroke="#b8452c" stroke-width="6"/>';
+  for(var i=1;i<8;i++){var t=i/8,x=6+108*t,y=(1-t)*(1-t)*96+2*t*(1-t)*40+t*t*96;s+='<line x1="'+x.toFixed(1)+'" y1="'+y.toFixed(1)+'" x2="'+x.toFixed(1)+'" y2="96" stroke="#d9583a" stroke-width="1.6"/>'}
+  s+=rp(2,94,116,8,'#8b97a3',' rx="2"')+rp(2,94,116,3,'#aeb8c2',' rx="1.5"')+rp(20,100,6,10,'#5d6873')+rp(94,100,6,10,'#5d6873');
+  return s;
+ }
+};
+ART.gate=function(){
+ var s=SHADOW,i,fc=['#e8603c','#ffb703','#2f9c95','#6a5ccc','#e8609a'];
+ s+=rp(6,46,26,64,'#fbf4e6')+rp(19,46,13,64,'#eadfca')+rp(88,46,26,64,'#fbf4e6')+rp(101,46,13,64,'#eadfca');
+ s+=pg('2,46 19,16 36,46','#e8609a')+pg('19,16 36,46 19,46','#c94a82')+pg('84,46 101,16 118,46','#e8609a')+pg('101,16 118,46 101,46','#c94a82');
+ s+='<line x1="19" y1="16" x2="19" y2="6" stroke="#7a5a3a" stroke-width="1.4"/>'+pg('19,6 29,9 19,12','#ffb703')+'<line x1="101" y1="16" x2="101" y2="6" stroke="#7a5a3a" stroke-width="1.4"/>'+pg('101,6 111,9 101,12','#ffb703');
+ s+=rp(11,74,16,13,'#5aa0e0',' rx="2"')+pg('8,74 30,74 27,67 11,67','#e8603c')+rp(93,74,16,13,'#4a8cc8',' rx="2"')+pg('90,74 112,74 109,67 93,67','#e8603c');
+ s+='<text x="19" y="100" font-size="8" font-weight="900" text-anchor="middle" fill="#8c2f39">售票</text><text x="101" y="100" font-size="8" font-weight="900" text-anchor="middle" fill="#8c2f39">售票</text>';
+ s+='<path d="M30,64 Q60,24 90,64 L90,48 Q60,6 30,48 Z" fill="#2f9c95"/><path d="M30,48 Q60,6 90,48" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="1 5" stroke-linecap="round"/>';
+ s+='<text x="60" y="41" font-size="11" font-weight="900" text-anchor="middle" fill="#fff">遊樂園</text>';
+ for(i=0;i<5;i++){var x=37+i*10.5,y=62-Math.sin((i+.5)/5*Math.PI)*17;s+=pg(x+','+y.toFixed(1)+' '+(x+7)+','+y.toFixed(1)+' '+(x+3.5)+','+(y+8).toFixed(1),fc[i])}
+ return s;
+};
+function artSVG(name,w,style){return '<svg class="art" width="'+w+'" height="'+w+'" viewBox="0 0 120 120" aria-hidden="true"'+(style?' style="'+style+'"':'')+'>'+ART[name]()+'</svg>'}
+function artBox(b){if(b.h==null)b.h=Math.round(b.w*.917-20);return {svg:artSVG(b.art,b.w,'margin-left:'+(40-b.w/2)+'px'),pad:0,top:0}}
+function mtEl(d){
+ var W=d.mt[0],H=d.mt[1],snow=d.mt[2],p=P(d.c,d.r),cx=p[0]+40,cy=p[1]+20,el=document.createElement('div');
+ var A=[W/2,0],L=[0,H],S=[W/2,H+W/4],R=[W,H];
+ function m(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]}
+ var s='<svg width="'+W+'" height="'+(H+W/4)+'" aria-hidden="true" style="display:block;overflow:visible">';
+ s+=poly([A,L,S],'#4f8f5d')+poly([A,S,R],'#7fbf74');
+ if(snow){s+=poly([A,m(A,L,.62),m(A,S,.56)],'#6f7f8c')+poly([A,m(A,S,.56),m(A,R,.62)],'#a3b1bb');
+  var q=m(A,S,.2);s+=poly([A,m(A,L,.3),[q[0]-W*.07,q[1]+3],m(A,S,.31),[q[0]+W*.07,q[1]+3],m(A,R,.3)],'#ffffff')+poly([A,m(A,L,.3),[q[0]-W*.07,q[1]+3],m(A,S,.31)],'#dfe9f2');}
+ else{s+=poly([A,m(A,L,.45),m(A,S,.4)],'#458553')+poly([A,m(A,S,.4),m(A,R,.45)],'#8fcb80')}
+ el.className='bld';el.style.width=W+'px';el.style.left=(cx-W/2)+'px';el.style.top=(cy-H-W/8)+'px';el.style.zIndex=Math.max(1,Math.round((d.c+d.r)*10)+4);
+ el.innerHTML=s+'</svg>';el.setAttribute('aria-hidden','true');
+ return el;
+}
+function winP(a,b,j,n,k,lit){
+ var t0=(j+.22)/n,t1=(j+.78)/n,q=function(t,dy){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t-k-dy]};
+ return poly([q(t0,0),q(t1,0),q(t1,6),q(t0,6)],lit?'#ffe9a0':'rgba(30,70,110,.5)');
+}
+
+/* ---------- island (city) ---------- */
+var X0=600,Y0=112,SW=1250,SH=880,zoom=1;
+function P(c,r){return [X0+(c-r)*40,Y0+(c+r)*20]}
+function rgb(hex){var n=parseInt(hex.slice(1),16);return [n>>16,n>>8&255,n&255]}
+function shade(hex,f){var a=rgb(hex);return 'rgb('+Math.round(a[0]*f)+','+Math.round(a[1]*f)+','+Math.round(a[2]*f)+')'}
+function tint(hex,k){var a=rgb(hex);return 'rgb('+Math.round(a[0]+(255-a[0])*k)+','+Math.round(a[1]+(255-a[1])*k)+','+Math.round(a[2]+(255-a[2])*k)+')'}
+function poly(pts,fill,stroke){return '<polygon points="'+pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1)}).join(' ')+'" fill="'+fill+'"'+(stroke?' stroke="'+stroke+'" stroke-width="1"':'')+'/>'}
+function ln(a,b,st,w,dash){return '<line x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'" stroke="'+st+'" stroke-width="'+w+'"'+(dash?' stroke-dasharray="'+dash+'"':'')+' stroke-linecap="round"/>'}
+
+var GC={grass:'#a6d483',road:'#6f7b85',bridge:'#8b97a3',park:'#74c178',sand:'#f0deb0',wood:'#b98b5e',plaza:'#ddd5c4',field:'#d2bd5a',ind:'#c9c2b6',forest:'#86c46f'};
+var LAND={},ROAD={};
+/* 遊戲建築：位置與外觀 */
+var POS={m1:[0,0],m2:[1,0],m3:[0,1],m4:[1,1],o1:[4,0],o2:[5,0],o3:[4,1],o4:[5,1],
+ s1:[0,3],s2:[1,3],s3:[2,3],s4:[0,4],h1:[8,3],h2:[9,3],h3:[8,4],h4:[9,4],
+ f1:[0,6],f2:[1,6],f3:[2,6],f4:[2,7],L1:[6,3],L2:[5,7],L3:[14,2],L4:[6,1],PK:[7,18]};
+var SPEC={
+ m1:{h:26,col:'#c9785f',f:.8,chim:1,g:'ind'},m2:{h:34,col:'#b98a72',f:.8,chim:1,g:'ind'},m3:{h:24,col:'#b7a58c',f:.86,g:'ind'},m4:{h:22,col:'#d39a6a',f:.8,win:1,g:'ind'},
+ o1:{h:58,col:'#86b3e3',f:.74,win:1},o2:{h:84,col:'#6fa3dc',f:.72,win:1},o3:{h:46,col:'#9cc4ea',f:.74,win:1},o4:{h:66,col:'#7fb8d8',f:.72,win:1},
+ s1:{h:22,col:'#c98a5a',f:.78},s2:{h:40,col:'#9fb7c9',f:.76,win:1},s3:{h:54,col:'#e7b7a1',f:.76,win:1},s4:{h:28,col:'#e6c463',f:.88},
+ h1:{h:30,col:'#f4f1ea',f:.8,win:1},h2:{h:20,col:'#bfe5d4',f:.76},h3:{h:56,col:'#f4f1ea',f:.8,win:1,cross:1},h4:{h:22,col:'#e3efc4',f:.76},
+ f1:{h:16,col:'#c0503a',f:.5,roof:'#7a2e22',g:'field'},f2:{h:22,col:'#f0c890',f:.78},f3:{h:30,col:'#f2d6a2',f:.84,win:1},f4:{h:56,col:'#cdb7e6',f:.72,win:1},
+ L1:{h:34,col:'#f1d27a',f:.82,g:'plaza'},L2:{h:20,col:'#5f8fb0',f:.7,g:'wood'},L3:{h:74,col:'#ffffff',f:.34,stripe:1,beacon:1,g:'plaza'},L4:{h:40,col:'#e9dcc6',f:.86,win:1,g:'plaza'},
+ PK:{art:'gate',w:132}
+};
+function house(c,r,roof){return {c:c,r:r,b:{h:14,col:'#f3e3c8',f:.66,roof:roof},nm:'住宅'}}
+var DECO=[
+ {c:3.2,r:-1.7,mt:[150,96,0]},{c:5,r:-2.4,mt:[214,142,1]},{c:7,r:-2.2,mt:[180,118,1]},{c:8.3,r:-1.2,mt:[112,66,0]},{c:1.6,r:-.9,mt:[96,52,0]},
+ {c:-1.6,r:2.6,mt:[124,72,0]},{c:-1.3,r:4.7,mt:[100,56,0]},
+ {c:2.6,r:-.9,em:'🌲🌲'},{c:4.2,r:-1,em:'🌲🌳'},{c:6.2,r:-1,em:'🌲🌲'},{c:9.3,r:-.7,em:'🌲🌳'},{c:.6,r:-.8,em:'🌲'},
+ {c:-1,r:1.2,em:'🌲🌲'},{c:-.9,r:3.7,em:'🌳🌲'},{c:-1,r:5.9,em:'🌲🌳'},{c:-1.9,r:3.6,em:'🌲'},{c:-.9,r:6.9,em:'🌴'},
+ {c:11.1,r:3.4,em:'🌴'},{c:11.3,r:4.5,em:'⛱️'},{c:11.2,r:5.6,em:'🏄'},{c:11,r:6.7,em:'🌴'},{c:11,r:.4,em:'🌲🌳'},
+ {c:1.3,r:8.3,em:'🌴'},{c:2.5,r:8.6,em:'⛱️'},{c:.2,r:8.1,em:'🐚'},{c:8.5,r:8.4,em:'🌴'},{c:9.6,r:8.2,em:'⛱️'},{c:8.4,r:9.4,em:'🌴'},{c:6.1,r:8.6,em:'🌳'},
+ {c:2,r:0,b:{h:30,col:'#a98f7c',f:.8,chim:1},g:'ind',nm:'工廠'},{c:6,r:0,b:{h:104,col:'#5f95d2',f:.7,win:1},nm:'商辦大樓'},{c:6,r:4,em:'🎠',g:'plaza',nm:'旋轉木馬'},{c:2,r:1,b:{h:18,col:'#4f6d8f',f:.86,sign:'🚇'},g:'plaza',nm:'捷運站'},
+ 
+ house(8,0,'#c8553d'),house(9,0,'#3d7fc8'),{c:10,r:0,b:{h:44,col:'#e8c9b0',f:.72,win:1},nm:'公寓'},house(8,1,'#4c9a6a'),
+ {c:9,r:1,em:'🌳🌲',g:'park',nm:'社區公園'},{c:10,r:1,b:{h:28,col:'#f2c9a0',f:.86,win:1,sign:'🏫'},g:'plaza',nm:'學校'},
+ {c:1,r:4,b:{h:20,col:'#e5a04e',f:.78,sign:'🍜'},nm:'麵店'},{c:2,r:4,em:'⛲',g:'plaza',nm:'噴水池廣場'},
+ {c:4,r:3,em:'🌳🌳',g:'park',nm:'中央公園'},{c:5,r:3,em:'🌸🌳',g:'park'},{c:4,r:4,em:'🛝',g:'sand',nm:'共融遊戲場'},{c:5,r:4,em:'🎡',g:'plaza',big:1,nm:'摩天輪'},
+ {c:10,r:3,b:{h:38,col:'#f4f1ea',f:.8,win:1,sign:'🚑'},nm:'急診大樓'},{c:10,r:4,em:'🌲🌳',g:'park'},
+ {c:1,r:7,em:'🌾🌾',g:'field'},house(0,7,'#c8553d'),
+ {c:4,r:6,b:{h:20,col:'#e07a5f',f:.78,sign:'🦞'},nm:'海鮮餐廳'},{c:5,r:6,b:{h:14,col:'#f2a65a',f:.9,sign:'🥬🐟'},g:'plaza',nm:'傳統市場'},{c:6,r:6,em:'📦📦',g:'wood'},
+ {c:4,r:7,em:'🏗️',g:'wood',big:1,nm:'海港起重機'},{c:6,r:7,em:'🛟',g:'wood'},
+ house(8,6,'#3d7fc8'),house(9,6,'#e0a030'),{c:10,r:6,b:{h:20,col:'#c0392b',f:.8,roof:'#e0a030',sign:'🏮'},g:'plaza',nm:'廟宇'},
+ {c:8,r:7,em:'⚽',g:'park',nm:'運動場'},{c:9,r:7,em:'⛱️',g:'sand',nm:'沙灘'},{c:10,r:7,em:'🗿',g:'sand',nm:'觀光石像'},
+ {c:14,r:1,em:'🌴',g:'grass'},{c:10,r:18,art:'castle',w:124,g:'plaza',nm:'城堡頒獎台'},{c:8.6,r:18,art:'tent',w:82,nm:'故事劇場'},{c:12,r:18,art:'ferris',w:98,nm:'摩天輪'},{c:8.5,r:20,art:'carousel',w:80,nm:'旋轉木馬'},{c:10.5,r:20,art:'coaster',w:88,nm:'雲霄飛車'},{c:12.5,r:20,art:'candy',w:72,nm:'糖果屋'},{c:11,r:18,em:'🍿'},{c:13,r:18,em:'🌴'},{c:7,r:20,em:'🌴'},{c:9.6,r:20.2,em:'⛲'},{c:11.6,r:20.2,em:'🍭'},{c:13.6,r:19.6,em:'🌴'},{c:6.5,r:19.3,em:'⛱️'},{c:13.4,r:20.5,em:'🎏'},{c:6.2,r:18.2,em:'🎈🎈'},{c:14,r:3,em:'⛺',g:'sand',nm:'露營地'}
+];
+(function(){
+ var c,r,k;
+ for(c=0;c<=10;c++)for(r=0;r<=7;r++)LAND[c+','+r]='grass';
+
+ for(c=0;c<=10;c++){LAND[c+',2']='road';LAND[c+',5']='road'}
+ for(r=0;r<=7;r++){LAND['3,'+r]='road';LAND['7,'+r]='road'}
+ LAND['11,2']='road';LAND['12,2']='bridge';LAND['13,2']='bridge';LAND['5,9']='wood';
+ LAND['14,1']='grass';LAND['14,2']='plaza';LAND['14,3']='sand';LAND['5,8']='wood';
+ for(r=8;r<=10;r++)LAND['7,'+r]='road';for(r=11;r<=17;r++)LAND['7,'+r]='bridge';LAND['7,18']='road';for(c=7;c<=13;c++)LAND[c+',19']='road';LAND['10,18']='plaza';
+ for(k in POS)if(SPEC[k].g)LAND[POS[k][0]+','+POS[k][1]]=SPEC[k].g;
+ DECO.forEach(function(d){if(d.g)LAND[d.c+','+d.r]=d.g});
+ for(k in LAND)if(LAND[k]==='road'||LAND[k]==='bridge')ROAD[k]=1;
+})();
+
+function arch(a,b,lift,col,w){
+ var C=[(a[0]+b[0])/2,(a[1]+b[1])/2-lift],s='<path d="M'+a[0]+' '+a[1]+' Q'+C[0]+' '+C[1]+' '+b[0]+' '+b[1]+'" fill="none" stroke="'+col+'" stroke-width="'+w+'" stroke-linecap="round"/>';
+ for(var i=1;i<8;i++){var t=i/8,x=(1-t)*(1-t)*a[0]+2*t*(1-t)*C[0]+t*t*b[0],y=(1-t)*(1-t)*a[1]+2*t*(1-t)*C[1]+t*t*b[1],by=a[1]+(b[1]-a[1])*t;s+=ln([x,y],[x,by],col,1.2)}
+ return s+ln(a,b,col,2.5);
+}
+/* 島嶼輪廓：不規則的海岸線，外圈沙灘、內圈草地，可設定海灣 */
+var ISLES=[{reg:[0,10,0,7],seed:1,bay:[137,.42,.16]},{reg:[14,14,1,3],seed:2.4,k:1.3},{reg:[7,13,18,20],seed:3.3,k:1.2}];
+function isleK(o,th){
+ var k=(o.k||1.13)+.05*Math.sin(3*th+o.seed)+.035*Math.sin(5*th+o.seed*2.1)+.02*Math.sin(8*th+o.seed*.7);
+ if(o.bay){var d=th-o.bay[0]*Math.PI/180;d=Math.atan2(Math.sin(d),Math.cos(d));k-=o.bay[1]*Math.exp(-(d*d)/(o.bay[2]*o.bay[2]))}
+ return k;
+}
+function islePath(o,dk,dy,front){
+ var R=o.reg,N=P(R[0],R[2]),E=P(R[1],R[2]),S2=P(R[1],R[3]),W=P(R[0],R[3]);
+ var cx=(N[0]+40+E[0]+80+S2[0]+40+W[0])/4,cy=(N[1]+E[1]+20+S2[1]+40+W[1]+20)/4,pp=(E[0]+80-W[0])/2,qq=(S2[1]+40-N[1])/2,pts=[],n=96;
+ for(var i=0;i<n;i++){var th=i/n*2*Math.PI,k=isleK(o,th)+dk-(front?front*Math.max(0,Math.sin(th)):0);pts.push((cx+pp*k*Math.cos(th)).toFixed(1)+' '+(cy+qq*k*Math.sin(th)+(dy||0)).toFixed(1))}
+ return 'M'+pts.join(' L')+' Z';
+}
+function isleSVG(o){
+ return '<path d="'+islePath(o,.11,4)+'" fill="rgba(170,245,235,.22)"/><path d="'+islePath(o,.05,4)+'" fill="rgba(200,252,244,.3)"/>'+
+  '<path d="'+islePath(o,0,17)+'" fill="#6f5539"/><path d="'+islePath(o,0,9)+'" fill="#9a7a52"/>'+
+  '<path d="'+islePath(o,0,0)+'" fill="#f3e2b3" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>'+
+  '<path d="'+islePath(o,-.045,0,.07)+'" fill="#a6d483"/><path d="'+islePath(o,-.12,0,.1)+'" fill="#b2dc8e" opacity=".6"/>';
+}
+/* 跨海大橋：斜張橋，兩座橋塔與拉索。layer 0 畫在地面層（遠側），layer 1 畫在最上層（近側） */
+var SEABR={c:7,r0:10.6,r1:18,t:[12.7,15.9]};
+function seaBridge(o,layer){
+ var s='',H=104,i,d;
+ function bk(t){var p=P(o.c,t);return [p[0]+40,p[1]]}
+ function fr(t){var p=P(o.c,t);return [p[0]+80,p[1]+20]}
+ function cl(t){return Math.max(o.r0,Math.min(o.r1,t))}
+ var side=layer?fr:bk;
+ s+=ln([side(o.r0)[0],side(o.r0)[1]-5],[side(o.r1)[0],side(o.r1)[1]-5],layer?'#f4f7fa':'#c9d3db',2.5);
+ o.t.forEach(function(T){
+  var b=bk(T),f=fr(T),ap=[(b[0]+f[0])/2,(b[1]+f[1])/2-H],base=side(T);
+  if(!layer)s+=ln([ap[0],ap[1]+H+6],[ap[0],ap[1]+H+40],'#5d6873',9);
+  for(i=1;i<=4;i++){d=i*.55;[T-d,T+d].forEach(function(t){var q=side(cl(t));s+=ln([ap[0],ap[1]+6+i*5],[q[0],q[1]-5],layer?'rgba(255,255,255,.95)':'rgba(225,235,242,.85)',1.3)})}
+  s+=ln(base,ap,layer?'#eef2f5':'#bcc7d0',7);
+  if(layer){var m1=[b[0]+(ap[0]-b[0])*.52,b[1]+(ap[1]-b[1])*.52],m2=[f[0]+(ap[0]-f[0])*.52,f[1]+(ap[1]-f[1])*.52];
+   s+=ln(m1,m2,'#dfe6ec',5)+'<circle cx="'+ap[0]+'" cy="'+ap[1]+'" r="5" fill="#e8603c" stroke="#fff" stroke-width="1.5"/>';}
+ });
+ return s;
+}
+function groundSVG(){
+ var cells=Object.keys(LAND).map(function(k){var a=k.split(',');return {c:+a[0],r:+a[1],g:LAND[k]}}).sort(function(a,b){return (a.c+a.r)-(b.c+b.r)});
+ var s='<svg class="ground" width="'+SW+'" height="'+SH+'" aria-hidden="true">';
+ var p1=P(11.4,2),p2=P(13,2);
+ s+=ISLES.map(isleSVG).join('');
+ cells.forEach(function(t){
+  var p=P(t.c,t.r),x=p[0],y=p[1],N=[x+40,y],E=[x+80,y+20],S=[x+40,y+40],W=[x,y+20],br=t.g==='bridge',d=br?5:12;
+  if(br&&t.c===12&&t.r===2)s+=arch([p1[0]+40,p1[1]-6],[p2[0]+80,p2[1]+14],62,'#b8452c',4);
+  if(br)s+=ln([x+40,y+42],[x+40,y+64],'#5d6873',7);
+  if(br&&!LAND[t.c+','+(t.r+1)])s+=poly([W,S,[S[0],S[1]+d],[W[0],W[1]+d]],'#5d6873');
+  if(br&&!LAND[(t.c+1)+','+t.r])s+=poly([S,E,[E[0],E[1]+d],[S[0],S[1]+d]],'#76828d');
+  if(t.g!=='grass')s+=poly([N,E,S,W],GC[t.g],'rgba(255,255,255,.2)');
+  if(ROAD[t.c+','+t.r]){
+   var hc=ROAD[(t.c-1)+','+t.r]||ROAD[(t.c+1)+','+t.r],hr=ROAD[t.c+','+(t.r-1)]||ROAD[t.c+','+(t.r+1)];
+   if(hc&&!hr){s+=ln([x+20,y+10],[x+60,y+30],'#fff',1.5,'5 6');s+=ln([x+8,y+19],[x+42,y+36],'#ffd23f',1.6,'2 3')}
+   else if(hr&&!hc){s+=ln([x+60,y+10],[x+20,y+30],'#fff',1.5,'5 6');s+=ln([x+72,y+19],[x+38,y+36],'#ffd23f',1.6,'2 3')}
+   else {for(var i=0;i<4;i++)s+=ln([x+26+i*8,y+13+i*4],[x+34+i*8,y+9+i*4],'#fff',2.2)}
+  }
+  if(t.g==='field')for(var j=1;j<4;j++)s+=ln([x+j*10,y+20+j*5],[x+40+j*10,y+j*5],'#b39a3a',1.5);
+ });
+ if(SEABR)s+=seaBridge(SEABR,0);
+ return s+'</svg>';
+}
+function overSVG(){
+ var p1=P(11.4,2),p2=P(13,2);
+ var q=P(8.4,21.6);
+ return '<svg class="over" width="'+SW+'" height="'+SH+'" aria-hidden="true"><text x="'+q[0]+'" y="'+q[1]+'" fill="#fff" font-size="17" font-weight="900" text-anchor="middle" style="paint-order:stroke;stroke:#0a4356;stroke-width:4px">遊樂園離島</text>'+arch([p1[0],p1[1]+14],[p2[0]+40,p2[1]+34],62,'#d9583a',4)+'</svg>'+(SEABR?'<svg class="over o2" width="'+SW+'" height="'+SH+'" aria-hidden="true">'+seaBridge(SEABR,1)+'</svg>':'');
+}
+function boxSVG(b,roofCol){
+ var f=b.f||.78,h=b.h,pad=b.roof?12:0,H=40+h+pad,cy=20+h+pad,k;
+ var N=[40,cy-20*f],E=[40+40*f,cy],S=[40,cy+20*f],W=[40-40*f,cy];
+ function up(p,k){return [p[0],p[1]-k]}
+ var s='<svg width="80" height="'+H+'" aria-hidden="true">';
+ var dx=-h*.5,dy=h*.25;s+=poly([E,S,[S[0]+dx,S[1]+dy],[W[0]+dx,W[1]+dy],[N[0]+dx,N[1]+dy],N],'rgba(10,40,50,.2)');
+ s+=poly([W,S,up(S,h),up(W,h)],shade(b.col,.72))+poly([S,E,up(E,h),up(S,h)],shade(b.col,.9));
+ if(b.win)for(k=6;k<h-9;k+=11)for(var j=0;j<3;j++){s+=winP(W,S,j,3,k,(k+j)%4===0)+winP(S,E,j,3,k,(k*3+j)%5===0)}
+ if(b.stripe)[[14,28],[44,58]].forEach(function(q){s+=poly([up(W,q[0]),up(S,q[0]),up(S,q[1]),up(W,q[1])],'#b8322a')+poly([up(S,q[0]),up(E,q[0]),up(E,q[1]),up(S,q[1])],'#d9483a')});
+ if(b.cross){var mx=(S[0]+E[0])/2,my=(S[1]+E[1])/2-h+12;s+='<text x="'+mx+'" y="'+my+'" font-size="13" text-anchor="middle" fill="#d9372a" font-weight="900">✚</text>'}
+ var Nt=up(N,h),Et=up(E,h),St=up(S,h),Wt=up(W,h);
+ if(b.roof){
+  var rc=roofCol||b.roof,M1=[(Nt[0]+Wt[0])/2,(Nt[1]+Wt[1])/2-12],M2=[(St[0]+Et[0])/2,(St[1]+Et[1])/2-12];
+  s+=poly([Nt,Et,M2,M1],shade(rc.charAt(0)==='#'?rc:'#888888',.8))+poly([Wt,St,M2,M1],rc)+poly([St,Et,M2],shade(b.col,.95));
+ }else s+=poly([Nt,Et,St,Wt],roofCol||tint(b.col,.35),'rgba(255,255,255,.7)');
+ if(b.chim)s+='<rect x="46" y="'+(Nt[1]-10)+'" width="7" height="22" fill="#5a4a44"/>';
+ return {svg:s+'</svg>',pad:pad,top:Nt[1]};
+}
+function place(el,c,r,b,pad){var p=P(c,r);el.style.left=p[0]+'px';el.style.top=(p[1]-b.h-pad)+'px';el.style.zIndex=(c+r)*10+5;el.style.animationDelay=(0.04*(c+r))+'s'}
+function gameEl(t,pop){
+ var b=SPEC[t.id],done=!t.info&&S.done[t.id]!=null,pos=POS[t.id];
+ var col=done?(t.job?CATCOL[t.job.cat]:'#ff9f1c'):null,bx=b.art?artBox(b):boxSVG(b,col);
+ var el=document.createElement('button');el.className='bld'+(pop?' pop':'');
+ place(el,pos[0],pos[1],b,bx.pad);
+ el.setAttribute('aria-label',t.n+(t.info?'，教學館':done?'，已完成 '+S.done[t.id]+' 顆星':'，尚未完成'));
+ el.innerHTML=bx.svg+(b.chim?'<i class="smoke" style="left:46px;top:'+(bx.top-18)+'px"></i>':'')+(b.beacon?'<i class="beacon" style="left:35px;top:'+(bx.top-6)+'px"></i>':'')+
+  '<span class="pin'+(done?' done':'')+(t.info?' info':'')+'" style="top:'+(bx.top-56)+'px;'+(done?'--pc:'+col:'')+'"><b>'+t.e+'</b><small>'+(done?'★'+S.done[t.id]+' ':'')+esc(t.n)+'</small></span>';
+ el.addEventListener('click',function(){if(t.info)t.open();else openTile(t)});
+ return el;
+}
+function decoEl(d){
+ var el=document.createElement('div'),p=P(d.c,d.r);
+ if(d.mt)return mtEl(d);
+ if(d.art&&!d.b)d.b={art:d.art,w:d.w};
+ if(d.b){var bx=d.b.art?artBox(d.b):boxSVG(d.b);el.className='bld';place(el,d.c,d.r,d.b,bx.pad);
+  el.innerHTML=bx.svg+(d.b.chim?'<i class="smoke" style="left:46px;top:'+(bx.top-18)+'px;animation-delay:-1.4s"></i>':'')+(d.b.sign?'<span class="sign" style="top:'+(bx.top-6)+'px">'+d.b.sign+'</span>':'')+(d.nm?'<span class="tip" style="top:'+(bx.top-26)+'px"><em>'+esc(d.nm)+'</em></span>':'');if(d.nm)el.className+=' has';}
+ else{el.className='flat'+(d.big?' big':'')+(d.nm?' has':'');el.style.zIndex=1;el.innerHTML=d.em+(d.nm?'<span class="tip" style="top:-20px"><em>'+esc(d.nm)+'</em></span>':'');el.style.left=p[0]+'px';el.style.top=(p[1]+(d.big?-16:2))+'px';el.style.zIndex=Math.max(1,Math.round((d.c+d.r)*10)+4)}
+ el.setAttribute('aria-hidden','true');
+ return el;
+}
+/* 街上的人：輪椅、電動輪椅、白手杖、長者、導盲犬與一般行人 */
+var WALK=['🚶','🧑‍🦽','🚶‍♀️','👨‍🦽','🧑‍🦯','👩‍🦼','🧓','👩‍🦽','🧑‍🦼','👨‍🦯','👵','🐕‍🦺','👩‍🦯','🏃','👴','👨‍🦼','🚴','👩‍👧','🧑‍🦽','🚶‍♂️','🧑‍🦯','👩‍🦼','👨‍👦','🧑‍🦼','👩‍🦽','🚌','🚌'];
+var walkers=[],roadKeys=[];
+function nextCell(w){
+ var o=[[1,0],[-1,0],[0,1],[0,-1]].map(function(d){return [w.c+d[0],w.r+d[1]]}).filter(function(q){return ROAD[q[0]+','+q[1]]&&!(q[0]===w.pc&&q[1]===w.pr)});
+ var q=o.length?o[Math.floor(Math.random()*o.length)]:[w.pc,w.pr];
+ w.nc=q[0];w.nr=q[1];
+}
+function drawWalker(w){
+ var cc=w.c+(w.nc-w.c)*w.t,rr=w.r+(w.nr-w.r)*w.t;
+ var x=X0+(cc-rr)*40+40-12+w.ox,y=Y0+(cc+rr)*20+20-22+w.oy,flip=((w.nc-w.c)-(w.nr-w.r))>0;
+ w.el.style.transform='translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px) scaleX('+(flip?-1:1)+')';
+ w.el.style.zIndex=Math.round((cc+rr)*10)+6;
+}
+function initWalkers(){
+ var wl=$('#wl');roadKeys=Object.keys(ROAD);
+ WALK.forEach(function(e,i){
+  var a=roadKeys[Math.floor(Math.random()*roadKeys.length)].split(','),bus=e==='🚌';
+  var w={c:+a[0],r:+a[1],pc:-9,pr:-9,t:Math.random(),sp:bus?.9:(.22+Math.random()*.3),ox:bus?0:(Math.random()*14-7),oy:bus?0:(Math.random()*8-4)};
+  nextCell(w);
+  w.el=document.createElement('div');w.el.className='walker'+(bus?' bus':'');w.el.setAttribute('aria-hidden','true');
+  w.el.innerHTML='<i style="animation-delay:-'+(i*.13).toFixed(2)+'s">'+e+'</i>';
+  wl.appendChild(w.el);walkers.push(w);drawWalker(w);
+ });
+ if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ var last=performance.now();
+ (function tick(now){
+  var dt=Math.min(.1,(now-last)/1000);last=now;
+  if(view==='iso')walkers.forEach(function(w){
+   w.t+=w.sp*dt;
+   if(w.t>=1){w.t-=1;w.pc=w.c;w.pr=w.r;w.c=w.nc;w.r=w.nr;nextCell(w)}
+   drawWalker(w);
+  });
+  requestAnimationFrame(tick);
+ })(last);
+}
+var built=false;
+function renderIsland(popId){
+ var st=$('#stage');
+ if(!built){
+  built=true;
+  var ships=[['⛴️',4.3,9.6],['🚢',5.5,10.9],['🛥️',11.6,9.4],['🛶',13.3,4.2],['⛵',13.6,6.4],['🚤',1.6,10.8]].map(function(q){var p=P(q[1],q[2]);return '<div class="ship" aria-hidden="true" style="left:'+(p[0]+26)+'px;top:'+p[1]+'px;z-index:'+Math.round((q[1]+q[2])*10)+';animation-delay:-'+(q[1]%3)+'s">'+q[0]+'</div>'}).join('');
+  st.innerHTML=groundSVG()+'<div id="bl"></div><div id="wl"></div>'+overSVG()+ships;
+  st.classList.add('intro');setTimeout(function(){st.classList.remove('intro')},2400);
+  initWalkers();
+ }
+ var bl=$('#bl');bl.innerHTML='';
+ DECO.forEach(function(d){bl.appendChild(decoEl(d))});
+ TILES.forEach(function(t){bl.appendChild(gameEl(t,t.id===popId))});
+ INFO.forEach(function(t){bl.appendChild(gameEl(t,false))});
+ fit();
+}
+function fit(keep){
+ var w=$('#wrap'),cw=w.clientWidth,s=Math.max(.5,Math.min(2,cw/SW,window.innerHeight*.84/SH))*zoom,z=$('#sizer');
+ var fx=w.scrollWidth>cw?(w.scrollLeft+cw/2)/w.scrollWidth:.5;
+ $('#stage').style.transform='scale('+s+')';
+ z.style.width=(SW*s)+'px';z.style.height=(SH*s)+'px';
+ w.classList.toggle('pan',SW*s>cw+2);
+ if(SW*s>cw)w.scrollLeft=(keep?fx:.5)*SW*s-cw/2;
+}
+function setZoom(d){zoom=Math.max(1,Math.min(2.2,+(zoom+d).toFixed(2)));fit(true)}
+$('#zIn').addEventListener('click',function(){if(view!=='iso')setView('iso');setZoom(.2)});
+$('#zOut').addEventListener('click',function(){if(view!=='iso')setView('iso');setZoom(-.2)});
+(function(){
+ var w=$('#wrap'),drag=null,moved=false;
+ w.addEventListener('pointerdown',function(e){if(e.pointerType==='mouse'&&e.button===0&&w.classList.contains('pan')){drag={x:e.clientX,y:e.clientY,l:w.scrollLeft,t:w.scrollTop};moved=false}});
+ window.addEventListener('pointermove',function(e){if(!drag)return;var dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>6)moved=true;if(moved){w.scrollLeft=drag.l-dx;w.scrollTop=drag.t-dy}});
+ window.addEventListener('pointerup',function(){drag=null;setTimeout(function(){moved=false},0)});
+ w.addEventListener('click',function(e){if(moved){e.stopPropagation();e.preventDefault()}},true);
+})();
+function renderList(){
+  var L=$('#list'),h='<h3>教學館</h3><div class="cards">'+INFO.map(function(t){return '<button class="card" data-id="'+t.id+'" style="--tint:#2f78c4"><i>'+t.e+'</i><span><b>'+esc(t.n)+'</b><small>講授與案例</small></span></button>'}).join('')+'</div>';
+  IND.forEach(function(d,c){
+    h+='<h3>'+d.n+'</h3><div class="cards">';
+    TILES.filter(function(t){return t.ind===c}).forEach(function(t){
+      var dn=S.done[t.id];
+      h+='<button class="card" data-id="'+t.id+'" style="--tint:'+(dn!=null&&t.job?CATCOL[t.job.cat]:d.t)+'"><i>'+t.e+'</i><span><b>'+esc(t.n)+'</b><small>'+(dn!=null?'★'.repeat(dn)+'☆'.repeat(3-dn):'尚未完成')+'</small></span></button>';
+    });
+    h+='</div>';
+  });
+  L.innerHTML=h;
+  L.querySelectorAll('.card').forEach(function(b){b.addEventListener('click',function(){var f=INFO.filter(function(t){return t.id===b.dataset.id})[0];if(f)f.open();else openTile(TILES.filter(function(t){return t.id===b.dataset.id})[0])})});
+}
+function renderHud(){
+  var s=totalStars();
+  $('#hStars').textContent=s;$('#hDone').textContent=doneCount()+'/'+TILES.length;$('#hIdx').textContent=Math.round(s/TOTAL*100)+'%';
+  var g='點有圖釘的建築，開始改造';
+  if(S.role)g=CATS[S.role].icon+' '+CATS[S.role].role+'，點有圖釘的建築開始改造';
+  
+  if(doneCount()===TILES.length)g='整座島都改造完成了！';
+  $('#guide').textContent=g;
+}
+function refresh(popId){renderIsland(popId);renderList();renderHud()}
+function setView(v){view=v;$('#wrap').hidden=v!=='iso';$('#list').hidden=v!=='list';$('#park').hidden=v!=='park';document.body.classList.toggle('park',v==='park');$('#vIso').classList.toggle('on',v==='iso');$('#vList').classList.toggle('on',v==='list');$('#vPark').classList.toggle('on',v==='park');if(v==='iso')fit();if(v==='park'){renderPark();fitPark()}renderHud();parkGuide();window.scrollTo(0,0)}
+$('#vIso').addEventListener('click',function(){setView('iso')});
+$('#vList').addEventListener('click',function(){setView('list')});
+window.addEventListener('resize',function(){fit(true)});
+$('#legend').innerHTML=Object.keys(CATS).map(function(k){return '<span class="chip" style="--c:'+CATCOL[k]+'">'+CATS[k].icon+' '+CATS[k].n+'</span>'}).join('');
+
+/* ---------- modal ---------- */
+var lastFocus=null;
+function openPanel(html,noClose,cls){
+  if(!$('#modal').firstChild)lastFocus=document.activeElement;
+  $('#modal').innerHTML='<div class="veil" role="dialog" aria-modal="true"><div class="panel'+(cls?' '+cls:'')+'">'+(noClose?'':'<button class="x" aria-label="關閉">✕</button>')+'<div id="pc">'+html+'</div></div></div>';
+  var x=$('#modal .x');if(x)x.addEventListener('click',closePanel);
+  var f=$('#modal button:not(.x), #modal input');if(f)f.focus();
+  return $('#pc');
+}
+function setPC(html){var p=$('#pc');p.innerHTML=html;$('#modal .panel').scrollTop=0;var f=$('#pc button, #pc input');if(f)f.focus();return p}
+function closePanel(){$('#modal').innerHTML='';if(lastFocus&&lastFocus.isConnected)lastFocus.focus();if(window.onPanelClose)window.onPanelClose()}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&$('#modal .x'))closePanel()});
+function starsHTML(n){var h='<div class="stars" aria-label="'+n+' 顆星">';for(var i=0;i<3;i++)h+='<span class="'+(i<n?'':'off')+'">★</span>';return h+'</div>'}
+function finish(id,stars){
+  var prev=S.done[id];if(prev==null||stars>prev)S.done[id]=stars;save();
+  refresh(id);
+}
+function dots(n,i){var h='<div class="dots">';for(var k=0;k<n;k++)h+='<i class="'+(k<=i?'on':'')+'"></i>';return h+'</div>'}
+
+/* 通用選擇題流程：steps=[{q,opts:[{t,ok}],ex}]，回傳第一次就答對的題數 */
+function runSteps(head,steps,done){
+  var i=0,right=0;
+  function show(){
+    var s=steps[i],first=true,opts=shuffle(s.opts);
+    var p=setPC(head+dots(steps.length,i)+'<p class="q">'+s.q+'</p><div class="opts">'+opts.map(function(o,k){return '<button class="opt" data-k="'+k+'">'+o.t+'</button>'}).join('')+'</div><div id="fb" aria-live="polite"></div>');
+    p.querySelectorAll('.opt').forEach(function(b){b.addEventListener('click',function(){
+      var o=opts[+b.dataset.k];if(first)LOGA(s.q,o.t,!!o.ok);
+      if(o.ok){
+        b.classList.add('ok');if(first)right++;
+        p.querySelectorAll('.opt').forEach(function(x){x.disabled=true});
+        $('#fb').innerHTML='<div class="fb">'+(first?'答對了。':'這次對了。')+s.ex+'</div><div class="row"><button class="btn go" id="nx">'+(i<steps.length-1?'下一步':'看結果')+'</button></div>';
+        $('#nx').addEventListener('click',function(){i++;if(i<steps.length)show();else done(right)});$('#nx').focus();
+      }else{
+        first=false;b.classList.add('no');b.disabled=true;
+        $('#fb').innerHTML='<div class="fb bad">'+(o.why||'再想想：職務再設計是調整工作來配合人，不是要人硬撐。')+'</div>';
+      }
+    })});
+  }
+  show();
+}
+
+function openTile(t){ if(t.job)playJob(t.job); else ({budget:playBudget,order:playOrder,elig:playElig,win:playWin})[t.mark.game](t.mark) }
+
+/* ---------- job game ---------- */
+function playJob(j){
+  var name=j.who.split('，')[0];
+  var head='<div class="eyebrow">'+IND[Math.floor(JOBS.indexOf(j)/4)].n+'　'+(j.off?'<span class="tag off">勞動部案例</span>':'<span class="tag">教學示意情境</span>')+'</div><h2>'+j.e+' '+esc(j.n)+'</h2>'+
+    '<div class="who"><i>🧑</i><div><b>'+esc(j.who)+'</b><br>'+esc(j.bar)+'</div></div>';
+  openPanel('');
+  var pool=shuffle(BADPOOL)[0];
+  var steps=[
+   {q:'第 1 步　開處方：哪一個改善方式最合適？',
+    opts:[{t:esc(j.fix),ok:1},{t:esc(j.bad),why:'這樣做沒有排除工作上的障礙，問題還在。'},{t:pool,why:'職務再設計是調整工作來配合人，目標是讓人留在崗位上發揮。'}],
+    ex:'「'+esc(j.fix)+'」直接排除了工作障礙。'},
+   {q:'第 2 步　分類：這個處方主要屬於五大類的哪一類？',
+    opts:Object.keys(CATS).map(function(k){return {t:CATS[k].icon+' '+CATS[k].n,ok:k===j.cat,why:CATS[k].n+'：'+CATS[k].d+'這個處方比較不像這一類。'}}),
+    ex:'<b>'+CATS[j.cat].n+'</b>：'+CATS[j.cat].d},
+   {q:'第 3 步　送件：'+esc(name)+'的申請要向哪裡提出？',
+    opts:[{t:GOV,ok:j.w==='gov',why:'中高齡（45 至 65 歲）與高齡（逾 65 歲）勞工，是向公立就業服務機構申請。'},{t:PES,ok:j.w==='pes',why:'身心障礙者，以及失智症、精神疾病、單側聽損、特教生四類未領證明者，是向縣市政府勞工主管機關申請。'},{t:'不用申請，自己先買再拿發票報帳',why:'要先提出申請，經訪視評估與審查核定後才執行改善。'}],
+    ex:j.w==='gov'?'身心障礙者與四類未領身障證明的對象，由縣市政府勞工主管機關受理。':'中高齡與高齡勞工，由公立就業服務機構受理。'}
+  ];
+  runSteps(head,steps,function(right){
+    var stars=Math.max(1,right);
+    setPC('<div class="eyebrow">改造完成</div><h2>'+j.e+' '+esc(j.n)+'</h2>'+starsHTML(stars)+
+     '<div class="ba"><div><b>改造前</b>'+esc(j.bar)+'</div><span>➜</span><div><b>改造後</b>'+esc(j.aft)+'</div></div>'+
+     '<p><span class="chip" style="--c:'+CATCOL[j.cat]+'">'+CATS[j.cat].icon+' '+CATS[j.cat].n+'</span></p>'+
+     '<div class="fb">補助每人每年最高 10 萬元，實際金額依訪視評估核定。'+(j.off?'這一格取自勞動部 2026 年 6 月公布的案例。':'這一格是教學示意情境，不是真實個案。')+'</div>'+
+     '<div class="row"><button class="btn go" id="bk">回到島上</button><button class="btn" id="ag">再玩一次</button></div>');
+    finish(j.id,stars);
+    $('#bk').addEventListener('click',closePanel);$('#ag').addEventListener('click',function(){playJob(j)});
+  });
+}
+
+/* ---------- landmark: budget ---------- */
+function playBudget(m){
+  var items=shuffle([
+   {t:'油壓升降台車',p:38000,ok:1},{t:'護腰輔具',p:6000,ok:1},{t:'理貨區照明改善',p:15000,ok:1},{t:'防滑地墊',p:8000,ok:1},{t:'標籤放大鏡燈',p:4500,ok:1},
+   {t:'員工旅遊補助',p:30000},{t:'個人新手機',p:25000},{t:'主管辦公室沙發',p:40000},{t:'全廠冷氣汰換',p:180000}
+  ]);
+  var pick={};
+  var p=openPanel('<div class="eyebrow">資源地標</div><h2>💰 十萬元金庫</h2>'+
+   '<div class="who"><i>📦</i><div><b>阿福，60 歲，倉儲理貨員</b><br>搬重箱腰痛、理貨區昏暗、地板濕滑、小標籤看不清。</div></div>'+
+   '<p class="q">每人每年補助最高 10 萬元。請挑出和阿福的工作障礙有關的改善項目。</p>'+
+   '<div class="meter"><i id="mi" style="width:0"></i></div><p class="num" id="mt">已選 0 元 / 100,000 元</p>'+
+   '<div class="opts" id="its">'+items.map(function(o,k){return '<button class="opt" data-k="'+k+'" aria-pressed="false">'+o.t+'　<span class="num">'+o.p.toLocaleString()+' 元</span></button>'}).join('')+'</div>'+
+   '<p><small>金額為教學示意，不是實際行情。</small></p><div class="row"><button class="btn go" id="sub">送出審查</button></div><div id="fb" aria-live="polite"></div>');
+  function sum(){var s=0;items.forEach(function(o,k){if(pick[k])s+=o.p});return s}
+  p.querySelectorAll('#its .opt').forEach(function(b){b.addEventListener('click',function(){
+    var k=+b.dataset.k;pick[k]=!pick[k];b.classList.toggle('pick',pick[k]);b.setAttribute('aria-pressed',pick[k]);
+    var s=sum();$('#mi').style.width=Math.min(100,s/1000)+'%';$('#mi').classList.toggle('over',s>100000);$('#mt').textContent='已選 '+s.toLocaleString()+' 元 / 100,000 元';
+  })});
+  $('#sub').addEventListener('click',function(){
+    var s=sum(),good=0,bad=0;items.forEach(function(o,k){if(pick[k]){if(o.ok)good++;else bad++}});
+    if(!good&&!bad){$('#fb').innerHTML='<div class="fb bad">請至少選一個項目。</div>';return}
+    var stars=(bad===0&&s<=100000&&good>=4)?3:(bad<=1&&s<=100000&&good>=2)?2:1;
+    p.querySelectorAll('#its .opt').forEach(function(b){var o=items[+b.dataset.k];b.disabled=true;b.classList.remove('pick');b.classList.add(o.ok?'ok':'no')});
+    $('#sub').hidden=true;
+    $('#fb').innerHTML=starsHTML(stars)+'<div class="fb'+(stars<3?' bad':'')+'">'+
+     (s>100000?'超過 10 萬元了。':'')+(bad?'有 '+bad+' 個項目和工作障礙無關，不在補助範圍。':'')+
+     '綠色項目都對應阿福的工作障礙，合計 71,500 元。</div>'+
+     '<div class="fb">三個重點：每人每年最高 10 萬元；有特殊需求經專案評估核准者可不受此限；5 千元以下的簡易就業輔具可免訪視、免開審查會。</div>'+
+     '<div class="row"><button class="btn go" id="bk">回到島上</button><button class="btn" id="ag">再玩一次</button></div>';
+    finish(m.id,stars);$('#bk').addEventListener('click',closePanel);$('#ag').addEventListener('click',function(){playBudget(m)});$('#bk').focus();
+  });
+}
+
+/* ---------- landmark: order ---------- */
+function playOrder(m){
+  var steps=[['提出申請','線上或書面申請'],['資格審查','受理單位審核資格'],['實地訪視','輔導委員或專案單位到場評估'],['審查核定','原則受理後 35 日內核定，但不包含試用與討論改善方案的時間'],['執行改善','依核定結果進行改善'],['請款核銷','改善完成後辦理經費核銷'],['追蹤輔導','追蹤成效與滿意度調查']];
+  var idx=0,err=0,pool=shuffle(steps.map(function(s,i){return i}));
+  var p=openPanel('<div class="eyebrow">資源地標</div><h2>⚓ 流程碼頭</h2><p class="q">一件申請案要經過七站。請依正確順序點選。</p>'+
+   '<div class="slots">'+steps.map(function(){return '<div class="slot"></div>'}).join('')+'</div>'+
+   '<div class="pool">'+pool.map(function(i){return '<button class="opt" data-i="'+i+'">'+steps[i][0]+'</button>'}).join('')+'</div><div id="fb" aria-live="polite"></div>');
+  var slots=p.querySelectorAll('.slot');
+  p.querySelectorAll('.pool .opt').forEach(function(b){b.addEventListener('click',function(){
+    var i=+b.dataset.i;
+    if(i===idx){
+      slots[idx].classList.add('fill');slots[idx].innerHTML='<span>'+steps[i][0]+'　<small style="font-weight:400">'+steps[i][1]+'</small></span>';
+      b.hidden=true;idx++;$('#fb').innerHTML='';
+      if(idx===steps.length){
+        var stars=err===0?3:err<=2?2:1;
+        $('#fb').innerHTML=starsHTML(stars)+'<div class="fb">七站走完：申請、資格審查、實地訪視、審查核定、執行改善、請款核銷、追蹤輔導。記得先核定、再改善、後核銷。</div><div class="row"><button class="btn go" id="bk">回到島上</button><button class="btn" id="ag">再玩一次</button></div>';
+        finish(m.id,stars);$('#bk').addEventListener('click',closePanel);$('#ag').addEventListener('click',function(){playOrder(m)});$('#bk').focus();
+      }
+    }else{
+      err++;b.classList.remove('no');void b.offsetWidth;b.classList.add('no');
+      $('#fb').innerHTML='<div class="fb bad">還沒輪到「'+steps[i][0]+'」。第 '+(idx+1)+' 站是什麼？</div>';
+    }
+  })});
+}
+
+/* ---------- landmark: eligibility ---------- */
+function playElig(m){
+  var cards=shuffle([
+   {t:'領有身心障礙證明的勞工',ok:1,ex:'身心障礙者是服務對象。'},
+   {t:'52 歲的作業員',ok:1,ex:'年滿 45 歲至 65 歲是中高齡者。'},
+   {t:'68 歲的清潔人員',ok:1,ex:'逾 65 歲是高齡者。'},
+   {t:'經醫療院所診斷為失智症，還沒有身障證明',ok:1,ex:'失智症且未取得身障證明者是服務對象。'},
+   {t:'經精神科專科醫師診斷為精神疾病，還沒有身障證明',ok:1,ex:'2024 年修正後新增的對象。'},
+   {t:'單側聽損，還沒有身障證明',ok:1,ex:'符合聽力閾值條件的單側聽損者是服務對象。'},
+   {t:'符合特教法身心障礙情事、未領證明的特教生',ok:1,ex:'2024 年修正後新增的對象。'},
+   {t:'44 歲、沒有身心障礙的業務員',ok:0,ex:'中高齡從年滿 45 歲起算。政府另有其他專案對象，請以官方公告為準。'},
+   {t:'30 歲、沒有工作障礙，只是想換新電腦的工程師',ok:0,ex:'補助是為了排除工作障礙，不是一般設備汰換。'}
+  ]);
+  var i=0,right=0;
+  openPanel('');
+  function show(){
+    var c=cards[i];
+    var p=setPC('<div class="eyebrow">資源地標</div><h2>🗼 資格燈塔</h2>'+dots(cards.length,i)+'<p>這位勞工是職務再設計的服務對象嗎？</p><div class="who"><i>🪪</i><div><b>'+c.t+'</b></div></div>'+
+     '<div class="row"><button class="btn go" id="y">是服務對象</button><button class="btn" id="n">不是</button></div><div id="fb" aria-live="polite"></div>');
+    function ans(v){
+      var ok=(v===!!c.ok);if(ok)right++;LOGA('資格判斷：'+c.t,v?'是服務對象':'不是',ok);
+      $('#y').disabled=$('#n').disabled=true;
+      $('#fb').innerHTML='<div class="fb'+(ok?'':' bad')+'">'+(ok?'答對了。':'答錯了。')+c.ex+'</div><div class="row"><button class="btn go" id="nx">'+(i<cards.length-1?'下一位':'看結果')+'</button></div>';
+      $('#nx').addEventListener('click',function(){i++;if(i<cards.length)show();else end()});$('#nx').focus();
+    }
+    $('#y').addEventListener('click',function(){ans(true)});$('#n').addEventListener('click',function(){ans(false)});
+  }
+  function end(){
+    var stars=right===cards.length?3:right>=7?2:1;
+    setPC('<div class="eyebrow">資源地標</div><h2>🗼 資格燈塔</h2>'+starsHTML(stars)+'<p>答對 '+right+' / '+cards.length+' 題。</p><div class="fb">服務對象：身心障礙者、45 至 65 歲中高齡者、逾 65 歲高齡者，以及失智症、精神疾病、單側聽損、特教生四類未領身障證明者。</div><div class="row"><button class="btn go" id="bk">回到島上</button><button class="btn" id="ag">再玩一次</button></div>');
+    finish(m.id,stars);$('#bk').addEventListener('click',closePanel);$('#ag').addEventListener('click',function(){playElig(m)});
+  }
+  show();
+}
+
+/* ---------- landmark: windows ---------- */
+function playWin(m){
+  openPanel('');
+  var head='<div class="eyebrow">資源地標</div><h2>🏛️ 服務窗口</h2>';
+  runSteps(head,[
+   {q:'身心障礙員工的職務再設計，向誰申請？',opts:[{t:GOV,ok:1},{t:PES,why:'這是中高齡與高齡勞工的受理單位。'},{t:'健保署',why:'職務再設計是勞動部的服務。'}],ex:'身心障礙者與四類未領證明對象，由縣市政府勞工主管機關受理。'},
+   {q:'55 歲員工的職務再設計，向誰申請？',opts:[{t:PES,ok:1},{t:GOV,why:'這是身心障礙者的受理單位。'},{t:'區公所',why:'請找公立就業服務機構。'}],ex:'中高齡與高齡勞工，由公立就業服務機構受理。'},
+   {q:'申請 5 千元以下的簡易就業輔具，流程有什麼不同？',opts:[{t:'可以免訪視、免開審查會',ok:1},{t:'和其他案件完全一樣',why:'2024 年起有簡化流程。'},{t:'金額太小，不受理',why:'小額輔具也可以申請，而且流程更快。'}],ex:'由受理單位直接審查核定。'},
+   {q:'受理後，原則上幾日內核定？',opts:[{t:'35 日',ok:1},{t:'7 日',why:'需要時間訪視與審查。'},{t:'90 日',why:'沒有那麼久。'}],ex:'原則於受理後 35 日內核定，但不包含試用與討論改善方案的時間。'},
+   {q:'身心障礙勞工可以自己提出申請嗎？',opts:[{t:'可以，而且能就全方位需求申請',ok:1},{t:'不行，只能由雇主申請',why:'個人也可以申請。'},{t:'可以，但只限輔具和人力協助',why:'這是 2026 年 6 月修正前的規定。'}],ex:'2026 年 6 月修正後，身障勞工個人申請範圍擴大到全方位需求。'}
+  ],function(right){
+    var stars=right===5?3:right>=3?2:1;
+    setPC(head+starsHTML(stars)+'<p>第一次就答對 '+right+' / 5 題。</p><div class="fb">線上申請請到職務再設計官網，也可以撥免付費專線 0800-777-888。入口都收在「資源港」。</div><div class="row"><button class="btn go" id="bk">回到島上</button><button class="btn" id="pt">打開資源港</button></div>');
+    finish(m.id,stars);$('#bk').addEventListener('click',closePanel);$('#pt').addEventListener('click',openPort);
+  });
+}
+
+/* ================= 教學館：服務中心與改造故事館 =================
+   講師可直接修改下面 WHO、DOCS、FLOW、CASES 四組資料的文字。 */
+var OFFICIAL='https://jobacmd.wda.gov.tw/DJOB_WEB/';
+/* 中高齡及高齡者申請文件頁：取得官網專區網址後換掉這一行 */
+var ELD_DOCS='https://jobacmd.wda.gov.tw/DJOB_WEB/PwdEld/List_Identity?type=Trade';
+/* 官網首頁的兩個入口。文字照官網；url 請換成官網各專區的網址；icon 請把官網圖示存成對應檔名放進 images 資料夾 */
+var MENU={
+ emp:{t:'我是雇主',items:[
+  {n:'身心障礙者專區',icon:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDY0LjIgNjMuMyI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogI2UzNGM3ZDsKICAgICAgICBzdHJva2Utd2lkdGg6IDBweDsKICAgICAgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CiAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjAsNDEuOWMtMi41LDAtNC41LDItNC41LDQuNXMyLDQuNSw0LjUsNC41LDQuNS0yLDQuNS00LjVjMC0yLjUtMi00LjUtNC41LTQuNVpNMjAsNDkuMWMtMS40LDAtMi42LTEuMi0yLjYtMi42czEuMi0yLjYsMi42LTIuNiwyLjYsMS4yLDIuNiwyLjZoMGMwLDEuNC0xLjIsMi42LTIuNiwyLjZaIi8+CiAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNNTEuNiw1Mi40Yy0xLjgsMC0zLjIsMS40LTMuMiwzLjJzMS40LDMuMiwzLjIsMy4yYzEuOCwwLDMuMi0xLjQsMy4yLTMuMmgwYzAtMS44LTEuNC0zLjItMy4yLTMuMlpNNTEuNiw1N2MtLjcsMC0xLjQtLjYtMS40LTEuM3MuNi0xLjQsMS4zLTEuNCwxLjQuNiwxLjQsMS4zaDBjMCwuNy0uNiwxLjMtMS4zLDEuNGgwWiIvPgogIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTYzLjMsNTQuN2gtNC4yYy0uNC0zLjQtMy4xLTYuMS02LjYtNi42di0xMi44YzAtMi4yLTEuOC00LTQtNGgtMS45di05LjFjMC0yLTEuNy0zLjctMy43LTMuN2gtMS4yYy0uNC0xLjQtMS43LTIuMy0zLjEtMi4zaC0yMS4ybC0yLjQtMTMuMkMxNSwxLjMsMTMuNiwwLDEyLDBILjlDLjQsMCwwLC40LDAsLjlzLjQuOS45LjloNS45bDIuNiwxNC4zYy0xLjguMy0yLjksMi4xLTIuNiwzLjguMywxLjUsMS42LDIuNiwzLjIsMi42aC41bDEuNiw4LjhjLTguMyw0LjMtMTEuNSwxNC41LTcuMiwyMi44LDQuMyw4LjMsMTQuNSwxMS41LDIyLjgsNy4yLDUuNi0yLjksOS4xLTguNyw5LjEtMTUsMC0uMywwLS43LDAtMWgxMy45djIuN2MtNC4xLjUtNy4xLDQuMy02LjYsOC41LjUsNC4xLDQuMyw3LjEsOC41LDYuNiwzLjQtLjQsNi4xLTMuMSw2LjYtNi42aDQuMmMuNSwwLC45LS40LjktLjksMC0uNS0uNC0uOS0uOS0uOWgwWk0xMiwxLjljLjksMCwxLjIsMS4xLDEuMiwxLjRsMi4zLDEyLjloLTQuMkw4LjgsMS45aDMuMlpNOC43LDE5LjRjMC0uOC42LTEuNCwxLjQtMS40aDI4LjZjLjgsMCwxLjQuNiwxLjQsMS40cy0uNiwxLjQtMS40LDEuNGgtOC40Yy0uNSwwLS45LjQtLjkuOSwwLC41LjQuOS45LjloOC40YzEuNCwwLDIuNy0uOSwzLjEtMi4zaDEuMmMxLDAsMS44LjgsMS44LDEuOHY5LjFoLTE3LjVjLTIuMy0xLjEtNC44LTEuNy03LjQtMS43aDBsLTEuMi02LjloNy4zYy41LDAsLjktLjQuOS0uOSwwLS41LS40LS45LS45LS45aC0xNS45Yy0uOCwwLTEuNC0uNi0xLjQtMS40aDBaTTEyLjUsMjIuN2g0LjJsMS4zLDdjLTEuNC4yLTIuNy41LTQsMWwtMS40LThaTTIwLDYxLjRjLTguMywwLTE1LTYuNy0xNS0xNXM2LjctMTUsMTUtMTUsMTUsNi43LDE1LDE1YzAsOC4zLTYuNywxNS0xNSwxNVpNMzYuNiw0My42Yy0uMy0xLjUtLjctMi45LTEuMy00LjNoNGMuNSwwLC45LS40LjktLjksMC0uNS0uNC0uOS0uOS0uOWgtNWMtMS0xLjYtMi40LTMuMS0zLjktNC4zaDE4LjJjMS4yLDAsMi4xLDEsMi4xLDIuMXYyLjFoLTcuMWMtLjUsMC0uOS40LS45LjksMCwuNS40LjkuOS45aDcuMXY0LjNoLTE0LjFaTTUxLjYsNjEuM2MtMy4xLDAtNS43LTIuNS01LjctNS43czIuNS01LjcsNS43LTUuN2MzLjEsMCw1LjcsMi41LDUuNyw1LjcsMCwzLjEtMi41LDUuNy01LjcsNS43WiIvPgogIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTIwLDMzLjhjLTcsMC0xMi42LDUuNi0xMi42LDEyLjYsMCw3LDUuNiwxMi42LDEyLjYsMTIuNiw3LDAsMTIuNi01LjYsMTIuNi0xMi42aDBjMC03LTUuNy0xMi42LTEyLjYtMTIuNlpNMjAsNTcuMmMtNS45LDAtMTAuNy00LjgtMTAuNy0xMC43LDAtNS45LDQuOC0xMC43LDEwLjctMTAuNyw1LjksMCwxMC43LDQuOCwxMC43LDEwLjdoMGMwLDUuOS00LjgsMTAuNy0xMC43LDEwLjdaIi8+Cjwvc3ZnPg==',url:OFFICIAL},
+  {n:'中高齡者專區',icon:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDUxLjggNzciPgogIDxkZWZzPgogICAgPHN0eWxlPgogICAgICAuY2xzLTEgewogICAgICAgIGZpbGw6ICNlMzRjN2Q7CiAgICAgICAgc3Ryb2tlOiAjZTM0YzdkOwogICAgICAgIHN0cm9rZS13aWR0aDogLjVweDsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBpc29sYXRpb246IGlzb2xhdGU7CiAgICAgIH0KICAgIDwvc3R5bGU+CiAgPC9kZWZzPgogIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTMwLjksMjEuOGMuNiwwLDEuMS0uNSwxLjEtMS4xaDB2LTEuOGMwLS42LS41LTEuMS0xLjEtMS4xcy0xLjEuNS0xLjEsMS4xdjEuOGMwLC42LjUsMS4xLDEuMSwxLjFaIi8+CiAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMjEuMiwyMS44Yy42LDAsMS4xLS41LDEuMS0xLjFoMHYtMS44YzAtLjYtLjUtMS4xLTEuMS0xLjFzLTEuMS41LTEuMSwxLjF2MS44YzAsLjYuNSwxLjEsMS4xLDEuMVoiLz4KICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0zMS40LDMwLjVjLjUsMCwuOC0uNC45LS45LjUtMS45LDAtNC0xLjEtNS41LTIuOC0yLjgtNy40LTIuOC0xMC4zLDAtMS4yLDEuNi0xLjYsMy42LTEuMSw1LjUsMCwuNS40LjguOS45LjQsMCwuOC4xLDEuMiwwLDEuNSwwLDMtLjUsNC4yLTEuNSwxLjUsMS4yLDMuNCwxLjgsNS4zLDEuNGgwWk0yNS4xLDI2LjdjLS43LDEuMS0xLjksMS43LTMuMiwxLjctLjEtMSwuMS0yLjEuNy0yLjksMS45LTEuNyw0LjktMS43LDYuOCwwLC42LjguOSwxLjkuNywyLjktMS4zLDAtMi41LS42LTMuMi0xLjctLjMtLjUtMS0uNy0xLjUtLjQtLjIuMS0uMy4zLS40LjRoMFoiLz4KICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0zOSw1OC4zYy0uNiwwLTEuMS41LTEuMSwxLjFoMHYxLjloLTEuOWMtLjYsMC0xLjEuNS0xLjEsMS4xcy41LDEuMSwxLjEsMS4xaDEuOXYxLjljMCwuNi41LDEuMSwxLjEsMS4xczEuMS0uNSwxLjEtMS4xdi0xLjloMS45Yy42LDAsMS4xLS41LDEuMS0xLjFzLS41LTEuMS0xLjEtMS4xaC0xLjl2LTEuOWMwLS42LS41LTEuMS0xLjEtMS4xaDBaIi8+CiAgPGcgY2xhc3M9ImNscy0yIj4KICAgIDxnIGNsYXNzPSJjbHMtMiI+CiAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTE3LjcsNjkuNmMtLjUsMC0xLS4zLTEtLjh2LTMuMWgtNS4yYy0uNSwwLS45LS4zLS45LS44aDBjMC0uNSwwLS44LjMtMS4xbDQuOS03LjhjLjMtLjQuOC0uNywxLjMtLjdoLjVjLjYsMCwxLjIuNCwxLjIsMXY3LjZoMWMuNCwwLC44LjIuOC42di4yYzAsLjQtLjIuOC0uNi45aC0xLjJ2Mi44YzAsLjUtLjMsMS0uOCwxaC0uM3YuMlpNMTIuNyw2NC4xaDMuOXYtNi41aDBjLS4zLjctLjcsMS40LTEuMSwyLjJsLTIuOCw0LjNaIi8+CiAgICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTI2LjMsNjkuOGMtMS41LDAtMy0uNS00LjEtMS40LS4yLDAtLjMtLjMtLjMtLjVzLjEtLjQuMi0uNmMuMi0uNC42LS41LDEtLjQuMSwwLC4yLDAsLjMuMi43LjYsMS43LjksMi42LjlzMS41LS4zLDItLjhjLjYtLjYuOS0xLjQuOC0yLjIsMC0uOC0uMi0xLjYtLjctMi4yLS41LS41LTEuMi0uOC0yLS44cy0xLjEsMC0xLjcuNGMtLjMuMy0uOC4zLTEuMiwwaDBjLS4zLS4yLS41LS42LS40LS45bC4zLTVjMC0uMy4xLS42LjQtLjkuMi0uMi42LS4zLjktLjNoNS4xYy40LDAsLjkuMi45Ljd2LjJjMCwuNS0uMi45LS43LjloLTQuNWwtLjMsMy42Yy42LS4zLDEuMy0uNSwxLjktLjUsMS4xLDAsMi4yLjMsMywxLjEuOS45LDEuNCwyLjEsMS4zLDMuNCwwLDEuNC0uNSwyLjctMS41LDMuNi0uOS44LTIuMSwxLjMtMy4zLDEuM3YuMloiLz4KICAgIDwvZz4KICA8L2c+CiAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNNDQuNCw0OC4yYy0xLjQtNC41LTQuMS04LjYtNy44LTExLjYtMS0uOC0yLjEtMS42LTMuMy0yLjIsMi43LTIsNC40LTUsNC44LTguMmguNmMyLjcsMCw0LjgtMi4yLDQuOC00LjhzLS42LTIuNy0xLjYtMy42Yy41LTEuOC42LTMuNy41LTUuNiwwLS42LS42LTEtMS4yLTFzLTEsLjYtMSwxLjJjMCwxLjQsMCwyLjktLjMsNC4zLS44LS4yLTEuNi0uMi0yLjQsMC0xLjEtMS41LTItMy4xLTIuNy00LjgtLjItLjUtLjgtLjgtMS4zLS43LTQuOCwxLjctMTAsMS43LTE0LjksMC0uNS0uMS0xLjEuMS0xLjMuNy0uNywxLjctMS42LDMuMy0yLjcsNC44LS44LS4yLTEuNy0uMi0yLjUsMC0uOS0yLjktLjMtNi4xLDEuNy04LjQuMy0uMy40LS44LjItMS4yLS41LTEuNC0uMi0zLC43LTQuMSwyLDEuMSw0LjQsMS40LDYuNy44LjUsMCwuOS0uMiwxLjQtLjMsNS4yLTEuMiw5LTEuOCwxMS4yLDEuOS4yLjMuNC40LjcuNSwxLjYuNSwzLjEsMS41LDQuMSwyLjkuNC41LDEsLjYsMS42LjMuNS0uMy42LTEsLjMtMS41LTEuMi0xLjctMy0zLTUtMy43LTMuMy00LjktOS4xLTMuNS0xMy40LTIuNS0uNS4xLTEsLjItMS40LjMtMy44LjgtNS41LS44LTUuNi0uOS0uNC0uNS0xLjEtLjUtMS41LS4xaDBjLTEuNywxLjgtMi40LDQuMy0xLjksNi43LTIuMiwzLTIuOCw3LTEuNiwxMC41LTEuOSwxLjgtMiw0LjgtLjIsNi44LjksMSwyLjIsMS41LDMuNSwxLjVoLjZjLjQsMy4zLDIuMSw2LjMsNC44LDguMy0xLjgsMS0zLjUsMi4yLTUsMy43LS40LjUtLjMsMS4yLjEsMS42LjQuMywxLC4zLDEuNCwwLDEuNS0xLjUsMy4yLTIuNyw1LjItMy42bDEuOSw0LjgtMS4zLDcuM2gtMTEuMWMuNy0xLjksMS41LTMuNiwyLjYtNS4yLjMtLjUuMi0xLjItLjMtMS41cy0xLjItLjItMS41LjNjLTEuMywyLTIuNCw0LjItMy4xLDYuNU0zOC4yLDE4LjljMS40LS4zLDIuNy42LDMsMnMtLjYsMi43LTIsM2gtMXYtNVpNMTQsMjMuOWMtMS40LjMtMi44LS42LTMuMS0xLjktLjMtMS40LjYtMi44LDEuOS0zLjFoMS4xdjVoLjFaTTIzLjQsNDguMmwxLjItNi4zaDNsMS4yLDYuM2gtNS40Wk0yMy4xLDM2LjVjMS45LjUsMy45LjUsNS44LDBsLTEuMiwzLjJoLTMuNGwtMS4yLTMuMlpNMzUuMywzOC40YzMuMSwyLjYsNS40LDYsNi43LDkuOGgtMTEuMWwtMS4zLTcuMywxLjktNC44YzEuMy42LDIuNiwxLjQsMy43LDIuNGgwWk0xNi4yLDI0LjdoMHYtNi4yYzEuMS0xLjUsMi4xLTMuMSwyLjgtNC44LDQuNiwxLjQsOS41LDEuNCwxNC4xLDAsLjgsMS43LDEuNywzLjMsMi44LDQuOHY2LjJjMCw1LjUtNC4zLDkuOS05LjgsMTBzLTkuOS00LjMtMTAtOS44di0uMmguMVoiLz4KICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik00NS45LDQ4LjNINS45Yy0zLjEsMC01LjYsMi41LTUuNiw1LjZ2MTcuMmMwLDMuMSwyLjUsNS42LDUuNiw1LjZoMjguMWMuNiwwLDEuMS0uNSwxLjEtMS4xcy0uNS0xLjEtMS4xLTEuMUg1LjljLTEuOSwwLTMuNC0xLjUtMy40LTMuNHYtMTcuMmMwLTEuOSwxLjUtMy40LDMuNC0zLjRoNDBjMS45LDAsMy40LDEuNSwzLjQsMy40djE3LjJjMCwxLjktMS41LDMuNC0zLjQsMy40aC03LjRjLS42LDAtMS4xLjUtMS4xLDEuMXMuNSwxLjEsMS4xLDEuMWg3LjRjMy4xLDAsNS42LTIuNSw1LjYtNS42di0xNy4yYzAtMy4xLTIuNS01LjYtNS42LTUuNloiLz4KPC9zdmc+',url:OFFICIAL},
+  {n:'因應貿易自由化就業協助對象',icon:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDY0LjIgNjQuNSI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogI2UzNGM3ZDsKICAgICAgICBzdHJva2Utd2lkdGg6IDBweDsKICAgICAgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CiAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNNTguMiw5aC0xMS41di0zLjhjMC0uNS0uNC0uOS0uOS0uOXMtLjkuNC0uOS45djMuOGgtMy45Yy0uNSwwLS45LjQtLjkuOXMuNC45LjkuOWgzLjl2NGgtLjdjLTEsMC0xLjguOC0xLjgsMS44djExLjFjMCwxLC44LDEuOCwxLjgsMS44aC43djcuNWMwLC41LjQuOS45LjlzLjktLjQuOS0uOXYtNy41aC43YzEsMCwxLjgtLjgsMS44LTEuOHYtMTEuMWMwLTEtLjgtMS44LTEuOC0xLjhoLS43di00aDExLjVjMi4zLDAsNC4xLDEuOCw0LjEsNC4xdjMyLjNIMS45VjE1YzAtMi4zLDEuOC00LjEsNC4xLTQuMWgxNi42djEuOGgtLjdjLTEsMC0xLjguOC0xLjgsMS44djExLjFjMCwxLC44LDEuOCwxLjgsMS44aC43djguM2MwLC41LjQuOS45LjlzLjktLjQuOS0uOXYtOC4zaC43YzEsMCwxLjgtLjgsMS44LTEuOHYtMTEuMWMwLTEtLjgtMS44LTEuOC0xLjhoLS43di0xLjhoMy45Yy41LDAsLjktLjQuOS0uOXMtLjQtLjktLjktLjloLTMuOXYtLjVjMC0uNS0uNC0uOS0uOS0uOXMtLjkuNC0uOS45di41SDZDMi43LDksMCwxMS43LDAsMTV2MzMuM2MwLDMuMywyLjcsNiw2LDZoMTQuNHY0LjhsLTMsMy41aC0xLjJjLS41LDAtLjkuNC0uOS45cy40LjkuOS45aDMxLjljLjUsMCwuOS0uNC45LS45cy0uNC0uOS0uOS0uOWgtMS4xbC0zLTMuNXYtNC44aDE0LjRjMy4zLDAsNi0yLjcsNi02VjE1YzAtMy4zLTIuNy02LTYtNmgwWk00Ny4zLDI3LjdoLTMuMXYtMTAuOWgzLjF2MTAuOWgwWk0yNSwyNS41aC0zLjF2LTEwLjloMy4xdjEwLjlaTTU4LjIsNTIuNGgtMTkuMWMtLjUsMC0uOS40LS45LjlzLjQuOS45LjloMi44djQuMmgtMi40Yy0uNSwwLS45LjQtLjkuOXMuNC45LjkuOWgyLjlsMS45LDIuMmgtMjQuNmwxLjktMi4yaDIuOWMuNSwwLC45LS40LjktLjlzLS40LS45LS45LS45aC0yLjR2LTQuMmgxMi45Yy41LDAsLjktLjQuOS0uOXMtLjQtLjktLjktLjlINmMtMS45LDAtMy42LTEuMy00LTMuMmg2MC4yYy0uNCwxLjktMi4xLDMuMi00LDMuMloiLz4KICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik05LjksMjcuNmMtLjUsMC0uOS40LS45LjloMHYyLjNjMCwxLC44LDEuOCwxLjgsMS44aC43djVjMCwuNS40LjkuOS45cy45LS40LjktLjl2LTVoLjdjMSwwLDEuOC0uOCwxLjgtMS44di0xMS4xYzAtMS0uOC0xLjgtMS44LTEuOGgtLjd2LTEuNWMwLS41LS40LS45LS45LS45cy0uOS40LS45Ljl2MS41aC0uN2MtMSwwLTEuOC44LTEuOCwxLjh2NC44YzAsLjUuNC45LjkuOXMuOS0uNC45LS45di00LjdoMy4xdjEwLjloLTMuMXYtMi4yYzAtLjUtLjQtLjktLjktLjloMFoiLz4KICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0zMywyNS42aC43djVjMCwuNS40LjkuOS45cy45LS40LjktLjl2LTVoLjdjMSwwLDEuOC0uOCwxLjgtMS44di03LjRjMC0uNS0uNC0uOS0uOS0uOXMtLjkuNC0uOS45aDB2Ny4zaC0zLjFWNi42aDMuMXY1LjhjMCwuNS40LjkuOS45cy45LS40LjktLjl2LTUuOWMwLTEtLjgtMS44LTEuOC0xLjhoLS43Vi45QzM1LjYuNCwzNS4xLDAsMzQuNiwwcy0uOS40LS45Ljl2My44aC0uN2MtMSwwLTEuOC44LTEuOCwxLjh2MTcuM2MwLDEsLjgsMS44LDEuOCwxLjhoMFoiLz4KICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik01MS4yLDI1LjljLjIuNS44LjYsMS4zLjQsMCwwLDAsMCwwLDBsNC4zLTIuMy0uMy44Yy0uMi41LDAsMSwuNSwxLjIuNS4yLDEsMCwxLjItLjUsMCwwLDAsMCwwLDBsMS4xLTIuOGMuMi0uNSwwLTEtLjUtMS4ybC0zLTEuMWMtLjUtLjItMSwwLTEuMi42LS4yLjUsMCwxLC41LDEuMmwuNy4zLTQuMywyLjNjLS41LjItLjYuOC0uNCwxLjNaIi8+CiAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNNS42LDQ0LjNjLjIuNS44LjcsMS4yLjUsMCwwLDAsMCwwLDBsMTIuMi01LjIsMS4xLDIuOWMuMi41LjcuNywxLjIuNSwwLDAsMCwwLC4xLDBsMjAuMS0xMC44Yy41LS4yLjYtLjguNC0xLjMtLjItLjUtLjgtLjYtMS4zLS40aDBsLTE5LjIsMTAuMy0xLjEtMi44Yy0uMi0uNS0uNy0uNy0xLjItLjUsMCwwLDAsMCwwLDBsLTEzLjEsNS42Yy0uNS4yLS43LjgtLjUsMS4yWiIvPgo8L3N2Zz4=',url:OFFICIAL},
+  {n:'尚未取得身障證明4類對象專區',icon:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDUxMiA1MTIiPgogIDxkZWZzPgogICAgPHN0eWxlPgogICAgICAuY2xzLTEgewogICAgICAgIGZpbGw6ICNlMzRjN2Q7CiAgICAgIH0KCiAgICAgIC5jbHMtMSwgLmNscy0yIHsKICAgICAgICBzdHJva2Utd2lkdGg6IDBweDsKICAgICAgfQoKICAgICAgLmNscy0yIHsKICAgICAgICBmaWxsOiBub25lOwogICAgICB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KICA8cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNjcsMTAzLjZjLTE3LjgtNC4xLTM0LjQuOS00NywxNC03LjMsNy42LTExLjUsMTYuMi0xMy4yLDI2LjktMy4xLDE5LjgsOC4zLDQxLjYsMjYuNCw1MC40LDEwLjIsNC45LDExLDQuOSwxMy41LS4xLDQtOC4yLDE0LjUtMjEuNywyNC4yLTMxLjEsOC4zLTguMSwxNi44LTE0LjQsMjkuNC0yMi4xLDEuNS0uOSwyLjctMi4zLDIuNy0zcy0xLjgtNC45LTMuOS05LjJjLTYuNi0xMy4xLTE4LjYtMjIuOC0zMi4xLTI1LjhoMFoiLz4KICA8cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0yNzguMywzNDQuMWwtNS4zLDEuM3YzNi43bDUuMy0uN2M1NC43LTYuNyw5Ni45LTQ2LjYsMTA2LjMtMTAwLjQsMi40LTEzLjcsMS41LTM2LTEuOS00OS4xLTkuMi0zNS4xLTMxLjUtNjIuOS02My43LTc5LjItOC45LTQuNS0yMy4yLTkuMi0zMi4xLTEwLjYtMy41LS41LTguMS0xLjItMTAuMS0xLjVsLTMuOC0uNXYxOTBsMi4zLS42YzE0LjYtNC4yLDI2LjktMTgsMjguMy0zMS44LjktNy45LDIuMi0xMS4zLDUtMTIuNiwzLjUtMS42LDQuNy0xLjQsNy44LDEsMi4zLDEuOCwyLjYsMi44LDIuNiw3LjgsMCwyMi40LTE3LjksNDQuNS00MC43LDUwLjJoMFpNMzA2LjEsMjM0LjFjLTIuNiwyLjUtMy43LDMtNS45LDIuNC01LjgtMS40LTYuMi0yLjUtNi4yLTE3LjdzLjItMTQsMi0xNS44LDcuMS0yLjYsMTAuMSwwYzIuMywxLjgsMi40LDIuNywyLjcsMTVsLjQsMTMuMS0zLjEsMy4xaDBaIi8+CiAgPHBhdGggY2xhc3M9ImNscy0yIiBkPSJNMzc4LjUsMzM2LjJjLTgsMTIuNS0yNS44LDMwLjItMzguMywzOC4zbC05LjMsNiwuNyw0YzQuMSwyNS4yLDMwLjQsNDMuOSw1NS43LDM5LjcsMTkuNS0zLjMsMzUuMi0xNy42LDQwLjItMzYuNyw1LjctMjIuMS01LjEtNDUuMy0yNS45LTU1LjUtNC40LTIuMi0xMC4xLTQuMy0xMi42LTQuNmwtNC41LS42LTYsOS40WiIvPgogIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTQ0NS4xLDE2MWwtOC4zLjZjLTEzLjQsMS0zMC4xLTIuNy00MS44LTkuNC0xNy41LTkuOS0zMS41LTI4LTM2LjYtNDcuMi0uOS0zLjYtMS44LTExLjQtMi0xNy41bC0uNC0xMC45LTYtMi43Yy0yMC44LTkuNS00Ni4yLTE2LTY4LTE3LjZsLTkuNS0uNiwyLjksMy43YzkuOCwxMi45LDExLjQsMTcuNiw3LjMsMjEuNC0zLjMsMy4yLTgsMi45LTEwLjctLjYtMS4xLTEuNS01LjEtNi44LTguOS0xMS43LTE5LjctMjYuMS00OS41LTQ0LjYtODIuMi01MS0xMS41LTIuMy0zNC4yLTIuOC00NS0xLTMxLDUtNTQuNywxNy4xLTc2LjUsMzguOXMtMTMuNCwxNC41LTE2LjEsMTguNmMtMzQuNiw1MS43LTMxLjUsMTE2LjksNy45LDE2NC41LDE4LjksMjIuOSw0Ni42LDM5LjUsNzYuNyw0NmwzLjQuNy0uNi00LjhjLS40LTIuNy0xLTkuMy0xLjMtMTQuNmwtLjctOS43LTUuNi0xLjdjLTguNC0yLjQtMjEuMS04LjYtMjkuNC0xNC4zLTguOC02LjEtMjEuNy0xOS4yLTI3LjctMjgtNi4zLTkuNC0xMi43LTIzLjctMTUuNy0zNC44LTIuMi04LjUtMi42LTExLjktMi42LTI1LjMsMC0xNi41LDEtMjMuNSw1LjgtMzcuMSw2LTE3LjMsMTguNy0zNS42LDMxLjgtNDYuMSw1LjctNC40LDguOC00LjgsMTIuMi0xLjMsNC4zLDQuMiwzLjQsNi44LTUuMywxNS4zLTkuOCw5LjctMTUsMTYuNS0yMCwyNi43LTE1LjIsMzAuNS0xMyw2NS4zLDUuOSw5My41LDEwLjEsMTUuMiwyNS4yLDI3LjUsNDEuOSwzNC4zLDExLjMsNC41LDEwLjYsNC43LDEyLTMsLjctMy43LDIuMy0xMCwzLjYtMTMuOCwxLjUtNC43LDEuOS03LjEsMS4xLTcuNC0uNi0uMi01LjEtMi40LTEwLjEtNC45LTE1LjktOC0yNy4zLTIxLjYtMzIuNy0zOS4yLTMuNS0xMS4yLTMuMy0yNi41LjUtMzcuNSw4LjktMjUuOCwzMC44LTQyLjYsNTcuNi00NC4yLDI3LTEuNiw1NCwxNS45LDYzLjEsNDAuN2wyLjEsNS43LDcuMy0yLjNjNC0xLjMsMTAuMy0yLjksMTQtMy41LDcuNy0xLjUsNy42LTEsMi40LTEzLjUtMTYuNi0zOS45LTYxLjgtNjMuNS0xMDMuOS01NC4zLTE1LjUsMy40LTE1LjYsMy40LTE4LjQuNS0xLjUtMS40LTIuNi0zLjctMi42LTUuMSwwLTcuNiwxNC40LTExLjksMzkuNS0xMS45czI2LjQsMS42LDQwLjMsNy4yYzI5LjYsMTIuMSw1My4xLDM3LjMsNjIuNSw2Ny4ybDIuMiw3aDYuNWMzLjYsMCw5LjguNSwxMy45LDEsNC4xLjYsNy42LjgsNy45LjYuMi0uMy0uNi00LjgtMS45LTEwLTEuOC03LjgtMi4xLTEwLTEuMS0xMi4xLDIuNC01LjEsOS40LTUuMiwxMi43LDAsLjksMS4zLDIuOCw3LjgsNC4zLDE0LjVsMi42LDEyLDYsMi4yYzM4LjYsMTQsNzAuMyw0Ni42LDgzLDg1LjQsNC4zLDEzLjIsNS43LDIxLjIsNi4zLDM2LjdsLjYsMTQuNiwzLjYuN2M5LjIsMS43LDI4LjMsOS45LDMwLjksMTMuMiwyLjIsMi45LDEuNSw3LjktMS40LDEwLjItMS41LDEuMi0zLjIsMi4xLTMuOSwyLjFzLTUtMS44LTkuNi0zLjljLTgtMy44LTIwLjYtNy45LTIxLjItNy0uMy40LTUuOSwyMC03LjMsMjUuNS0uNSwxLjguMiwyLjIsNS44LDMuOCwxMC40LDIuOSwxNy42LDcuMywyNi44LDE2LjYsOS43LDkuNywxMy44LDE3LDE3LjIsMzAuMiw3LjksMzEuNS0xMC45LDY1LTQyLjUsNzUuNC03LDIuNC05LjksMi44LTE5LjcsMi44cy0xMi43LS40LTE5LjctMi44Yy0yMC4xLTYuNi0zNi4xLTIzLjEtNDEuOC00My4xLTEtMy4zLTEuOC02LjEtMS45LTYuMiwwLS4yLTIuNS42LTUuNCwxLjctMi44LDEuMS05LDIuOS0xMy43LDQuMXMtOC41LDIuNi04LjUsMy4xYzAsMi4xLDUuMiwxNi4yLDgsMjEuOHMzLjcsOS40LjUsMTIuNWMtMywzLjEtNi42LDMuMi0xMCwuMi0zLTIuNi05LjctMTcuNy0xMi4xLTI3bC0xLjYtNi40LTEzLjEtLjZjLTIxLjQtLjktMzYuOC00LjctNTUuMi0xMy42LTI5LjYtMTQuNC01My45LTQwLjYtNjYuNC03MS41LTIuMS01LjMtNC05LjktNC4zLTEwLjEtLjItLjItMy45LTEuMS04LjMtMi0yMy4xLTQuOC00Mi42LTEzLjYtNjQuMi0yOS4xLTEuNS0xLjEtMi4zLS40LTIuMywxLjksMCw3LjYsMy4yLDI3LjMsNi40LDQwLDMuNywxNC41LDcuMywyNC4xLDE0LjIsMzguOGw0LjYsOS42aDEyLjFjMTguNCwwLDMxLjQsMy45LDQ1LDEzLjcsMjAuNCwxNC41LDMxLjgsMzYuNSwzMS45LDYxLjV2OS4zbDguMiwzLjhjMzQuOCwxNi4xLDgwLjIsMjEuNiwxMTguOSwxNC40LDEyLjMtMi4zLDExLjktMi4xLDkuMS00LjktNC42LTQuNi0yLjYtMTEuNCwzLjYtMTIuOSwyLjYtLjcsMi45LS41LDE0LDcuMiwxMi42LDguOSwyOS43LDE0LjgsNDYsMTUuOCw0NS45LDMuMSw4Ny44LTI4LjksOTcuMS03NC4xLDUuNS0yNi41LTEtNTQuMS0xNy43LTc2LjEtNC01LjItNC41LTEwLjEtMS40LTEyLjksMi44LTIuNSw3LjUtMi4zLDEwLjUuNSwxLjQsMS4zLDIuNywyLjIsMi45LDEuOS4yLS4yLDEuNC02LDIuNS0xMi45LDcuMS00MS41LDEtODQuMy0xNy40LTEyMi44bC01LjQtMTEuMmgwWiIvPgogIDxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTExNS4xLDM3Ny42Yy0yNy4zLTgtNTcuNiw1LjUtNzAuNywzMS42LTIyLjcsNDUuMSwxNy40LDk2LjcsNjcuMSw4Ni4zLDIxLjYtNC41LDQwLjItMjIuNCw0Ni4xLTQ0LjMsMi03LjUsMi0yMywwLTMwLjYtNS4zLTE5LjktMjIuMy0zNy4xLTQyLjQtNDNoLS4xWk01Ni43LDQyNy4xYy0zLjItMy45LTMuNC02LS42LTkuNSwyLjUtMy4yLDcuMS0zLjUsMTEuNC0uNiwzLjgsMi41LDcuNiwyLjUsMTAuOCwwLDEuNC0xLjEsMy45LTIsNS42LTIsNC4xLDAsNy4xLDMuMSw3LjEsNy40cy0uNyw0LjEtMy42LDYuNGMtOS4xLDcuNS0yMy42LDYuNy0zMC43LTEuN2gwWk0xMjkuNiw0NjIuM2MtMS4zLDYuNS0yLDYuNy0zMC42LDYuN3MtMjUuOSwwLTI4LjQtMi4xYy0zLjQtMi43LTMuNi03LjktLjQtMTAuOSwyLjEtMS45LDMuNC0yLDI4LjUtMmgyNi40bDIuNiwyLjZjMiwyLDIuNCwzLjEsMS45LDUuN2gwWk0xNDAuNSw0MjcuNmMtNi4yLDYuMi0xNy4yLDguMS0yNS4yLDQuNC04LjctMy45LTExLjctMTAtNy4zLTE0LjgsMi42LTIuOCw3LjYtMi45LDExLS4yLDMuMiwyLjUsNy44LDIuNSwxMSwwLDgtNi4yLDE3LjYsMy41LDEwLjUsMTAuNloiLz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTUwNS4yLDEwNS40YzIuOC0xMC4xLDMuMS0yNy41LjUtMzcuNC0zLjktMTQuOS0xNC4xLTMxLTI1LjctNDAuNi02LjYtNS40LTIxLjItMTIuOC0yOS40LTE0LjktMjAuNy01LjItNDcuOS0uMy02MC4zLDEwLjgtMy4zLDIuOS0zLjEsNy45LjMsMTAuNiwzLjYsMi44LDQuNywyLjcsMTIuMy0xLjMsMTAuNS01LjQsMTcuMi03LDI5LjEtN3MxNi4zLDEsMjYuOCw2LjFjOC43LDQuMSwyMCwxNC40LDI1LDIyLjYsMS44LDMuMSw0LjUsOC44LDYsMTIuOSwyLjIsNi4zLDIuNiw4LjksMi42LDE4LjhzLS40LDEyLjUtMi42LDE4LjhjLTMuOCwxMC41LTguMywxNy40LTE2LjUsMjUuMi0yNCwyMi45LTYwLjUsMjIuMy04NC4yLTEuMi0xNy44LTE3LjctMjIuOS00NS0xMi42LTY3LjUsMy02LjcsMy4xLTguMy40LTExLjctMy0zLjgtNy45LTMuNi0xMS4zLjUtMS40LDEuNy0yLjYsMy40LTIuNiwzLjlzLS43LDIuNC0xLjUsNC4zbC0xLjUsMy42LTYuNy0zLjFjLTIzLjgtMTAuOC01Ni4zLTE3LjgtODIuNi0xNy44aC0xMS44bC02LjMtNS40QzIyMC41LDguNCwxNzYuOS00LjIsMTM1LDEuNSw3OCw5LjMsMzAuNCw0OC45LDEyLjEsMTAzLjVjLTUuNiwxNi44LTcuNCwyOC4yLTcuNSw0NywwLDEzLjguNCwxOS4xLDIuMiwyOC4yLDUuMSwyNS43LDE2LjIsNDkuNCwzMi4zLDY5bDUuOSw3LjF2MTAuNGMwLDI4LjUsNy45LDYyLjgsMjAuNyw4OS45bDUsMTAuNS01LjcsMi44Yy0xOC41LDkuMS0zMi43LDI1LjktMzkuMiw0Ni42LTEuOSw2LjMtMi4zLDkuNi0yLjMsMjFzMS43LDIyLjgsOC44LDM2LjVjNC44LDkuNCwxNy43LDIyLjksMjYuOSwyOC40LDM2LDIxLjEsODAuMSwxMC45LDEwMi45LTIzLjcsMi42LTMuOSw1LjUtOS4yLDYuNS0xMS43LjktMi41LDItNC41LDIuMy00LjVzNC40LDEuNiw4LjksMy41YzI3LjIsMTEuNSw1NC45LDE2LjksODYuMiwxNi44LDE5LjgsMCwzNC45LTEuOCw1Mi44LTYuM2wxMS43LTMsOCwzLjVjMTQuNCw2LjIsMjMuOCw3LjksNDIsNy45LDE0LS4xLDE3LjItLjQsMjYtMi44LDExLjktMy4xLDI5LjQtMTEuNSwzOC42LTE4LjUsMTkuMi0xNC42LDMzLjMtMzUuOSw0MC4xLTYwLjgsMS44LTYuNiwyLjEtMTAuNSwyLjItMjUuMywwLTE1LjctLjMtMTguNS0yLjYtMjctMS40LTUuMi0zLjktMTIuNS01LjUtMTYuMWwtMy02LjUsMi44LTExLjJjNC45LTE5LjQsNi4zLTMxLjcsNi4zLTU0LjIsMC0zNS4xLTYuMi02My42LTIwLjUtOTMuOS0yLjctNS43LTQuOC0xMC41LTQuNy0xMC42LjIsMCwzLjUtMS44LDcuMy0zLjgsMTguMi05LjUsMzEuOC0yNi41LDM3LjctNDcuM2gwWk0xNTcuNiw0NTEuMmMtNS45LDIxLjktMjQuNSwzOS44LTQ2LjEsNDQuMy00OS43LDEwLjQtODkuOC00MS4yLTY3LjEtODYuMywxMy4xLTI2LjEsNDMuNC0zOS42LDcwLjctMzEuNiwyMC4xLDUuOSwzNy4xLDIzLjEsNDIuNCw0MywyLjEsNy42LDIuMSwyMy4xLDAsMzAuNmguMVpNNDY3LjksMjk1Yy0xLjEsNi45LTIuMywxMi43LTIuNSwxMi45LS4yLjMtMS41LS42LTIuOS0xLjktMy0yLjgtNy43LTMtMTAuNS0uNS0zLjEsMi44LTIuNiw3LjcsMS40LDEyLjksMTYuNywyMiwyMy4yLDQ5LjYsMTcuNyw3Ni4xLTkuMyw0NS4yLTUxLjIsNzcuMi05Ny4xLDc0LjEtMTYuMy0xLTMzLjQtNi45LTQ2LTE1LjgtMTEuMS03LjctMTEuNC03LjktMTQtNy4yLTYuMiwxLjUtOC4yLDguMy0zLjYsMTIuOXMzLjIsMi42LTkuMSw0LjljLTM4LjcsNy4yLTg0LjEsMS43LTExOC45LTE0LjRsLTguMS0zLjh2LTkuM2MtLjItMjUtMTEuNi00Ny0zMi02MS41LTEzLjYtOS44LTI2LjYtMTMuNy00NS0xMy43aC0xMi4xbC00LjYtOS42Yy02LjktMTQuNy0xMC41LTI0LjMtMTQuMi0zOC44LTMuMi0xMi43LTYuNC0zMi40LTYuNC00MHMwLTMuNSwyLjMtMS45YzIxLjYsMTUuNSw0MS4xLDI0LjMsNjQuMiwyOS4xLDQuNC45LDguMSwxLjgsOC4zLDIsLjMuMiwyLjIsNC44LDQuMywxMC4xLDEyLjUsMzAuOSwzNi44LDU3LjEsNjYuNCw3MS41LDE4LjQsOC45LDMzLjgsMTIuNyw1NS4yLDEzLjZsMTMuMS42LDEuNiw2LjRjMi40LDkuMyw5LjEsMjQuNCwxMi4xLDI3LDMuNCwzLDcsMi45LDEwLS4yLDMuMi0zLjEsMy4xLTUuMy0uNS0xMi41LTIuOC01LjYtOC0xOS43LTgtMjEuOHMzLjgtMS45LDguNS0zLjEsMTAuOS0zLDEzLjctNC4xYzIuOS0xLjEsNS4zLTEuOSw1LjQtMS43LjEuMS45LDIuOSwxLjksNi4yLDUuNywyMCwyMS43LDM2LjUsNDEuOCw0My4xLDcsMi40LDkuOSwyLjgsMTkuNywyLjhzMTIuNy0uNCwxOS43LTIuOGMzMS42LTEwLjQsNTAuNC00My45LDQyLjUtNzUuNC0zLjQtMTMuMi03LjUtMjAuNS0xNy4yLTMwLjItOS4yLTkuMy0xNi40LTEzLjctMjYuOC0xNi42LTUuNi0xLjYtNi4zLTItNS44LTMuOCwxLjQtNS41LDctMjUuMSw3LjMtMjUuNS42LS45LDEzLjIsMy4yLDIxLjIsNyw0LjYsMi4xLDguOSwzLjksOS42LDMuOXMyLjQtLjksMy45LTIuMWMyLjktMi4zLDMuNi03LjMsMS40LTEwLjItMi42LTMuMy0yMS43LTExLjUtMzAuOS0xMy4ybC0zLjYtLjctLjYtMTQuNmMtLjYtMTUuNS0yLTIzLjUtNi4zLTM2LjctMTIuNy0zOC44LTQ0LjQtNzEuNC04My04NS40bC02LTIuMi0yLjYtMTJjLTEuNS02LjctMy40LTEzLjItNC4zLTE0LjUtMy4zLTUuMS0xMC4zLTUtMTIuNywwLTEsMi4xLS43LDQuMywxLjEsMTIuMSwxLjMsNS4yLDIuMSw5LjcsMS45LDEwLS4zLjItMy44LDAtNy45LS42LTQuMS0uNS0xMC4zLTEtMTMuOS0xaC02LjVsLTIuMi03Yy05LjQtMjkuOS0zMi45LTU1LjEtNjIuNS02Ny4yLTEzLjktNS42LTIyLjYtNy4yLTQwLjMtNy4yLTI1LjEsMC0zOS41LDQuMy0zOS41LDExLjlzMS4xLDMuNywyLjYsNS4xYzIuOCwyLjksMi45LDIuOSwxOC40LS41LDQyLjEtOS4yLDg3LjMsMTQuNCwxMDMuOSw1NC4zLDUuMiwxMi41LDUuMywxMi0yLjQsMTMuNS0zLjcuNi0xMCwyLjItMTQsMy41bC03LjMsMi4zLTIuMS01LjdjLTkuMS0yNC44LTM2LjEtNDIuMy02My4xLTQwLjctMjYuOCwxLjYtNDguNywxOC40LTU3LjYsNDQuMi0zLjgsMTEtNCwyNi4zLS41LDM3LjUsNS40LDE3LjYsMTYuOCwzMS4yLDMyLjcsMzkuMiw1LDIuNSw5LjUsNC43LDEwLjEsNC45LjguMy40LDIuNy0xLjEsNy40LTEuMywzLjgtMi45LDEwLjEtMy42LDEzLjgtMS40LDcuNy0uNyw3LjUtMTIsMy0xNi43LTYuOC0zMS44LTE5LjEtNDEuOS0zNC4zLTE4LjktMjguMi0yMS4xLTYzLTUuOS05My41LDUtMTAuMiwxMC4yLTE3LDIwLTI2LjcsOC43LTguNSw5LjYtMTEuMSw1LjMtMTUuMy0zLjQtMy41LTYuNS0zLjEtMTIuMiwxLjMtMTMuMSwxMC41LTI1LjgsMjguOC0zMS44LDQ2LjEtNC44LDEzLjYtNS45LDIwLjYtNS44LDM3LjEsMCwxMy40LjQsMTYuOCwyLjYsMjUuMywzLDExLjEsOS40LDI1LjQsMTUuNywzNC44LDYsOC44LDE4LjksMjEuOSwyNy43LDI4LDguMyw1LjcsMjEsMTEuOSwyOS40LDE0LjNsNS42LDEuNy43LDkuN2MuMyw1LjMuOSwxMS45LDEuMywxNC42bC42LDQuOC0zLjQtLjdjLTMwLjEtNi41LTU3LjgtMjMuMS03Ni43LTQ2LTM5LjQtNDcuNi00Mi41LTExMi44LTcuOS0xNjQuNSwyLjctNC4xLDEwLTEyLjUsMTYuMS0xOC42LDIxLjgtMjEuOCw0NS41LTMzLjksNzYuNS0zOC45LDEwLjgtMS44LDMzLjUtMS4zLDQ1LDEsMzIuNyw2LjQsNjIuNSwyNC45LDgyLjIsNTEsMy44LDQuOSw3LjgsMTAuMiw4LjksMTEuNywyLjcsMy41LDcuNCwzLjgsMTAuNy42LDQuMS0zLjgsMi41LTguNS03LjMtMjEuNGwtMi45LTMuNyw5LjUuNmMyMS44LDEuNiw0Ny4yLDguMSw2OCwxNy42bDYsMi43LjQsMTAuOWMuMiw2LjEsMS4xLDEzLjksMiwxNy41LDUuMSwxOS4yLDE5LjEsMzcuMywzNi42LDQ3LjIsMTEuNyw2LjcsMjguNCwxMC40LDQxLjgsOS40bDguMy0uNiw1LjQsMTEuMmMxOC40LDM4LjUsMjQuNSw4MS4zLDE3LjQsMTIyLjhoMFpNMjU4LDI4NC41djQ1LjhsLTIuNC0uNmMtMTQuNi0zLjctMjcuMS0xOC4zLTI4LjktMzMuOC0uOS03LjYtMS44LTkuNi01LjItMTAuOS0zLjYtMS40LTcuOC41LTkuMyw0LjEtMi40LDUuOSwxLjYsMjEuOSw3LjgsMzEuNiw3LjQsMTEuNCwyMC4yLDIwLjYsMzMsMjMuNmw1LDEuMmMwLDI4LjQtLjMsMzYuNC0xLjIsMzYuNC00LjcsMC0yMS43LTMuNi0yOS4yLTYuMS00MS45LTE0LTcyLjctNDkuMi04MS4yLTkyLjYtMi41LTEyLjYtMi4zLTMzLjkuNC00Ni4zLDEwLjgtNTAuNCw1MC04Ny42LDEwMC43LTk1LjUsNC40LS43LDguNi0xLjMsOS4zLTEuNC45LDAsMS4yLDE1LDEuMiw3Mi4ydjcyLjJoMFpNMjAwLjMsMTQxLjZjLTEyLjYsNy43LTIxLjEsMTQtMjkuNCwyMi4xLTkuNyw5LjQtMjAuMiwyMi45LTI0LjIsMzEuMS0yLjUsNS0zLjMsNS0xMy41LjEtMTguMS04LjgtMjkuNS0zMC42LTI2LjQtNTAuNCwxLjctMTAuNyw1LjktMTkuMywxMy4yLTI2LjksMTIuNi0xMy4xLDI5LjItMTguMSw0Ny0xNCwxMy41LDMsMjUuNSwxMi43LDMyLjEsMjUuOCwyLjEsNC4zLDMuOSw4LjQsMy45LDkuMnMtMS4yLDIuMS0yLjcsM2gwWk0zMTYuNCwyODYuMWMtMy4xLTIuNC00LjMtMi42LTcuOC0xLTIuOCwxLjMtNC4xLDQuNy01LDEyLjYtMS40LDEzLjgtMTMuNywyNy42LTI4LjMsMzEuOGwtMi4zLjZ2LTE5MGwzLjguNWMyLC4zLDYuNiwxLDEwLjEsMS41LDguOSwxLjQsMjMuMiw2LjEsMzIuMSwxMC42LDMyLjIsMTYuMyw1NC41LDQ0LjEsNjMuNyw3OS4yLDMuNCwxMy4xLDQuMywzNS40LDEuOSw0OS4xLTkuNCw1My44LTUxLjYsOTMuNy0xMDYuMywxMDAuNGwtNS4zLjd2LTM2LjdsNS4zLTEuM2MyMi44LTUuNyw0MC0yNy44LDQwLjctNTAuMnMtLjMtNi0yLjYtNy44aDBaTTM4OSwzMjcuNGMyLjUuMyw4LjIsMi40LDEyLjYsNC42LDIwLjgsMTAuMiwzMS42LDMzLjQsMjUuOSw1NS41LTUsMTkuMS0yMC43LDMzLjQtNDAuMiwzNi43LTI1LjMsNC4yLTUxLjYtMTQuNS01NS43LTM5LjdsLS43LTQsOS4zLTZjMTIuNS04LjEsMzAuMy0yNS44LDM4LjMtMzguM2w2LTkuNCw0LjUuNloiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTg3LjQsNDI4LjhjMi45LTIuMywzLjYtMy43LDMuNi02LjQsMC00LjMtMy03LjQtNy4xLTcuNHMtNC4yLjktNS42LDJjLTMuMiwyLjUtNywyLjUtMTAuOCwwLTQuMy0yLjktOC45LTIuNi0xMS40LjYtMi44LDMuNS0yLjYsNS42LjYsOS41LDcuMSw4LjQsMjEuNiw5LjIsMzAuNywxLjdoMFoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTEzMCw0MTdjLTMuMiwyLjUtNy44LDIuNS0xMSwwLTMuNC0yLjctOC40LTIuNi0xMSwuMi00LjQsNC44LTEuNCwxMC45LDcuMywxNC44LDgsMy43LDE5LDEuOCwyNS4yLTQuNHMtMi41LTE2LjgtMTAuNS0xMC42WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNNDAyLjYsOTAuNGMzLTIuNCw0LjMtMi42LDcuNy0xLDIuOCwxLjMsNC43LDQuOCw0LjcsOC42czQuNSwxMC45LDkuMywxMy4yYzcsMy40LDEzLjgsMi4zLDE5LjQtMy4xLDMuMy0zLjIsNC42LTYuMiw1LjgtMTMsMS02LjUsNi44LTguNywxMi00LjYsMi42LDIsMi43LDIuNSwyLjMsOC4yLTEuMywxNS45LTE0LjEsMjguMy0zMC4yLDI5LjItMy41LjItNy45LS4yLTEwLjMtMS0xNC00LjYtMjMuMS0xNi40LTIzLjMtMjkuNXMuNC01LjMsMi42LTdaIi8+CiAgICA8cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0yMjkuNCwyMDFoMGM0LjEsMCw3LjUsMy40LDcuNSw3LjV2MjAuNmMwLDQuMS0zLjQsNy41LTcuNSw3LjVoMGMtNC4xLDAtNy41LTMuNC03LjUtNy41di0yMC42YzAtNC4xLDMuNC03LjUsNy41LTcuNVoiLz4KICAgIDxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTMwMS41LDIwMWgwYzQuMSwwLDcuNSwzLjQsNy41LDcuNXYyMC42YzAsNC4xLTMuNCw3LjUtNy41LDcuNWgwYy00LjEsMC03LjUtMy40LTcuNS03LjV2LTIwLjZjMC00LjEsMy40LTcuNSw3LjUtNy41WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNNDEyLjcsNTAuNGgwYzQuMSwwLDcuNSwzLjQsNy41LDcuNXYxMC45YzAsNC4xLTMuNCw3LjUtNy41LDcuNWgwYy00LjEsMC03LjUtMy40LTcuNS03LjV2LTEwLjljMC00LjEsMy40LTcuNSw3LjUtNy41WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNNDUxLjMsNTAuNGgwYzQuMSwwLDcuNSwzLjQsNy41LDcuNXYxMC45YzAsNC4xLTMuNCw3LjUtNy41LDcuNWgwYy00LjEsMC03LjUtMy40LTcuNS03LjV2LTEwLjljMC00LjEsMy40LTcuNSw3LjUtNy41WiIvPgogICAgPHBhdGggY2xhc3M9ImNscy0xIiBkPSJNNjkuNSw0NDQuMmMzLTIuNCw0LjMtMi42LDcuNy0xLDIuOCwxLjMsNC43LDQuOCw0LjcsOC42czQuNSwxMC45LDkuMywxMy4yYzcsMy40LDEzLjgsMi4zLDE5LjQtMy4xLDMuMy0zLjIsNC42LTYuMiw1LjgtMTMsMS02LjUsNi44LTguNywxMi00LjYsMi42LDIsMi43LDIuNSwyLjMsOC4yLTEuMywxNS45LTE0LjEsMjguMy0zMC4yLDI5LjItMy41LjItNy45LS4yLTEwLjMtMS0xNC00LjYtMjMuMS0xNi40LTIzLjMtMjkuNXMuNC01LjMsMi42LTdaIi8+CiAgPC9nPgo8L3N2Zz4=',url:OFFICIAL},
+  {n:'勞工就業通計畫',icon:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI5LjUuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDkuMDMgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMCIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCA2NCA2NCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgNjQgNjQ7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KCS5zdDB7ZmlsbDojRTM0QzdEO30KPC9zdHlsZT4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsNTEyLjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSI+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMjc1LjQsNTA5OS4yYy03MC02LjMtMTM0LjItMzUuNS0xODMuNy04My43Yy0xNy45LTE3LjUtMjcuNi0yOS0zOS44LTQ3LjJjLTYyLjItOTEuOC02OC45LTIwOC4xLTE3LjktMzA2LjYKCQljMjguNC01NC44LDcyLjItOTguNiwxMjctMTI3LjJjMTA2LjMtNTUuNCwyMzMuMS00Mi45LDMyNy4zLDMyLjNjMTAuOSw4LjYsMTIuOSwxMi4xLDEwLjksMTguMWMtMS40LDMuOS03LjEsNi45LTEwLjksNS45CgkJYy0xLjUtMC40LTkuMS01LjgtMTYuOS0xMS45Yy01NS43LTQzLjUtMTI3LjctNjQuNS0xOTguNi01Ny41Yy0xMTUuNywxMS4zLTIxMi42LDkyLjktMjQzLjYsMjA1LjZjLTEuNiw2LjMtMy40LDEzLTMuOSwxNS4zCgkJbC0wLjgsMy45TDM1LDQ3NDRjNS44LTEuMywxNi00LDIyLjktNmwxMi40LTMuNmwyNi4zLTI2LjNjMjcuNC0yNy4zLDMwLjMtMjkuNCwzNy0yNi42YzYsMi41LDIzLjksMzQuNSwyNS42LDQ1LjgKCQljMS41LDEwLTYuOSwyMy41LTI4LjksNDYuOGMtOC40LDguOS0xMy4xLDE2LjYtMTEuNCwxOC40YzAuNCwwLjQsMTAuNCwwLjEsMjIuMS0wLjhsMjEuNS0xLjVsNi45LDMuNGMxMS4xLDUuNCwyMSwxNi40LDI5LjQsMzIuNgoJCWM0LjEsNy42LDEwLDE3LDEzLjEsMjAuOGMxNi40LDE4LjksNDQuMywzMy4zLDY0LjcsMzMuNGMxMC44LDAsMTcuNiw2LjMsMjUuNiwyMy40YzkuOCwyMC41LDEzLjMsNDQuNCw4LjQsNTYuOQoJCWMtNCwxMC4zLTE1LjYsMTguMy00MC44LDI3LjljLTE2LjYsNi40LTI1LjUsMTAuNS0yOC41LDEzLjRjLTQuOCw0LjQtNC4xLDEzLjYsMy41LDUyLjljMi4xLDExLDQuNCwyMC40LDQuOSwyMQoJCWMxLjgsMiwyOS4xLDQuNiw0OS43LDQuNmMxMi4xLDAsMjcuOS0wLjksMzYuMy0xLjljOTIuMi0xMiwxNzIuNi02OC45LDIxNC4xLTE1MS43YzQwLjYtODEsNDAuNC0xNzIuNy0wLjgtMjU0CgkJYy01LjgtMTEuMy0xMC40LTIyLjEtMTAuNC0yNGMwLTQsNS04LjYsOS41LTguNmM0LjQsMCw4LjUsNC41LDE0LjgsMTYuMWMxNy4xLDMxLjMsMjguOCw2Ni40LDM0LjEsMTAyLjZjMywyMC4xLDIuOSw2Mi45LDAsODIuNwoJCWMtNS4xLDMzLjQtMTMuNiw2MC43LTI4LjQsOTAuN2MtMTUuNCwzMS40LTMyLjgsNTUuOS01Ni45LDgwYy00Ny4yLDQ3LjItMTA5LjMsNzcuNC0xNzUuNiw4NS42CgkJQzMyMC43LDUwOTkuOSwyODkuOCw1MTAwLjUsMjc1LjQsNTA5OS4yeiBNMjI0LjEsNTA1MS42Yy00LjQtMjIuOC02LjEtMzkuMS01LjEtNDcuOGMxLjgtMTMuOSw5LjUtMjAuMSw0MC4xLTMyLjMKCQljMzUuOS0xNC40LDM3LjktMTYuOSwzMS45LTQwLjZjLTEuNC01LjQtNC44LTE0LjUtNy41LTIwbC01LTEwLjFsLTktMC45Yy0xNi4xLTEuNi0zNC41LTktNTItMjEuMWMtMTUuMS0xMC40LTI3LjktMjUuOS0zNy42LTQ1LjkKCQljLTQuMy04LjUtMTIuMS0xNy44LTE3LjktMjAuOGMtMi44LTEuNS02LjQtMS41LTIwLjUtMC41Yy0yNywxLjktMzcuMy0wLjEtNDIuMi04LjVjLTIuMS0zLjYtMi4zLTQuOS0xLTExLjMKCQljMi40LTEyLDcuOS0yMS41LDIwLjUtMzQuOWM2LjMtNi44LDEzLjYtMTUuNSwxNi4zLTE5LjNsNC44LTdsLTIuNC02LjRjLTIuOS03LjQtOC42LTE3LjgtMTAtMTcuOGMtMS40LDAuMS0zNC4xLDMyLjQtMzksMzguNQoJCWMtNS41LDYuOC0xMyw5LjYtNDQuNCwxNy4xbC0yMi41LDUuM2wtMSw2LjhjLTEuOSwxMi4xLTAuMyw1Ni40LDIuOCw3M2MxOC40LDEwMy45LDg5LjEsMTg2LjEsMTg4LjksMjE5LjUKCQljMTEuMywzLjksMTQuNiw0LjUsMTQuOSwzLjNDMjI3LjIsNTA2OSwyMjUuOSw1MDYwLjcsMjI0LjEsNTA1MS42eiIvPgoJPHBhdGggY2xhc3M9InN0MCIgZD0iTTQyOC42LDQ5NzQuNGMtMTMuMy0zLjgtMjkuNi0xMS42LTM2LjUtMTcuNWMtNC45LTQuMS0xLjEtMjIuOSw1LjQtMjYuOWMyLjEtMS40LDIuNC0zLjMsMi40LTIxLjUKCQljMC0xMy40LDAuNS0yMSwxLjYtMjNjMy4zLTYuNSwxMy45LTYsMTcsMC42YzAuOSwyLDEuNCwxMS40LDEuNCwyNWMwLDIzLTAuNiwyNi02LjEsMzFjLTEuNSwxLjQtMi42LDIuOC0yLjYsMy4zCgkJYzAsMS4zLDEzLDYuOSwyMS42LDkuNGMxMy45LDQsMzcuMywxLjgsNDIuNC00YzIuOS0zLjMsMTIuMy0xOSwxMi4zLTIwLjVjMC0wLjgtNy44LTQuOS0xNy4xLTkuNGMtOS41LTQuNS0xOS42LTkuMy0yMi40LTEwLjYKCQljLTUtMi40LTgtNi41LTgtMTAuNmMwLTIuNiw2LjgtOS4zLDkuNC05LjNjMS4xLDAsOS4xLDMuMSwxNy45LDdjMzUuNCwxNS42LDQyLjgsMjEuMSw0Mi44LDMxLjhjMCw0LjYtMTQuMywyOC45LTIxLjEsMzYKCQljLTcuMyw3LjUtMTcuMSwxMC41LTM2LjQsMTFDNDQwLDQ5NzYuNSw0MzUuMSw0OTc2LjIsNDI4LjYsNDk3NC40eiIvPgoJPHBhdGggY2xhc3M9InN0MCIgZD0iTTM4Ni43LDQ4NjguM2MtNjAtMTAuOC0xMDQuNy01NS44LTExNS4xLTExNi4xYy05LTUyLjQsMTUuMS0xMDcuOCw2MC0xMzhjMTQuOS0xMCwzMy42LTE3LjksNTIuNS0yMS45CgkJYzkuNi0yLDQxLjctMiw1MS4zLDBjMjAuNiw0LjQsNDIuMywxMy45LDU3LjcsMjUuNWw4LjQsNi4zbDEyLTEybDExLjktMTEuOWwtNy44LTguMWMtMTIuNS0xMy0xNC40LTkuOCwzMC4xLTU0LjIKCQljMzUtMzUsMzguMS0zNy45LDQyLjItMzcuOWMzLjksMCw2LjQsMiwyNy4xLDIyLjljMjAuOSwyMC44LDIyLjksMjMuMywyMi45LDI3LjFjMCw0LTIuOSw3LjEtMzcuOSw0Mi4yCgkJYy00NC40LDQ0LjUtNDEuMSw0Mi43LTU0LjIsMzAuMWwtOC4xLTcuOGwtMTEuOSwxMS45bC0xMiwxMmw2LjMsOC40YzExLjYsMTUuNCwyMS4xLDM3LDI1LjUsNTcuN2MyLDkuNiwyLDQxLjcsMCw1MS4zCgkJYy03LjgsMzYuMS0yOC40LDY4LjUtNTYuNSw4OC40QzQ2MS4zLDQ4NjUuNSw0MjEuNyw0ODc0LjYsMzg2LjcsNDg2OC4zeiBNNDM4LjgsNDg0Ni43YzIyLjgtNS45LDQwLTE2LDU2LjgtMzMuMQoJCWMxNS45LTE2LjMsMjUuOS0zNC4zLDMxLjUtNTYuNWMzLjQtMTMuNCwzLTQxLjgtMC44LTU1LjVjLTYuMy0yMy4zLTE1LTM4LjUtMzItNTUuN2MtMTYuOC0xNi44LTMyLjUtMjUuOS01NS43LTMyLjEKCQljLTE0LjgtNC00Mi00LTU3LjIsMGMtMjIuOSw1LjktNDAuMSwxNS45LTU2LjcsMzIuNmMtMTEuOSwxMi0yMC40LDI0LjgtMjYuMSwzOWMtNi41LDE2LjMtOC4xLDI0LjktOC4xLDQ0LjkKCQljLTAuMSwxOS4xLDIsMzAuNCw4LjMsNDUuN2MxNS45LDM4LjEsNTIuMyw2Ni43LDkzLjIsNzMuMkM0MDMuMiw0ODUwLjgsNDI3LjksNDg0OS42LDQzOC44LDQ4NDYuN3ogTTU4OC4xLDQ1NzcuN2wyNy41LTI3LjUKCQlsLTEyLjktMTIuOGwtMTIuOC0xMi45bC0yNy44LDI3LjhsLTI3LjksMjcuOWwxMi41LDEyLjVjNi45LDYuOSwxMi44LDEyLjUsMTMuMSwxMi41UzU3Myw0NTkyLjgsNTg4LjEsNDU3Ny43eiIvPgoJPHBhdGggY2xhc3M9InN0MCIgZD0iTTM1OS44LDQ3OTguN2MtNi4xLTItMTYuNi0xMi44LTE4LjUtMTkuMWMtMy41LTExLjgtMS0yMS4xLDcuOS0yOS45YzEyLjgtMTIuOSwzMC40LTEyLjYsNDIuMywwLjYKCQljMTEuNiwxMi45LDExLjMsMjguNS0xLDQwLjZDMzgxLjcsNDc5OS44LDM3MS41LDQ4MDIuMywzNTkuOCw0Nzk4Ljd6IE0zNzYuNyw0Nzc3LjJjNi4zLTYuMSwxLjktMTYuOS02LjktMTYuOQoJCWMtNS4xLDAtMTAsNC45LTEwLDEwYzAsNS4xLDQuOSwxMCwxMCwxMEMzNzIuMiw0NzgwLjMsMzc0LjgsNDc3OS4yLDM3Ni43LDQ3NzcuMnoiLz4KCTxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik00MDIuNyw0NzM3LjRjLTU3LjUtNTcuNC02Mi45LTYzLjItNjIuOS02Ni45YzAtNS41LDQuOC0xMC4zLDEwLjMtMTAuM2MzLjgsMCw5LjUsNS41LDY2LjMsNjIuMgoJCWMzNi45LDM2LjksNjIuNCw2My4zLDYyLjksNjUuMmMxLjYsNi41LTMuOCwxMi44LTExLDEyLjhDNDY2LjQsNDgwMC4zLDQ0Ny40LDQ3ODIuMiw0MDIuNyw0NzM3LjR6Ii8+Cgk8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNDM5LjksNDcxOC42Yy02LjEtMi0xNi42LTEyLjgtMTguNS0xOS4xYy0zLjUtMTEuOC0xLTIxLjEsNy45LTI5LjljMTIuOC0xMi45LDMwLjQtMTIuNiw0Mi4zLDAuNgoJCWMxMS42LDEyLjksMTEuMywyOC41LTEsNDAuNkM0NjEuOCw0NzE5LjgsNDUxLjUsNDcyMi4zLDQzOS45LDQ3MTguNnogTTQ1Ni44LDQ2OTcuMWM2LjMtNi4xLDEuOS0xNi45LTYuOS0xNi45CgkJYy01LjEsMC0xMCw0LjktMTAsMTBjMCw1LjEsNC45LDEwLDEwLDEwQzQ1Mi4zLDQ3MDAuMiw0NTQuOSw0Njk5LjEsNDU2LjgsNDY5Ny4xeiIvPgoJPHBhdGggY2xhc3M9InN0MCIgZD0iTTIyMSw0NzQ1LjRjLTE3LjEtNS42LTIxLjgtOS0yNi4xLTE4LjljLTUtMTEuNC03LTQ1LjItMy4xLTUzLjNjMi40LTUsOC45LTkuOCwyMi44LTE2LjYKCQljNS40LTIuOCwxMC40LTUuOCwxMS4xLTYuNmMyLjMtMi45LDktMjUuOCwxMy00NC4yYzMuMS0xNC44LDYuNS0yMiwxNC42LTMxLjFjMy4zLTMuOCw3LjgtOS4xLDEwLjEtMTJjNy45LTkuOCwzMi0yMy40LDM4LjgtMjEuOQoJCWMyLjMsMC41LDcuOSw1LjMsMTUuNiwxMy4xbDEyLjMsMTIuNGwtMC41LDE0LjRjLTAuNSwxNi44LTEuNSwxOC45LTkuOCwxOC45Yy03LjgsMC05LjMtMi41LTkuOC0xNS40Yy0wLjUtMTAuOS0wLjUtMTAuOS01LjYtMTYuMQoJCWMtMi45LTMtNS44LTUuNC02LjUtNS40Yy00LjEsMC0xNy40LDEwLTIzLjUsMTcuOGMtMy41LDQuNi04LjEsMTAuNC0xMC4xLDEyLjljLTIuOCwzLjQtNC40LDcuOC02LjYsMTcuOAoJCWMtNi44LDMwLjgtMTMuMyw0OS40LTE5LDU0LjdjLTEuNCwxLjMtOC40LDUuMy0xNS40LDguOGwtMTIuOSw2LjRsMC4xLDE1YzAuMSw4LjMsMC44LDE3LjQsMS42LDIwLjFjMS4zLDQuNiwyLjEsNS41LDgsOC4xCgkJYzYuOSwzLjEsMTkuOSw0LDI4LDEuOWMzLjUtMC45LDQuNS0wLjYsNy45LDIuOGM5LjksOS45LTAuOCwxOS4xLTIxLjYsMTguOUMyMzAuOCw0NzQ3LjYsMjI0LjcsNDc0Ni42LDIyMSw0NzQ1LjR6Ii8+CjwvZz4KPC9zdmc+Cg==',url:OFFICIAL}
+ ]},
+ pub:{t:'我是民眾',items:[
+  {n:'身心障礙者',url:OFFICIAL},
+  {n:'中高齡者',url:OFFICIAL},
+  {n:'失智症者',url:OFFICIAL},
+  {n:'單側聽損者',url:OFFICIAL},
+  {n:'勞工就業通計畫',url:OFFICIAL},
+  {n:'高齡者',url:OFFICIAL},
+  {n:'「因應貿易自由化產業調整支援方案」指定產業之事業單位',url:OFFICIAL},
+  {n:'精神疾病者',url:OFFICIAL}
+ ]},
+ apply:{n:'我要申請',url:OFFICIAL}
+};
+var DOCS=[
+ {t:'領有身心障礙證明者',q:'領有身心障礙證明。',d:['身心障礙證明正反面影本','勞工保險或公教人員保險（公保）投保證明','最近一個月薪資所得證明','個人資料使用授權同意書'],n:'公保身分也可以申請：在政府機關、學校任職的身心障礙者同樣適用。'},
+ {t:'失智症者（未取得身障證明）',q:'經醫療院所診斷為失智症。',d:['國民身分證正反面影本','勞工保險或公教人員保險（公保）投保證明','最近一個月薪資所得證明','醫療院所確診失智症的診斷證明','個人資料使用授權同意書'],n:'公保身分也可以申請，與領有身心障礙證明者相同。'},
+ {t:'精神疾病者（未取得身障證明）',q:'經精神科專科醫師診斷為精神疾病。',d:['國民身分證正反面影本','勞工保險投保證明','最近一個月薪資所得證明','精神科專科醫師確診的診斷證明']},
+ {t:'單側聽損者（未取得身障證明）',q:'劣耳聽力閾值 40 分貝以上，且與優耳相差 25 分貝以上。',d:['國民身分證正反面影本','勞工保險投保證明','最近一個月薪資所得證明','勞動部指定醫療單位開具、近六個月內的聽力鑑定證明']},
+ {t:'特教生（未取得身障證明）',q:'符合特殊教育法所稱身心障礙之情事。',d:['國民身分證正反面影本','勞工保險投保證明','最近一個月薪資所得證明','有效、或有效期間屆滿次日起五年內的特殊教育學生鑑定證明']},
+ {t:'中高齡者與高齡者',q:'年滿 45 歲至 65 歲為中高齡者；逾 65 歲為高齡者。',d:null,n:'<a href="'+ELD_DOCS+'" target="_blank" rel="noopener">到官網看中高齡及高齡者的申請文件 ↗</a>'}
+];
+var FLOW=[
+ ['提出申請','線上申請（官網「我要申請」）或書面申請。','身心障礙者與 4 類未領證對象找縣市政府勞工主管機關；中高齡與高齡者找公立就業服務機構。'],
+ ['資格審查','受理單位審核申請資格與文件是否齊備。',''],
+ ['實地訪視','輔導委員或職務再設計專案單位到職場訪視評估。','5 千元以下的簡易就業輔具可以免訪視、免開審查會。'],
+ ['審查核定','原則上受理後 35 日內核定，但不包含試用與討論改善方案的時間。','每人每年補助最高 10 萬元，特殊需求經專案評估核准者不在此限。'],
+ ['執行改善','依核定結果執行改善方案。','先核定、再改善。'],
+ ['請款核銷','改善完成後，向受理單位辦理經費核銷。',''],
+ ['追蹤輔導','受理單位追蹤改善成效，並做滿意度調查。','']
+];
+/* 圖片：把檔案放進網站的 images 資料夾，檔名照 img 欄位即可自動顯示 */
+var CASES=[
+ {t:'不能負重的搬運工作',img:['images/case1-1.jpg','images/case1-2.jpg'],
+  hard:'申請者身體無法負重，但工作需要反覆彎腰、搬抬重物。',
+  ev:'訪視時除了看搬運設備，也一併評估整個作業流程與工作姿勢。',
+  fix:['導入升降台車，減少彎腰與負重','依流程評估的結果調整作業方式'],cats:['B','E']},
+ {t:'學校總務處的低視力同仁',img:['images/case2-1.jpg','images/case2-2.jpg'],
+  hard:'個案為低視力，在學校總務處工作，內容包含門禁管理、中距離觀看與近距離閱讀。',
+  ev:'依不同的工作任務與觀看距離，分別評估適合的輔具。',
+  fix:['門禁管理：包覆式濾光眼鏡','中距離觀看：特製眼鏡','近距離閱讀：可攜式擴視機'],cats:['A']},
+ {t:'服務視障者的個人助理員',img:['images/case3-1.jpg','images/case3-2.jpg'],
+  hard:'個案是膝上截肢者，擔任視障者的個人助理員，工作上需要義肢。',
+  ev:'義肢同時與生活、工作有關，由勞政與社政分攤補助。',
+  fix:['申請義肢，經費由勞政與社政分攤'],cats:['A'],
+  note:'2026 年 6 月修正後，補助額度以「扣除社政實際補助額後的餘額」作為評估基準。'}
+];
+function offLink(txt){return '<a class="btn" style="text-decoration:none;color:var(--ink)" href="'+OFFICIAL+'" target="_blank" rel="noopener">'+txt+' ↗</a>'}
+function openCenter(floor){
+ floor=floor||1;
+ var names=['1 樓　誰可以申請','2 樓　資格與文件','3 樓　申請流程'];
+ var head='<div class="eyebrow">'+['第 2 關　旋轉木馬','第 3 關　摩天輪','第 4 關　雲霄飛車'][floor-1]+'</div><h2>'+['🎠 誰可以申請','🎡 資格與文件','🎢 申請流程'][floor-1]+'</h2>';
+ var body='';
+ if(floor===1){
+  var card=function(it){return '<a class="ocard" href="'+it.url+'" target="_blank" rel="noopener"><span>'+it.n+'</span>'+(it.icon?'<img src="'+it.icon+'" alt="" data-src="'+it.icon+'">':'')+'</a>'};
+  body='<p class="q">職務再設計可以由雇主申請，也可以由使用者本人申請。點選對象，直接開啟官網說明。</p>'+
+   '<div class="osec emp"><h3>'+MENU.emp.t+'</h3><div class="ogrid">'+MENU.emp.items.map(card).join('')+'</div></div>'+
+   '<div class="osec pub"><h3>'+MENU.pub.t+'</h3><div class="ogrid">'+MENU.pub.items.map(card).join('')+'</div></div>'+
+   '<div class="row"><a class="btn oapply" href="'+MENU.apply.url+'" target="_blank" rel="noopener">'+MENU.apply.n+' ↗</a><button class="btn go" data-go="2">上 2 樓</button></div>';
+ }else if(floor===2){
+  body='<p class="q">點開你的身分，看資格與應備文件。</p>'+DOCS.map(function(d){
+    return '<details class="doc"><summary>'+d.t+'</summary><p><b>資格：</b>'+d.q+'</p>'+(d.d?'<p><b>應備文件：</b></p><ul>'+d.d.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul>':'')+(d.n?'<div class="fb">'+d.n+'</div>':'')+'</details>'}).join('')+
+   '<p class="note">文件清單各縣市可能不同，請以官網與受理單位公告為準。</p>'+
+   '<div class="row"><button class="btn" data-go="1">回 1 樓</button>'+offLink('到官網看申請文件')+'<button class="btn go" data-go="3">上 3 樓</button></div>';
+ }else{
+  body='<div class="route" id="route"></div><div class="stepbox" id="stepbox" aria-live="polite"></div>'+
+   '<div class="row"><button class="btn" id="fp">上一步</button><button class="btn go" id="fn">下一步</button></div>'+
+   '<div class="row"><button class="btn" data-go="2">回 2 樓</button>'+offLink('到官網「我要申請」')+'<button class="btn" id="toOrder">到流程碼頭驗收</button></div>';
+ }
+ var p=openPanel(head+body,false,'wide');
+ p.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){openCenter(+b.dataset.f)})});
+ p.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){openCenter(+b.dataset.go)})});
+ if(floor===1)p.querySelectorAll('.ocard img').forEach(function(im){im.addEventListener('error',function(){var d=document.createElement('small');d.className='oph';d.textContent='圖示：'+im.dataset.src;im.replaceWith(d)})});
+ if(floor===3){
+  var i=0;
+  var draw=function(){
+   $('#route').innerHTML=FLOW.map(function(s,k){return '<i class="'+(k===i?'on':k<i?'past':'')+'">'+(k+1)+'<br>'+s[0]+'</i>'}).join('');
+   var s=FLOW[i];
+   $('#stepbox').innerHTML='<div class="eyebrow">第 '+(i+1)+' 步，共 7 步</div><h3>'+s[0]+'</h3><p>'+s[1]+'</p>'+(s[2]?'<div class="fb">'+s[2]+'</div>':'');
+   $('#fp').disabled=i===0;$('#fn').disabled=i===FLOW.length-1;
+  };
+  $('#fp').addEventListener('click',function(){if(i>0){i--;draw()}});
+  $('#fn').addEventListener('click',function(){if(i<FLOW.length-1){i++;draw()}});
+  $('#toOrder').addEventListener('click',function(){playOrder(MARKS[1])});
+  draw();
+ }
+}
+function openStory(i){
+ i=i||0;var c=CASES[i];
+ var head='<div class="eyebrow">教學館 ④　案例分享</div><h2>🖼️ 改造故事館</h2><div class="tabs">'+CASES.map(function(x,k){return '<button class="tab'+(k===i?' on':'')+'" data-k="'+k+'">案例 '+(k+1)+'</button>'}).join('')+'</div>';
+ var body='<h3 style="margin:0;font-size:21px">'+c.t+'</h3><div class="imgs">'+c.img.map(function(src,k){return '<img src="'+src+'" alt="案例 '+(i+1)+' 圖片 '+(k+1)+'" data-src="'+src+'">'}).join('')+'</div>'+
+  '<div class="sec"><h4>遇到的困難</h4><p>'+c.hard+'</p></div>'+
+  '<div class="sec"><h4>訪視評估</h4><p>'+c.ev+'</p></div>'+
+  '<div class="sec"><h4>改善方式</h4><ul>'+c.fix.map(function(f){return '<li>'+f+'</li>'}).join('')+'</ul></div>'+
+  '<p>'+c.cats.map(function(k){return '<span class="chip" style="--c:'+CATCOL[k]+'">'+CATS[k].icon+' '+CATS[k].n+'</span>'}).join(' ')+'</p>'+
+  (c.note?'<div class="fb">'+c.note+'</div>':'')+
+  '<div class="row"><button class="btn" id="sp"'+(i===0?' disabled':'')+'>上一則</button><button class="btn go" id="sn">'+(i<CASES.length-1?'下一則':'回到島上')+'</button></div>';
+ var p=openPanel(head+body,false,'wide');
+ p.querySelectorAll('.imgs img').forEach(function(im){im.addEventListener('error',function(){var d=document.createElement('div');d.className='ph';d.innerHTML='圖片位置<br><b>'+im.dataset.src+'</b>';im.replaceWith(d)})});
+ p.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){openStory(+b.dataset.k)})});
+ $('#sp').addEventListener('click',function(){openStory(i-1)});
+ $('#sn').addEventListener('click',function(){if(i<CASES.length-1)openStory(i+1);else closePanel()});
+}
+var INFO=[
+ {id:'PK',e:'🎟️',n:'遊樂園大門售票口：進場闖 8 關',info:1,open:function(){setView('park')}}
+];
+function openTour(){
+ var steps=[['① 進遊樂園：依序闖 8 關（含諮詢服務台）',function(){closePanel();setView('park')}],['② 回城市：點職業圖釘做改造任務',function(){closePanel();setView('iso')}],['③ 城市驗收：流程碼頭',function(){playOrder(MARKS[1])}],['④ 城市驗收：服務窗口',function(){playWin(MARKS[3])}],['⑤ 領取改造師證書',openCert]];
+ var p=openPanel('<div class="eyebrow">講師用</div><h2>🧭 上課導覽</h2><p>照順序點，就能一步一步帶學員上課。</p><div class="opts">'+steps.map(function(s,k){return '<button class="opt" data-k="'+k+'">'+s[0]+'</button>'}).join('')+'</div>');
+ p.querySelectorAll('.opt').forEach(function(b){b.addEventListener('click',function(){steps[+b.dataset.k][1]()})});
+}
+$('#bTour').addEventListener('click',openTour);
+
+/* ---------- port (links) ---------- */
+function openPort(){
+  openPanel('<div class="eyebrow">官方資源入口</div><h2>⛴️ 資源港</h2><p>想申請或查詢真實案例，請從這裡前往官方網站。</p><div class="links">'+
+   '<a href="https://jobacmd.wda.gov.tw/DJOB_WEB/" target="_blank" rel="noopener">職務再設計官網（線上申請）<small>https://jobacmd.wda.gov.tw/DJOB_WEB/</small></a>'+
+   '<a href="https://jobacmd.wda.gov.tw/DJOB_WEB/PwdEld/PwdWindow" target="_blank" rel="noopener">身心障礙者服務窗口<small>https://jobacmd.wda.gov.tw/DJOB_WEB/PwdEld/PwdWindow</small></a>'+
+   '<a href="https://jobacmd.wda.gov.tw/DJOB_WEB/PwdEld/EldWindow" target="_blank" rel="noopener">中高齡及高齡者服務窗口<small>https://jobacmd.wda.gov.tw/DJOB_WEB/PwdEld/EldWindow</small></a>'+
+   '</div><div class="fb">免付費客服專線：<b class="num">0800-777-888</b></div><div class="row"><button class="btn go" id="bk">回到島上</button></div>');
+  $('#bk').addEventListener('click',closePanel);
+}
+$('#bPort').addEventListener('click',openPort);
+
+/* ---------- certificate ---------- */
+function openCert(){
+  var d=doneCount(),s=totalStars();
+  var pk=parkLeft();if(pk>0&&!unlockAll){openPanel('<div class="eyebrow">改造師證書</div><h2>遊樂園還有 '+pk+' 關</h2><p>完成遊樂園前 7 關就能領證。目前在城市完成 '+d+' 格，累積 '+s+' 顆星。</p><div class="row"><button class="btn go" id="bk">回到島上</button></div>');$('#bk').addEventListener('click',closePanel);return}
+  var lvl=d===TILES.length?'首席職務再設計師':d>=14?'資深職務再設計師':'職務再設計師';
+  var role=S.role?CATS[S.role].icon+' '+CATS[S.role].role:'';
+  openPanel('<div class="eyebrow">改造師證書</div><h2>恭喜結業</h2><label for="nm">請輸入姓名</label><input type="text" id="nm" maxlength="12" value="'+esc(S.name)+'" placeholder="你的名字">'+
+   '<div class="cert"><div class="eyebrow">職務再設計資源島</div><h3 id="cn">'+esc(S.name||'島民')+'</h3><p>完成 '+d+' / '+TILES.length+' 格改造，累積 <b>'+s+'</b> 顆星<br>授予 <b>'+lvl+'</b>'+(role?'<br>專長：'+role:'')+'</p><div class="seal">改造<br>認證</div><p><small>'+new Date().toLocaleDateString('zh-TW')+'</small></p></div>'+
+   '<p><small>可以截圖留念。</small></p><div class="row"><button class="btn go" id="pt">前往官方資源</button><button class="btn" id="bk">回到島上</button></div>');
+  $('#nm').addEventListener('input',function(){S.name=this.value;save();$('#cn').textContent=S.name||'島民'});
+  $('#bk').addEventListener('click',closePanel);$('#pt').addEventListener('click',openPort);
+  confetti();
+}
+$('#bCert').addEventListener('click',openCert);
+
+/* ---------- quiz ---------- */
+var QUIZ=[
+ {q:'新同事說辦公桌用起來不順手，你第一個念頭是？',o:{A:'找個合用的小工具給他',B:'把桌子改一改',C:'把整個座位區重新配置',D:'先問他需要什麼協助',E:'換個做法，也許根本不必用那張桌子'}},
+ {q:'形容你座位抽屜的樣子，下列哪一個最符合？',o:{A:'各種小道具一應俱全',B:'螺絲起子、膠帶、束線帶',C:'分格收納、貼好標籤',D:'補助規定和資源手冊',E:'流程圖和待辦清單'}},
+ {q:'團隊趕件、需要更有效能地工作時，你通常會優先想怎麼做？',o:{A:'找出最順手的工具發給大家',B:'把卡卡的機器先修好',C:'清出場地、把燈調亮',D:'排班表、安排大家輪流休息',E:'把工作重新拆解、分工'}},
+ {q:'逛大賣場，最吸引你的是哪一區？',o:{A:'3C 與生活小物',B:'五金與電動工具',C:'家具與燈飾',D:'美食街，先坐下來聊聊',E:'收納用品與整理術書架'}},
+ {q:'朋友說「這份工作我做不來」，你優先會回？',o:{A:'有沒有什麼工具可以幫你？',B:'是不是設備不好用？',C:'是不是環境讓你不舒服？',D:'需要有人協助，或調整時間嗎？',E:'我們把工作流程拆開來看看'}}
+];
+function startQuiz(){
+  var i=0,score={A:0,B:0,C:0,D:0,E:0};
+  openPanel('',true);
+  function show(){
+    var q=QUIZ[i],keys=shuffle(Object.keys(q.o));
+    var p=setPC('<div class="eyebrow">趣味心理測驗　'+(i+1)+' / '+QUIZ.length+'</div>'+dots(QUIZ.length,i)+'<h2>'+q.q+'</h2><div class="opts">'+keys.map(function(k){return '<button class="opt" data-k="'+k+'">'+q.o[k]+'</button>'}).join('')+'</div>');
+    p.querySelectorAll('.opt').forEach(function(b){b.addEventListener('click',function(){score[b.dataset.k]++;LOG({ev:'answer',q:q.q,a:q.o[b.dataset.k]});i++;if(i<QUIZ.length)show();else result()})});
+  }
+  function result(){
+    var best='A';Object.keys(score).forEach(function(k){if(score[k]>score[best])best=k});
+    S.role=best;save();renderHud();LOG({ev:'quiz',a:CATS[best].role,x:best});
+    var c=CATS[best];
+    setPC('<div class="eyebrow">你的職場改造師類型</div><h2 style="font-size:30px">'+c.icon+' '+c.role+'</h2><p>'+c.desc+'</p>'+
+     '<div class="fb" style="border-color:'+CATCOL[best]+'">你的拿手處方正好是職務再設計五大類之一：<b>'+c.n+'</b>。'+c.d+'</div>'+
+     '<p>五種類型做的是同一件事：<b>調整工作來配合人</b>。政府提供專業訪視與每人每年最高 10 萬元的補助。</p>'+
+     '<p><small>這是引起動機的趣味測驗，不是專業心理量表。</small></p><div class="row"><button class="btn go" id="go">前往遊樂園闖關</button></div>');
+    $('#go').addEventListener('click',function(){closePanel();setView('park')});
+  }
+  show();
+}
+$('#bQuiz').addEventListener('click',startQuiz);
+function intro(){
+  openPanel('<div class="eyebrow">職務再設計宣導互動課程</div><h2 style="font-size:28px">歡迎來到資源島</h2>'+
+   '<p>本島是一座城市，有 20 個職業和 4 座資源地標。過橋的離島是遊樂園，闖 8 關學會誰能申請、要準備什麼、流程怎麼走。每個職場都有人遇到工作障礙，等你去改造。</p>'+
+   '<p>先用 5 題小測驗找出你是哪一型職場改造師，接著進遊樂園。</p>'+
+   '<div class="row"><button class="btn go" id="q">開始測驗</button><button class="btn" id="sk">先逛城市</button></div>',true);
+  $('#q').addEventListener('click',startQuiz);$('#sk').addEventListener('click',closePanel);
+}
+
+/* ---------- confetti ---------- */
+function confetti(){
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  var cv=$('#confetti'),cx=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;
+  var cols=['#ffb703','#e8603c','#1f8f82','#6a5ccc','#2f78c4','#fff'],ps=[];
+  for(var i=0;i<140;i++)ps.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.5,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,s:5+Math.random()*6,c:cols[i%cols.length],r:Math.random()*6});
+  var t0=performance.now();
+  (function tick(t){
+    cx.clearRect(0,0,cv.width,cv.height);
+    ps.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.r+=.1;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);cx.restore()});
+    if(t-t0<3500)requestAnimationFrame(tick);else cx.clearRect(0,0,cv.width,cv.height);
+  })(t0);
+}
+
+/* ---------- 離島遊樂園：八個關卡依序解鎖 ---------- */
+var PW=1000,PH=600,unlockAll=false;
+if(!S.park)S.park={};
+function seen(id,fn){return function(){S.park[id]=1;save();fn()}}
+var STN=[
+ {id:'p1',x:118,y:515,w:164,a:'gate',n:'大門售票口',sub:'選票：雇主還是本人',run:function(){playTicket()},ok:function(){return S.park.p1>=1}},
+ {id:'p2',x:322,y:442,w:132,a:'carousel',n:'旋轉木馬',sub:'翻牌配對：誰可以申請',run:function(){openCenter(1)}},
+ {id:'p3',x:500,y:522,w:168,a:'ferris',n:'摩天輪',sub:'裝文件：資格與文件',run:function(){openCenter(2)}},
+ {id:'p4',x:728,y:462,w:140,a:'coaster',n:'雲霄飛車',sub:'鋪軌道：申請流程',run:function(){openCenter(3)}},
+ {id:'p5',x:885,y:512,w:150,a:'tent',n:'故事劇場',sub:'三則案例與謝幕問答',run:function(){openStory(0)}},
+ {id:'p6',x:868,y:338,w:108,a:'stall',n:'射擊攤',sub:'射擊：誰符合資格',run:function(){playShoot()},ok:function(){return S.done.L3!=null}},
+ {id:'p7',x:648,y:286,w:100,a:'candy',n:'糖果屋',sub:'補助判斷與理由',run:function(){playCandy()},ok:function(){return S.done.L1!=null}},
+ {id:'p8',x:500,y:312,w:236,a:'castle',n:'城堡頒獎台',sub:'守門問答與證書',run:function(){if(S.done.L4==null&&!unlockAll)bossQuiz();else{S.park.p8=1;save();openCert()}}}
+];
+var DESK={x:236,y:556,w:78,a:'info',n:'諮詢服務台',sub:'常見問題與提問'};
+var EXIT={x:188,y:292,w:112,a:'bridge',n:'過橋回城市',sub:'改造 20 個職業'};
+function stOk(i){var s=STN[i];return s.ok?s.ok():!!S.park[s.id]}
+function stOpen(i){return unlockAll||i===0||stOk(i-1)}
+function curStn(){for(var i=0;i<STN.length;i++)if(!stOk(i))return i;return -1}
+function parkLeft(){var n=0;for(var i=0;i<STN.length-1;i++)if(!stOk(i))n++;return n}
+function parkGuide(){if(view!=='park')return;var c=curStn();$('#guide').textContent=c<0?'遊樂園 8 關全部完成，過橋回城市改造職業吧':'下一站：第 '+(c+1)+' 關 '+STN[c].n}
+function ptree(x,y,k){return '<g transform="translate('+x+','+y+') scale('+k+')"><ellipse cx="0" cy="2" rx="16" ry="4" fill="rgba(0,50,20,.2)"/><rect x="-3" y="-18" width="6" height="20" fill="#8a5a3a"/><circle cx="0" cy="-30" r="17" fill="#3f9a55"/><circle cx="-10" cy="-22" r="12" fill="#4fae62"/><circle cx="10" cy="-23" r="12" fill="#57b96a"/><circle cx="-4" cy="-36" r="9" fill="#6ccb7c"/></g>'}
+function pcloud(x,y,k,c){return '<g class="cl '+c+'"><g transform="translate('+x+','+y+') scale('+k+')" fill="#fff"><ellipse cx="0" cy="0" rx="46" ry="15"/><circle cx="-14" cy="-10" r="17"/><circle cx="12" cy="-13" r="20"/><circle cx="32" cy="-3" r="12"/></g></g>'}
+function parkBg(){
+ var s='<svg width="'+PW+'" height="'+PH+'" aria-hidden="true"><defs>'+
+  '<linearGradient id="gSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f9be6"/><stop offset="1" stop-color="#d6f1ff"/></linearGradient>'+
+  '<linearGradient id="gSea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b9fc4"/><stop offset="1" stop-color="#7fdcdc"/></linearGradient>'+
+  '<linearGradient id="gLawn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a5e08a"/><stop offset="1" stop-color="#58b257"/></linearGradient></defs>';
+ s+='<rect width="1000" height="215" fill="url(#gSky)"/>';
+ s+='<circle cx="850" cy="74" r="62" fill="rgba(255,230,130,.25)"/><circle cx="850" cy="74" r="46" fill="rgba(255,230,130,.4)"/><g class="rot">';
+ for(var i=0;i<12;i++){var a=i*Math.PI/6;s+='<line x1="'+(850+44*Math.cos(a)).toFixed(1)+'" y1="'+(74+44*Math.sin(a)).toFixed(1)+'" x2="'+(850+58*Math.cos(a)).toFixed(1)+'" y2="'+(74+58*Math.sin(a)).toFixed(1)+'" stroke="#ffd84d" stroke-width="4" stroke-linecap="round"/>'}
+ s+='<circle cx="850" cy="74" r="59" fill="none"/></g><circle cx="850" cy="74" r="34" fill="#ffd84d"/><circle cx="842" cy="66" r="22" fill="#ffe98a"/>';
+ s+=pcloud(150,70,1,'')+pcloud(430,48,.7,'b')+pcloud(660,96,.85,'')+pcloud(960,150,.6,'b');
+ s+='<polygon points="0,210 110,118 200,172 330,84 452,182 560,124 690,190 806,104 920,176 1000,138 1000,210" fill="#7f9fc4"/>';
+ s+='<polygon points="330,84 300,116 318,110 330,122 343,108 362,118" fill="#fff"/><polygon points="806,104 780,132 797,126 806,138 818,124 834,132" fill="#fff"/><polygon points="560,124 541,146 554,142 560,150 569,140 580,146" fill="#fff"/><polygon points="110,118 92,142 104,138 110,146 118,136 130,142" fill="#fff"/>';
+ s+='<polygon points="0,214 80,170 170,200 260,160 360,204 470,172 590,206 700,166 800,202 900,174 1000,200 1000,214" fill="#5d9d6c"/><polygon points="260,160 360,204 260,204" fill="#4f8d5e"/><polygon points="700,166 800,202 700,202" fill="#4f8d5e"/><polygon points="470,172 590,206 470,206" fill="#4f8d5e"/>';
+ s+='<rect y="206" width="1000" height="34" fill="url(#gSea)"/><path d="M0,216 h1000 M0,226 h1000" stroke="rgba(255,255,255,.5)" stroke-width="1.5" stroke-dasharray="26 40"/>';
+ s+='<path d="M0,238 Q500,216 1000,238 L1000,600 L0,600 Z" fill="url(#gLawn)"/><path d="M0,238 Q500,216 1000,238" fill="none" stroke="#f0deb0" stroke-width="7"/>';
+ [[60,268,.7],[140,262,.75],[345,258,.7],[410,262,.65],[610,258,.7],[790,262,.75],[945,270,.8],[28,430,1.1],[975,410,1.1],[400,585,1.2],[610,592,1.2],[215,592,1.25],[790,590,1.2],[168,372,.9]].forEach(function(t){s+=ptree(t[0],t[1],t[2])});
+ var fc=['#fff','#ffd84d','#ff8fa3','#fff'];
+ for(i=0;i<70;i++){var fx=(i*137+40)%1000,fy=262+((i*89)%330);s+='<circle cx="'+fx+'" cy="'+fy+'" r="'+(2+i%2)+'" fill="'+fc[i%4]+'" opacity=".85"/>'}
+ return s+'</svg>';
+}
+var parkBuilt=false;
+function renderPark(){
+ if(!parkBuilt){parkBuilt=true;$('#parkBg').innerHTML=parkBg()}
+ var cur=curStn(),pts=STN.concat([EXIT]),i,h='<svg class="pth" width="'+PW+'" height="'+PH+'" aria-hidden="true">';
+ var pl=pts.map(function(q){return q.x+','+q.y}).join(' ');
+ h+='<polyline points="'+pl+'" fill="none" stroke="#b8935a" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/><polyline points="'+pl+'" fill="none" stroke="#f3e2ba" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>';
+ for(i=0;i<pts.length-1;i++){var a=pts[i],b=pts[i+1],co='x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" stroke-linecap="round"';
+  if(stOk(i))h+='<line '+co+' stroke="#ffd166" stroke-width="38"/>';
+  h+='<line '+co+' stroke="'+(stOk(i)?'#fff':'#d9c08e')+'" stroke-width="4" stroke-dasharray="1 13"/>';}
+ h+='</svg>';
+ [['🎈',70,345,'fl'],['🎈',955,300,'fl'],['🎈',588,360,'fl'],['🍿',395,470,''],['⛲',600,385,''],['🎏',790,545,'']].forEach(function(d){h+='<div class="deco '+d[3]+'" aria-hidden="true" style="left:'+d[1]+'px;top:'+d[2]+'px;z-index:'+(d[2]+30)+'">'+d[0]+'</div>'});
+ function node(s,cls,attr,badge,aria){
+  return '<button class="stn'+cls+'" '+attr+' style="left:'+s.x+'px;top:'+s.y+'px;z-index:'+s.y+'" aria-label="'+aria+'"><i class="glow"></i><span class="pic" style="left:'+(-s.w/2)+'px;top:'+(-s.w*.92)+'px">'+artSVG(s.a,s.w)+badge+'</span><span class="lab"><b>'+s.n+'</b><small>'+s.sub+'</small></span></button>';
+ }
+ STN.forEach(function(s,i){
+  var ok=stOk(i),op=stOpen(i);
+  var badge='<i class="no" style="left:'+(s.w*.08)+'px;top:'+(s.w*.1)+'px">'+(i+1)+'</i>'+(ok?'<i class="mk" style="right:'+(s.w*.06)+'px;top:'+(s.w*.1)+'px">✅</i>':op?'':'<i class="mk" style="right:'+(s.w*.06)+'px;top:'+(s.w*.1)+'px">🔒</i>');
+  h+=node(s,(ok?' done':'')+(op?'':' lock')+(i===cur?' cur':''),'data-i="'+i+'"',badge,'第 '+(i+1)+' 關 '+s.n+'：'+s.sub+(ok?'，已完成':op?'':'，尚未解鎖'));
+ });
+ h+=node(EXIT,' exit'+(cur<0?' cur':''),'id="stExit"','',EXIT.n+'：'+EXIT.sub);
+ h+=node(DESK,' desk','id="stDesk"','',DESK.n+'：'+DESK.sub);
+ $('#parkMap').innerHTML=h;
+ var tk=cur<0?EXIT:STN[cur],t=$('#token');t.style.left=(tk.x+tk.w*.3)+'px';t.style.top=(tk.y-34)+'px';
+ $('#parkMap').querySelectorAll('.stn[data-i]').forEach(function(b){b.addEventListener('click',function(){
+  var i=+b.dataset.i;
+  if(!stOpen(i)){b.classList.remove('nope');void b.offsetWidth;b.classList.add('nope');$('#guide').textContent='第 '+(i+1)+' 關還沒解鎖，先完成第 '+i+' 關';return}
+  STN[i].run();
+ })});
+ $('#stExit').addEventListener('click',function(){setView('iso')});
+ $('#stDesk').addEventListener('click',function(){openDesk('faq')});
+}
+function fitPark(){
+ var w=$('#park'),cw=w.clientWidth-10,s=Math.max(.62,Math.min(1.6,cw/PW,window.innerHeight*.8/PH));
+ $('#parkIn').style.transform='scale('+s+')';$('#parkSz').style.width=(PW*s)+'px';$('#parkSz').style.height=(PH*s)+'px';
+}
+window.onPanelClose=function(){renderHud();if(view==='park'){renderPark();parkGuide()}};
+window.addEventListener('resize',function(){if(view==='park')fitPark()});
+$('#bUnlock').addEventListener('click',function(){unlockAll=!unlockAll;this.classList.toggle('on',unlockAll);this.textContent=unlockAll?'講師模式：全部開放':'講師模式';renderPark()});
+$('#vPark').addEventListener('click',function(){setView('park')});
+
+/* ================= 遊樂園小遊戲 ================= */
+function parkDone(id,stars){var p=S.park[id];if(!(p>=stars))S.park[id]=stars;save()}
+function endPanel(title,stars,msg,again){
+ setPC('<div class="eyebrow">過關</div><h2>'+title+'</h2>'+starsHTML(stars)+'<div class="fb">'+msg+'</div><div class="row"><button class="btn go" id="bk">回到園區</button><button class="btn" id="ag">再玩一次</button></div>');
+ $('#bk').addEventListener('click',closePanel);$('#ag').addEventListener('click',again);
+ if(stars===3)confetti();
+}
+var NOMOTION=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---- 第 2 關 旋轉木馬：翻牌配對 ---- */
+var PAIRS=[['身心障礙者','領有身心障礙證明'],['中高齡者','年滿 45 歲至 65 歲'],['高齡者','逾 65 歲'],['失智症者','醫療院所診斷，未領身障證明'],['精神疾病者','精神科專科醫師診斷'],['單側聽損者','劣耳 40 分貝以上，兩耳相差 25 分貝'],['特教生','符合特教法身心障礙情事'],['勞工就業通','連續失業 30 日以上，由雇主申請']];
+function playMemory(){
+ var cards=[];PAIRS.forEach(function(p,i){cards.push({k:i,t:p[0],a:1});cards.push({k:i,t:p[1],a:0})});cards=shuffle(cards);
+ var p=openPanel('<div class="eyebrow">第 2 關　旋轉木馬</div><h2>🎠 翻牌配對：誰可以申請</h2><p>把橘色的「服務對象」和綠色的「條件」配成一對。開始前讓你偷看 4 秒。</p><div class="mhud"><span>翻牌次數 <b id="mv">0</b></span><span>配對 <b id="mp">0</b> / '+PAIRS.length+'</span></div><div class="mgrid">'+cards.map(function(c,i){return '<button class="mc show" data-i="'+i+'" aria-label="第 '+(i+1)+' 張牌"><span class="mi"><span class="mf">🎠</span><span class="mb '+(c.a?'a':'b')+'">'+c.t+'</span></span></button>'}).join('')+'</div><div id="fb" aria-live="polite"></div>',false,'wide');
+ var open=[],lock=true,moves=0,found=0,els=p.querySelectorAll('.mc');
+ setTimeout(function(){els.forEach(function(e){e.classList.remove('show')});lock=false},4000);
+ els.forEach(function(e){e.addEventListener('click',function(){
+  var i=+e.dataset.i;if(lock||e.classList.contains('show')||e.classList.contains('ok'))return;
+  e.classList.add('show');open.push(i);
+  if(open.length<2)return;
+  moves++;$('#mv').textContent=moves;
+  var a=cards[open[0]],b=cards[open[1]],ea=els[open[0]],eb=els[open[1]];open=[];
+  if(a.k===b.k){
+   ea.classList.add('ok');eb.classList.add('ok');found++;$('#mp').textContent=found;
+   $('#fb').innerHTML='<div class="fb">配對成功：<b>'+PAIRS[a.k][0]+'</b>　'+PAIRS[a.k][1]+'</div>';
+   if(found===PAIRS.length){var st=moves<=13?3:moves<=20?2:1;LOG({ev:'detail',a:'翻牌 '+moves+' 次'});parkDone('p2',st);setTimeout(function(){if($('#mv'))endPanel('🎠 翻牌配對',st,'翻了 '+moves+' 次完成 8 組配對。服務對象包含身心障礙者、中高齡與高齡者，以及失智症、精神疾病、單側聽損、特教生四類未領證明者；勞工就業通由雇主申請。',playMemory)},1100)}
+  }else{lock=true;setTimeout(function(){ea.classList.remove('show');eb.classList.remove('show');lock=false},950)}
+ })});
+}
+
+/* ---- 第 3 關 摩天輪：幫乘客把文件裝進車廂 ---- */
+var DPOOL={A:'身心障礙證明影本',B:'國民身分證影本',C:'投保證明',D:'最近一個月薪資所得證明',E:'失智症診斷證明',F:'近六個月內的聽力鑑定證明',G:'個人資料使用授權同意書',H:'畢業證書',I:'戶口名簿',J:'存摺封面影本',K:'汽車駕照'};
+var DROUNDS=[
+ {who:'在學校任職、領有身心障礙證明的職員',need:'ACDG',ex:'領有身障證明者要附身障證明。投保證明可以是勞保，也可以是公保。若確定要申請聽覺輔具，部分縣市也會要求附上聽力相關資料。'},
+ {who:'經醫療院所診斷為失智症、未領身障證明的員工',need:'BCDEG',ex:'未領證者改附身分證，再加上失智症診斷證明。投保證明勞保或公保都可以。'},
+ {who:'單側聽損、未領身障證明的員工',need:'BCDFG',ex:'未領證者附身分證，再加上勞動部指定醫療單位開的近六個月內聽力鑑定證明。'}
+];
+function playDocs(){
+ var r=0,perfect=0;
+ openPanel('',false,'wide');
+ function round(){
+  var R=DROUNDS[r],keys=shuffle(Object.keys(DPOOL)),pick={},first=true;
+  var p=setPC('<div class="eyebrow">第 3 關　摩天輪</div><h2>🎡 幫乘客把文件裝進車廂</h2><div class="cabs">'+DROUNDS.map(function(x,i){return '<i class="'+(i<r?'ok':i===r?'on':'')+'">'+(i+1)+'</i>'}).join('')+'</div>'+
+   '<div class="who"><i>🧑‍💼</i><div><b>第 '+(r+1)+' 位乘客</b><br>'+R.who+'</div></div><p class="q">申請職務再設計要帶哪些文件？全部選出來，不需要的不要選。</p>'+
+   '<div class="docs">'+keys.map(function(k){return '<button class="opt" data-k="'+k+'" aria-pressed="false">'+DPOOL[k]+'</button>'}).join('')+'</div>'+
+   '<div class="row"><button class="btn go" id="sub">送上車廂</button></div><div id="fb" aria-live="polite"></div>');
+  var chips=p.querySelectorAll('.docs .opt');
+  chips.forEach(function(b){b.addEventListener('click',function(){
+   var k=b.dataset.k;pick[k]=!pick[k];chips.forEach(function(x){x.classList.remove('ok','no','miss')});
+   chips.forEach(function(x){x.classList.toggle('pick',!!pick[x.dataset.k])});b.setAttribute('aria-pressed',!!pick[k]);
+  })});
+  $('#sub').addEventListener('click',function(){
+   var bad=0,miss=0,nm=Object.keys(pick).filter(function(k){return pick[k]}).map(function(k){return DPOOL[k]}).join('、');
+   chips.forEach(function(x){var k=x.dataset.k,need=R.need.indexOf(k)>=0;x.classList.remove('pick');
+    if(pick[k]&&need)x.classList.add('ok');else if(pick[k]&&!need){x.classList.add('no');bad++}else if(!pick[k]&&need){x.classList.add('miss');miss++}});
+   if(first)LOGA('文件：'+R.who,nm||'（沒選）',!(bad||miss));
+   if(bad||miss){first=false;$('#fb').innerHTML='<div class="fb bad">'+(bad?'紅色的 '+bad+' 份不需要。':'')+(miss?'還少 '+miss+' 份（虛線框）。':'')+'調整後再送一次。</div>';
+    chips.forEach(function(x){if(x.classList.contains('ok'))x.classList.add('pick')});return}
+   if(first)perfect++;
+   chips.forEach(function(x){x.disabled=true});$('#sub').hidden=true;
+   $('#fb').innerHTML='<div class="fb">'+(first?'一次到位！':'文件齊全了。')+R.ex+'</div><div class="row"><button class="btn go" id="nx">'+(r<DROUNDS.length-1?'下一位乘客':'看結果')+'</button></div>';
+   $('#nx').addEventListener('click',function(){r++;if(r<DROUNDS.length)round();else{var st=Math.max(1,perfect);parkDone('p3',st);endPanel('🎡 文件裝車廂',st,'三位乘客都上車了，其中 '+perfect+' 位一次備齊。實際請以官網與受理單位公告為準。',playDocs)}});$('#nx').focus();
+  });
+ }
+ round();
+}
+
+/* ---- 第 4 關 雲霄飛車：鋪好申請流程的軌道 ---- */
+function playCoaster(){
+ var names=FLOW.map(function(f){return f[0]}),d='M16,150 C66,150 76,44 126,44 S186,150 236,150 S296,64 346,64 S406,160 456,150 S516,54 566,64 S616,118 634,118';
+ var idx=0,err=0,pool=shuffle(names.map(function(n,i){return i}));
+ var p=openPanel('<div class="eyebrow">第 4 關　雲霄飛車</div><h2>🎢 鋪好申請流程的軌道</h2><p>申請職務再設計有七站。依正確順序點選，車子才會往前開。</p>'+
+  '<svg class="trk" viewBox="0 0 650 196" aria-hidden="true"><path d="'+d+'" fill="none" stroke="#9aa7b5" stroke-width="12" stroke-linecap="round"/><path id="ctrk" d="'+d+'" fill="none" stroke="#b8322a" stroke-width="6" stroke-linecap="round"/><g id="cn"></g><g id="cart"><rect x="-15" y="-19" width="30" height="15" rx="5" fill="#ffb703" stroke="#fff" stroke-width="2"/><circle cx="-7" cy="-21" r="5" fill="#12313a"/><circle cx="7" cy="-21" r="5" fill="#12313a"/></g></svg>'+
+  '<div class="pool" style="margin-top:10px">'+pool.map(function(i){return '<button class="opt" data-i="'+i+'">'+names[i]+'</button>'}).join('')+'</div><div id="fb" aria-live="polite"></div>',false,'wide');
+ var path=$('#ctrk'),L=path.getTotalLength(),pos=[],cur=0,h='';
+ for(var k=0;k<7;k++){var q=path.getPointAtLength(L*(k+.7)/7.3);pos.push(L*(k+.7)/7.3);h+='<circle id="cd'+k+'" cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="11" fill="#fff" stroke="#b8322a" stroke-width="3"/><text x="'+q.x.toFixed(1)+'" y="'+(q.y+4.5).toFixed(1)+'" font-size="12" font-weight="900" text-anchor="middle" fill="#b8322a">'+(k+1)+'</text><text id="ct'+k+'" x="'+q.x.toFixed(1)+'" y="'+(q.y>100?q.y+30:q.y-18).toFixed(1)+'" font-size="13" font-weight="700" text-anchor="middle" fill="#12313a"></text>'}
+ $('#cn').innerHTML=h;
+ function put(l){var a=path.getPointAtLength(l);$('#cart').setAttribute('transform','translate('+a.x.toFixed(1)+','+a.y.toFixed(1)+')')}
+ function run(to,ms,cb){var from=cur,t0=performance.now();if(NOMOTION){cur=to;put(to);if(cb)cb();return}
+  (function st(t){var k=Math.min(1,(t-t0)/ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;cur=from+(to-from)*e;if(!$('#cart'))return;put(cur);if(k<1)requestAnimationFrame(st);else if(cb)cb()})(t0)}
+ put(0);
+ p.querySelectorAll('.pool .opt').forEach(function(b){b.addEventListener('click',function(){
+  var i=+b.dataset.i;
+  LOGA('流程第 '+(idx+1)+' 站',names[i],i===idx);
+  if(i!==idx){err++;b.classList.remove('no');void b.offsetWidth;b.classList.add('no');$('#fb').innerHTML='<div class="fb bad">還沒輪到「'+names[i]+'」。第 '+(idx+1)+' 站是什麼？</div>';return}
+  b.hidden=true;$('#cd'+idx).setAttribute('fill','#ffd166');$('#ct'+idx).textContent=names[idx];
+  $('#fb').innerHTML='<div class="fb"><b>第 '+(idx+1)+' 站　'+FLOW[idx][0]+'</b>：'+FLOW[idx][1]+(FLOW[idx][2]?' '+FLOW[idx][2]:'')+'</div>';
+  var last=idx===6;run(pos[idx],650,last?function(){run(L,700,function(){var st=err===0?3:err<=2?2:1;parkDone('p4',st);setTimeout(function(){if($('#cart'))endPanel('🎢 流程軌道',st,'七站順序：提出申請、資格審查、實地訪視、審查核定、執行改善、請款核銷、追蹤輔導。記得先核定、再改善、後核銷。',playCoaster)},500)})}:null);
+  idx++;
+ })});
+}
+
+/* ---- 第 5 關 故事劇場：謝幕問答 ---- */
+function playTheater(){
+ var score=0,head='<div class="curtain"><i></i><i></i><span>🎭 謝幕問答</span></div><div class="eyebrow">第 5 關　故事劇場</div>';
+ openPanel('',false,'wide');
+ runSteps(head,[{q:'案例一：不能負重的申請者，最後是怎麼改善的？',opts:[{t:'導入升降台車，並評估調整作業流程',ok:1},{t:'請他多練重量訓練',why:'職務再設計是調整工作來配合人。'},{t:'把他調到不用做事的位置',why:'目標是讓人留在崗位上發揮。'}],ex:'除了設備，訪視時也一併評估了整個作業流程。'}],function(r1){
+  score+=r1;
+  var L=[['門禁管理','包覆式濾光眼鏡'],['中距離觀看','特製眼鏡'],['近距離閱讀','可攜式擴視機']],right=shuffle(L.map(function(x,i){return i})),sel=-1,err=0,done=0;
+  var p=setPC(head+dots(3,1)+'<p class="q">案例二：學校總務處的低視力同仁。把左邊的工作任務配上右邊的輔具。</p><div class="match"><div class="opts">'+L.map(function(x,i){return '<button class="opt ml" data-i="'+i+'">'+x[0]+'</button>'}).join('')+'</div><div class="opts">'+right.map(function(i){return '<button class="opt mr" data-i="'+i+'">'+L[i][1]+'</button>'}).join('')+'</div></div><div id="fb" aria-live="polite"></div>');
+  p.querySelectorAll('.ml').forEach(function(b){b.addEventListener('click',function(){sel=+b.dataset.i;p.querySelectorAll('.ml').forEach(function(x){x.classList.toggle('pick',x===b)})})});
+  p.querySelectorAll('.mr').forEach(function(b){b.addEventListener('click',function(){
+   if(sel<0){$('#fb').innerHTML='<div class="fb bad">先點左邊的工作任務。</div>';return}
+   if(+b.dataset.i===sel){var l=p.querySelector('.ml[data-i="'+sel+'"]');l.classList.remove('pick');l.classList.add('ok');b.classList.add('ok');l.disabled=b.disabled=true;sel=-1;done++;$('#fb').innerHTML='';
+    if(done===3){if(!err)score++;$('#fb').innerHTML='<div class="fb">'+(err?'配對完成。':'全部一次配對成功！')+'同一位個案，不同的工作任務需要不同的輔具。</div><div class="row"><button class="btn go" id="nx">下一題</button></div>';$('#nx').addEventListener('click',q3);$('#nx').focus()}
+   }else{err++;b.classList.remove('no');void b.offsetWidth;b.classList.add('no');setTimeout(function(){b.classList.remove('no')},400)}
+  })});
+ });
+ function q3(){
+  var p=setPC('');
+  runSteps(head,[{q:'案例三：膝上截肢的個人助理員需要義肢，經費怎麼處理？',opts:[{t:'由勞政與社政分攤',ok:1},{t:'全部由個案自費',why:'可以申請補助。'},{t:'由雇主全額負擔',why:'政府有補助資源。'}],ex:'義肢同時與生活、工作有關。2026 年 6 月修正後，補助以扣除社政實際補助額後的餘額作為評估基準。'}],function(r3){
+   score+=r3;var st=Math.max(1,score);parkDone('p5',st);endPanel('🎭 謝幕問答',st,'三題中有 '+score+' 題一次答對。三則案例分別用到設備與流程調整、多項視覺輔具、以及勞政社政分攤的義肢。',playTheater);
+  });
+  /* 單題流程的進度點改為第 3 題 */
+  var d=$('#pc .dots');if(d)d.outerHTML=dots(3,2);
+ }
+}
+
+/* ---- 第 6 關 射擊攤：打中符合資格的靶 ---- */
+var SHOTS=[['領有身心障礙證明',1],['52 歲作業員',1],['68 歲清潔人員',1],['失智症診斷　未領證',1],['精神疾病診斷　未領證',1],['單側聽損　未領證',1],['特教生　未領證',1],['45 歲倉管',1],['60 歲照服員',1],
+ ['44 歲　無身心障礙',0,'中高齡從年滿 45 歲起算'],['只是想換新電腦',0,'補助是為了排除工作障礙'],['30 歲　沒有工作障礙',0,'不在服務對象內'],['主管想換新沙發',0,'和員工的工作障礙無關'],['想辦員工旅遊',0,'不是職務再設計的補助項目']];
+function playShoot(){
+ if(NOMOTION){playElig(MARKS[2]);return}
+ var p=openPanel('<div class="eyebrow">第 6 關　射擊攤</div><h2>🎯 打中符合資格的靶</h2><p>靶子上寫著不同的人。<b>是符合推動職務再設計服務計畫對象的才打</b>，不是的放它過去。</p><div class="mhud"><span>時間 <b id="st">45</b> 秒</span><span>命中 <b id="sh">0</b></span><span>誤擊 <b id="sw">0</b></span></div><div class="shoot" id="arena"><i class="lane" style="top:112px"></i><i class="lane" style="top:206px"></i><i class="lane" style="top:300px"></i><div class="start"><button class="btn go" id="sgo" style="font-size:18px;padding:12px 28px">開始射擊</button></div></div><div id="fb" aria-live="polite"></div>',false,'wide');
+ var arena=$('#arena'),hits=0,wrong=0,time=45,n=0,queue=shuffle(SHOTS.concat(SHOTS)).concat(shuffle(SHOTS)),tick,spawnT;
+ function alive(){return arena.isConnected}
+ function spawn(){
+  if(!alive()||n>=queue.length)return;
+  var q=queue[n],lane=n%3,W=arena.clientWidth,b=document.createElement('button');n++;
+  b.className='tg';b.style.top=(28+lane*94)+'px';b.innerHTML='<span class="bd"></span><span class="tx">'+q[0]+'</span>';
+  var ltr=lane%2===0,an=b.animate([{transform:'translateX('+(ltr?-130:W+10)+'px)'},{transform:'translateX('+(ltr?W+10:-130)+'px)'}],{duration:6200+lane*500,easing:'linear'});
+  an.onfinish=function(){b.remove()};
+  b.addEventListener('click',function(){
+   an.pause();LOGA('射擊：'+q[0],'射擊',!!q[1]);
+   if(q[1]){hits++;$('#sh').textContent=hits;b.classList.add('hit');b.querySelector('.bd').textContent='✓'}
+   else{wrong++;$('#sw').textContent=wrong;b.classList.add('bad');b.querySelector('.bd').textContent='✗';$('#fb').innerHTML='<div class="fb bad">誤擊「'+q[0]+'」：'+q[2]+'。</div>'}
+   setTimeout(function(){b.remove()},380);
+  });
+  arena.appendChild(b);
+ }
+ $('#sgo').addEventListener('click',function(){
+  arena.querySelector('.start').remove();spawn();
+  spawnT=setInterval(function(){if(!alive()){clearInterval(spawnT);return}spawn()},1350);
+  tick=setInterval(function(){
+   if(!alive()){clearInterval(tick);clearInterval(spawnT);return}
+   time--;$('#st').textContent=time;
+   if(time<=0){clearInterval(tick);clearInterval(spawnT);var net=hits-wrong,st=(hits>=13&&wrong<=1)?3:net>=8?2:1;finish('L3',st);
+    endPanel('🎯 射擊攤',st,'命中 '+hits+' 個、誤擊 '+wrong+' 個。服務對象：身心障礙者、45 至 65 歲中高齡者、逾 65 歲高齡者，以及失智症、精神疾病、單側聽損、特教生四類未領證明者。',playShoot)}
+  },1000);
+ });
+}
+
+/* ---- 第 8 關 城堡：守門問答後頒證 ---- */
+function bossQuiz(){
+ openPanel('',false,'wide');
+ runSteps('<div class="eyebrow">第 8 關　城堡</div><h2>🏰 城堡守門問答</h2><p>答完五題，城門就會打開。</p>',[
+  {q:'身心障礙員工的職務再設計，向誰申請？',opts:[{t:GOV,ok:1},{t:PES,why:'這是中高齡與高齡勞工的受理單位。'},{t:'健保署',why:'職務再設計是勞動部的服務。'}],ex:'身心障礙者與四類未領證對象，由縣市政府勞工主管機關受理。'},
+  {q:'55 歲員工的職務再設計，向誰申請？',opts:[{t:PES,ok:1},{t:GOV,why:'這是身心障礙者的受理單位。'},{t:'區公所',why:'請找公立就業服務機構。'}],ex:'中高齡與高齡勞工，由公立就業服務機構受理。'},
+  {q:'每人每年的補助上限是多少？',opts:[{t:'最高 10 萬元',ok:1},{t:'最高 1 萬元',why:'上限比這高。'},{t:'沒有上限',why:'原則上有上限，特殊需求才專案評估。'}],ex:'每人每年最高 10 萬元，特殊需求經專案評估核准者不在此限。'},
+  {q:'申請 5 千元以下的簡易就業輔具，流程有什麼不同？',opts:[{t:'可以免訪視、免開審查會',ok:1},{t:'和其他案件完全一樣',why:'有簡化流程。'},{t:'金額太小，不受理',why:'小額輔具也可以申請。'}],ex:'由受理單位直接審查核定。'},
+  {q:'誰可以提出申請？',opts:[{t:'雇主和使用者本人都可以',ok:1},{t:'只有雇主',why:'本人也可以申請。'},{t:'只有本人',why:'雇主也可以為員工申請。'}],ex:'官網分成「我是雇主」和「我是民眾」兩個入口。'}
+ ],function(right){
+  var st=right===5?3:right>=3?2:1;finish('L4',st);S.park.p8=1;save();
+  setPC('<div class="eyebrow">城門打開了</div><h2>🏰 通過守門問答</h2>'+starsHTML(st)+'<p>第一次就答對 '+right+' / 5 題。</p><div class="row"><button class="btn go" id="ct">進城堡領證書</button></div>');
+  $('#ct').addEventListener('click',openCert);
+ });
+}
+
+/* ---- 說明面板加上「開始闖關」按鈕（只在遊樂園畫面） ---- */
+var _oc=openCenter,_os=openStory;
+openCenter=function(f){
+ _oc(f);if(view!=='park')return;
+ var g=[null,['🎠 翻牌配對',playMemory],['🎡 文件裝車廂',playDocs],['🎢 鋪流程軌道',playCoaster]][f||1],pc=$('#pc');
+ var t=pc.querySelector('.tabs');if(t)t.remove();
+ pc.querySelectorAll('[data-go],#toOrder').forEach(function(b){b.remove()});
+ pc.querySelector('h2').insertAdjacentHTML('afterend','<div class="cta"><b>先看下面的說明，準備好就開始闖關。</b><button class="btn go" id="gGo">'+g[0]+'　開始</button></div>');
+ $('#gGo').addEventListener('click',g[1]);
+};
+openStory=function(i){
+ _os(i);if(view!=='park')return;
+ $('#pc .tabs').insertAdjacentHTML('afterend','<div class="cta"><b>三則案例都看過了嗎？</b><button class="btn go" id="gGo">🎭 謝幕問答　開始</button></div>');
+ $('#gGo').addEventListener('click',playTheater);
+};
+
+/* ================= 作答紀錄 =================
+   部署 Google Apps Script 後，把網址貼在 LOG_ENDPOINT 的引號裡。
+   留空時只記在這台裝置，不會上傳。 */
+var LOG_ENDPOINT='https://script.google.com/macros/s/AKfycbw7mKDQWSko4gRlhDHXLTlLd_ZUA4u7Xpw3kyoSdPtsfR2-ZFSld_9sBfldRzrKjqjl9Q/exec';
+var GAME='',LQ='jr-log-q';
+if(!S.sid){S.sid='S'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);save()}
+try{var URLC=new URLSearchParams(location.search).get('c');if(URLC&&URLC!==S.cls){S.cls=URLC.slice(0,30);save()}}catch(e){}
+function plain(h){return String(h==null?'':h).replace(/<[^>]*>/g,'').replace(/\s+/g,' ').trim().slice(0,300)}
+function lqGet(){try{return JSON.parse(localStorage.getItem(LQ)||'[]')}catch(e){return []}}
+function lqSet(a){try{localStorage.setItem(LQ,JSON.stringify(a.slice(-2000)))}catch(e){}}
+function LOG(o){
+ o.t=new Date().toISOString();o.sid=S.sid;o.name=S.name||'';o.cls=S.cls||'';o.game=o.game||GAME||'';
+ if(o.q!=null)o.q=plain(o.q);if(o.a!=null)o.a=plain(o.a);
+ var q=lqGet();q.push(o);lqSet(q);flushSoon();
+}
+function LOGA(q,a,ok){LOG({ev:'answer',q:q,a:a,ok:!!ok})}
+var flushT=null,flushing=false;
+function flushSoon(){if(!LOG_ENDPOINT||flushT)return;flushT=setTimeout(function(){flushT=null;flush()},2500)}
+function flush(beacon){
+ if(!LOG_ENDPOINT||flushing)return;var q=lqGet();if(!q.length)return;
+ var batch=q.slice(0,80),body=JSON.stringify(batch);
+ if(beacon&&navigator.sendBeacon){if(navigator.sendBeacon(LOG_ENDPOINT,new Blob([body],{type:'text/plain'})))lqSet(q.slice(batch.length));return}
+ flushing=true;
+ fetch(LOG_ENDPOINT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body,keepalive:true})
+  .then(function(){lqSet(lqGet().slice(batch.length));flushing=false;if(lqGet().length)flushSoon()})
+  .catch(function(){flushing=false;setTimeout(flushSoon,8000)});
+}
+window.addEventListener('pagehide',function(){flush(true)});
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')flush(true)});
+flushSoon();
+
+/* 每個遊戲開始時記下遊戲名稱，過關時記下星數 */
+function tagGame(f,label){return function(){GAME=typeof label==='function'?label.apply(null,arguments):label;LOG({ev:'start'});return f.apply(this,arguments)}}
+playJob=tagGame(playJob,function(j){return '城市｜'+j.n});
+playElig=tagGame(playElig,'城市｜資格燈塔');
+playOrder=tagGame(playOrder,'城市｜流程碼頭');
+playWin=tagGame(playWin,'城市｜服務窗口');
+playMemory=tagGame(playMemory,'旋轉木馬｜翻牌配對');
+playDocs=tagGame(playDocs,'摩天輪｜文件裝車廂');
+playCoaster=tagGame(playCoaster,'雲霄飛車｜流程軌道');
+playTheater=tagGame(playTheater,'故事劇場｜謝幕問答');
+playShoot=tagGame(playShoot,'射擊攤｜資格射擊');
+bossQuiz=tagGame(bossQuiz,'城堡｜守門問答');
+startQuiz=tagGame(startQuiz,'心理測驗');
+finish=(function(f){return function(id,st){LOG({ev:'stars',stars:st,x:id});return f(id,st)}})(finish);
+parkDone=(function(f){return function(id,st){LOG({ev:'stars',stars:st,x:id});return f(id,st)}})(parkDone);
+
+/* ================= 進島報到 ================= */
+function intro(){
+ openPanel('<div class="eyebrow">職務再設計宣導互動課程</div><h2 style="font-size:28px">歡迎登島</h2>'+
+  '<p>這座島有一座城市和一座遊樂園。登島前先報到，再做 5 題小測驗，看看你是哪一型職場改造師。</p>'+
+  '<div class="reg"><label for="rgN">請輸入你的大名</label><input type="text" id="rgN" maxlength="12" value="'+esc(S.name||'')+'" placeholder="例如：王小明"></div>'+
+  '<div class="row"><button class="btn go" id="rgGo">報到，開始測驗</button></div><div id="fb" aria-live="polite"></div>',true);
+ $('#rgGo').addEventListener('click',function(){
+  var n=$('#rgN').value.trim();
+  if(!n){$('#fb').innerHTML='<div class="fb bad">請輸入你的大名。</div>';$('#rgN').focus();return}
+  S.name=n.slice(0,12);save();
+  LOG({ev:'join',game:'報到'});startQuiz();
+ });
+}
+
+/* ================= 第 1 關 售票口：雇主票還是本人票 ================= */
+var TICKETS={emp:'雇主票',self:'本人票',both:'雙人票'};
+var TK=[
+ {who:'坐輪椅的行政人員，需要電動升降辦公桌',ans:'both',ex:'雇主可以為員工申請；2026 年 6 月起，身心障礙者本人也能就全方位需求自己申請。'},
+ {who:'雇主新僱用連續失業 30 日以上、前一份工作在受國際情勢影響製造業的勞工（勞工就業通計畫）',ans:'emp',ex:'勞工就業通的職務再設計，由符合條件的雇主主動申請，不必經公立就業服務機構轉介。'},
+ {who:'聽障求職者要去面試，需要手語翻譯',ans:'both',ex:'要徵才的雇主可以為面試者提出申請；身心障礙者本人有求職面試需求時，也可以自己申請。'},
+ {who:'身心障礙員工想調整工作方法、改善工作環境',ans:'both',ex:'這兩項過去只能由雇主申請，2026 年 6 月起本人也可以提出。'},
+ {who:'58 歲的中高齡者，工作上需要就業輔具',ans:'both',ex:'雇主可以為中高齡員工申請；本人也可以自己申請，例如參加職業訓練時就能申請就業輔具。'}
+];
+function playTicket(){
+ GAME='售票口｜選票';LOG({ev:'start'});
+ var list=shuffle(TK),i=0,right=0;
+ openPanel('',false,'wide');
+ function show(){
+  var c=list[i],first=true;
+  var p=setPC('<div class="eyebrow">第 1 關　大門售票口</div><h2>🎫 該買哪一種票？</h2><p>職務再設計可以由雇主申請，也可以由本人申請。看情境，選出誰可以提出申請。</p>'+dots(list.length,i)+
+   '<div class="who"><i>🧾</i><div><b>情境 '+(i+1)+'</b><br>'+c.who+'</div></div>'+
+   '<div class="tix">'+['emp','self','both'].map(function(k){return '<button class="tkt '+k+'" data-k="'+k+'"><b>'+TICKETS[k]+'</b><small>'+{emp:'只有雇主可以申請',self:'只有本人可以申請',both:'雇主或本人都可以'}[k]+'</small></button>'}).join('')+'</div><div id="fb" aria-live="polite"></div>');
+  p.querySelectorAll('.tkt').forEach(function(b){b.addEventListener('click',function(){
+   var k=b.dataset.k,ok=k===c.ans;
+   if(first)LOGA('選票：'+c.who,TICKETS[k],ok);
+   if(!ok){first=false;b.classList.add('no');b.disabled=true;$('#fb').innerHTML='<div class="fb bad">不是這張票，再想想。</div>';return}
+   if(first)right++;
+   b.classList.add('ok');p.querySelectorAll('.tkt').forEach(function(x){x.disabled=true});
+   $('#fb').innerHTML='<div class="fb"><b>'+TICKETS[k]+'</b>：'+c.ex+'</div><div class="row"><button class="btn go" id="nx">'+(i<list.length-1?'下一位':'看結果')+'</button></div>';
+   $('#nx').addEventListener('click',function(){i++;if(i<list.length)show();else{var st=right===5?3:right>=3?2:1;parkDone('p1',st);endPanel('🎫 選票',st,'第一次就選對 '+right+' / 5 張票。記住：只有勞工就業通計畫是雇主票，其他情境雇主或本人都可以申請。',playTicket)}});$('#nx').focus();
+  })});
+ }
+ show();
+}
+
+/* ================= 第 7 關 糖果屋：補助判斷與理由 ================= */
+var CRIT={rel:'障礙與工作的關聯性',need:'就業需求性',urg:'迫切性',reas:'合理性',ratio:'職場使用時間比率'};
+var REASONS={
+ r1:['直接排除工作上的障礙','rel'],
+ r8:['工作需要看清楚，不改善就難以勝任','need'],
+ r2:['有安全疑慮，需要及早改善','urg'],
+ r3:['和工作障礙無關','rel'],
+ r4:['主要在職場以外的地方使用','ratio'],
+ r5:['有成本更低、一樣有效的方案','reas'],
+ r6:['是全體設備汰換，不是針對個人的工作障礙','rel'],
+ r9:['有安全考量，避免熱危害，需要及早改善','urg'],
+ r10:['工作需要站得穩，不改善就難以勝任','need']
+};
+var ONLYD=['r9'];
+var CANDY=[
+ {n:'油壓升降台車',p:38000,yes:1,r:'r1',c:'🍬',ex:'阿福搬重箱時要彎腰負重。升降台車讓箱子保持在腰部高度，直接排除這個障礙。'},
+ {n:'標籤放大鏡燈',p:4500,yes:1,r:'r1',c:'🍭',ex:'看不清小標籤會影響理貨正確性。5 千元以下的簡易就業輔具，可以免訪視、免開審查會。'},
+ {n:'理貨區照明改善（廠區照明已符合職安法）',p:15000,yes:1,r:'r8',c:'🍡',ex:'廠區照明已經符合職業安全衛生法規，但阿福有老花，理貨時仍看不清品項與數量，所以要針對他的工作位置加強照明。'},
+ {n:'防滑地墊',p:8000,yes:1,r:'r10',c:'🍫',ex:'搬運時要站得穩，地板濕滑就難以勝任理貨工作。'},
+ {n:'個人新手機',p:25000,yes:0,r:'r3',c:'🍬',ex:'手機和阿福的工作障礙沒有關係。'},
+ {n:'家用電動按摩椅',p:30000,yes:0,r:'r4',c:'🍩',ex:'放在家裡用，在職場使用的時間幾乎是零。'},
+ {n:'電動堆高機',p:650000,yes:0,r:'r5',c:'🧁',ex:'升降台車就能解決搬運問題。堆高機成本高出很多，也遠超過補助上限。'},
+ {n:'全廠冷氣汰換',p:180000,yes:0,r:'r6',d:['r9'],c:'🍪',ex:'這是全廠的設備更新，不是針對阿福個人的工作障礙。避免高溫危害屬於雇主一般的安全衛生責任，不是職務再設計的補助範圍。'}
+];
+function playCandy(){
+ GAME='糖果屋｜補助判斷';LOG({ev:'start'});
+ var list=shuffle(CANDY),i=0,pts=0,jar=0,picked=[],head='<div class="eyebrow">第 7 關　糖果屋</div><h2>🍭 補助糖果罐</h2>';
+ var crit='<div class="crit">審查面向：'+Object.keys(CRIT).map(function(k){return '<span>'+CRIT[k]+'</span>'}).join('')+'</div>';
+ openPanel('',false,'wide');
+ function jarHTML(){return '<div class="jarbox"><div class="jar" aria-label="糖果罐內有 '+picked.length+' 項">'+picked.map(function(c){return '<i>'+c+'</i>'}).join('')+'</div><div style="flex:1"><div class="meter"><i style="width:'+Math.min(100,jar/1000)+'%" class="'+(jar>100000?'over':'')+'"></i></div><p class="num">罐內 '+jar.toLocaleString()+' 元 / 上限 100,000 元</p></div></div>'}
+ function show(){
+  var c=list[i];
+  var p=setPC(head+'<div class="who"><i>📦</i><div><b>阿福，60 歲，倉儲理貨員</b><br>腰痛不能久彎和負重、理貨區昏暗、地板濕滑、看不清小標籤。</div></div>'+crit+jarHTML()+dots(list.length,i)+
+   '<div class="candy"><span>'+c.c+'</span><div><b>'+c.n+'</b><br><span class="num">'+c.p.toLocaleString()+' 元</span></div></div>'+
+   '<p class="q">第 1 步：要放進補助糖果罐嗎？</p><div class="row" id="yn"><button class="btn go" data-v="1">🍬 放進糖果罐</button><button class="btn" data-v="0">🚫 不補助</button></div><div id="rs"></div><div id="fb" aria-live="polite"></div>');
+  p.querySelectorAll('#yn .btn').forEach(function(b){b.addEventListener('click',function(){
+   var v=+b.dataset.v,okD=v===c.yes;
+   LOGA('糖果屋：'+c.n+'（要補助嗎）',v?'補助':'不補助',okD);
+   p.querySelectorAll('#yn .btn').forEach(function(x){x.disabled=true;x.classList.toggle('on',x===b)});
+   var fixed=c.d||[],pool=Object.keys(REASONS).filter(function(k){return k!==c.r&&fixed.indexOf(k)<0&&ONLYD.indexOf(k)<0});
+   var opts=fixed.concat(shuffle([c.r].concat(shuffle(pool).slice(0,3-fixed.length))));
+   $('#rs').innerHTML='<p class="q">第 2 步：你的理由是？</p><div class="opts">'+opts.map(function(k){return '<button class="opt" data-k="'+k+'">'+REASONS[k][0]+'　<span class="tag">'+CRIT[REASONS[k][1]]+'</span></button>'}).join('')+'</div>';
+   $('#rs').querySelectorAll('.opt').forEach(function(o){o.addEventListener('click',function(){
+    var k=o.dataset.k,okR=k===c.r;
+    LOGA('糖果屋：'+c.n+'（理由）',REASONS[k][0],okR);
+    pts+=(okD?1:0)+(okR?1:0);
+    $('#rs').querySelectorAll('.opt').forEach(function(x){x.disabled=true;if(x.dataset.k===c.r)x.classList.add('ok');else if(x===o)x.classList.add('no')});
+    if(c.yes){jar+=c.p;picked.push(c.c)}
+    var verdict=c.yes?'✅ 應該補助':'❌ 不應補助';
+    $('#fb').innerHTML='<div class="fb'+(okD&&okR?'':' bad')+'"><b>'+verdict+'</b>（'+CRIT[REASONS[c.r][1]]+'）<br>'+c.ex+'<br><small>你的判斷：'+(okD?'對':'不對')+'；理由：'+(okR?'對':'不對')+'</small></div><div class="row"><button class="btn go" id="nx">'+(i<list.length-1?'下一顆糖果':'看結果')+'</button></div>';
+    $('#nx').addEventListener('click',function(){i++;if(i<list.length)show();else end()});$('#nx').focus();
+   })});
+  })});
+ }
+ function end(){
+  var st=pts>=14?3:pts>=10?2:1;finish('L1',st);
+  setPC(head+starsHTML(st)+jarHTML()+'<p>判斷和理由共答對 '+pts+' / 16 項。</p>'+
+   '<table class="ctab"><thead><tr><th>項目</th><th>金額</th><th>結果</th><th>理由</th></tr></thead><tbody>'+CANDY.map(function(c){return '<tr><td>'+c.c+' '+c.n+'</td><td class="num">'+c.p.toLocaleString()+'</td><td>'+(c.yes?'補助':'不補助')+'</td><td>'+REASONS[c.r][0]+'</td></tr>'}).join('')+'</tbody></table>'+
+   '<div class="fb">補助的四項合計 65,500 元，在每人每年 10 萬元的上限內。審查面向參考勞動部 2026 年 6 月公布的審查原則；金額為教學示意，實際補助由專業人員訪視評估後核定。</div>'+
+   '<div class="row"><button class="btn go" id="bk">回到'+(view==='park'?'園區':'島上')+'</button><button class="btn" id="ag">再玩一次</button></div>');
+  $('#bk').addEventListener('click',closePanel);$('#ag').addEventListener('click',playCandy);
+  if(st===3)confetti();
+ }
+ show();
+}
+playBudget=function(){playCandy()};
+
+/* ================= 諮詢服務台 ================= */
+ART.info=function(){
+ var s=SHADOW,i;
+ s+=rp(58,24,4,50,'#8a6b4a');
+ for(i=0;i<6;i++){var x0=12+i*16;s+=pg(x0+',42 '+(x0+16)+',42 60,8',i%2?'#fff':'#2f9c95')}
+ for(i=0;i<6;i++)s+=ci(20+i*16,43,8,i%2?'#fff':'#2f9c95');
+ s+=rp(22,68,76,42,'#fff3d6')+rp(60,68,38,42,'#ecdcb6')+rp(18,62,84,9,'#e8603c',' rx="3"');
+ s+=ci(60,90,12,'#2f78c4')+'<text x="60" y="96" font-size="17" font-weight="900" text-anchor="middle" fill="#fff" font-family="Georgia,serif">i</text>';
+ return s;
+};
+
+var FAQ=[
+ ['什麼是職務再設計？','透過工作分析、提供輔具、改善工作設備或環境、調整工作條件或方法，排除身心障礙者、中高齡及高齡者等勞工在工作上遇到的障礙。'],
+ ['誰可以申請？','雇主可以為員工申請，使用者本人也可以自己申請。各對象可以申請的項目，請看官網「我是雇主」「我是民眾」兩個入口。'],
+ ['補助金額有上限嗎？','每人每年最高 10 萬元。有特殊需求、經專案評估核准者不在此限。'],
+ ['要向哪裡申請？','身心障礙者，以及失智症、精神疾病、單側聽損、特教生四類未領身障證明者，向工作所在地的縣市政府勞工主管機關申請；中高齡及高齡者向公立就業服務機構申請。也可以在官網線上申請。'],
+ ['多久會核定？','原則上受理後 35 日內核定，但不包含試用與討論改善方案的時間。'],
+ ['小額的輔具也要等訪視嗎？','申請 5 千元以下的簡易就業輔具，可以免訪視、免開審查會，由受理單位直接審查核定。'],
+ ['可以先買再拿發票申請嗎？','流程是先提出申請，經資格審查、訪視、審查核定後才執行改善，改善完成再辦理核銷。'],
+ ['還有問題可以問誰？','撥打職務再設計免付費客服專線 0800-777-888。']
+];
+var MYQ='jr-myq';
+function openDesk(tab){
+ GAME='諮詢服務台';tab=tab||'faq';
+ var tabs=[['faq','常見問題'],['ask','我要提問'],['ans','講師回覆']];
+ var h='<div class="eyebrow">遊樂園服務</div><h2>💁 諮詢服務台</h2><div class="tabs">'+tabs.map(function(t){return '<button class="tab'+(t[0]===tab?' on':'')+'" data-t="'+t[0]+'">'+t[1]+'</button>'}).join('')+'</div>';
+ if(tab==='faq')h+=FAQ.map(function(f){return '<details class="doc"><summary>'+f[0]+'</summary><p>'+f[1]+'</p></details>'}).join('')+'<div class="row"><a class="btn" style="text-decoration:none;color:var(--ink)" href="'+OFFICIAL+'" target="_blank" rel="noopener">職務再設計官網 ↗</a></div>';
+ else if(tab==='ask'){
+  var mine=[];try{mine=JSON.parse(localStorage.getItem(MYQ)||'[]')}catch(e){}
+  h+='<label for="qT" class="q" style="display:block">想問講師什麼？</label><textarea id="qT" maxlength="300" rows="4" placeholder="例如：自營作業者可以申請嗎？"></textarea>'+
+   '<p class="note">'+(LOG_ENDPOINT?'問題會送到講師後台，講師會在課堂上或「講師回覆」分頁回答。':'目前沒有連上講師後台，問題只會存在這台裝置。請直接舉手發問。')+'</p>'+
+   '<div class="row"><button class="btn go" id="qGo">送出問題</button></div><div id="fb" aria-live="polite"></div>'+
+   (mine.length?'<p class="q">我問過的問題</p><ul class="myq">'+mine.map(function(m){return '<li>'+esc(m)+'</li>'}).join('')+'</ul>':'');
+ }else h+='<div id="ansList"><p>'+(LOG_ENDPOINT?'讀取中…':'目前沒有連上講師後台，請留意講師在課堂上的回覆。')+'</p></div>';
+ var p=openPanel(h,false,'wide');
+ p.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){openDesk(b.dataset.t)})});
+ if(tab==='ask')$('#qGo').addEventListener('click',function(){
+  var t=$('#qT').value.trim();if(!t){$('#fb').innerHTML='<div class="fb bad">請先寫下問題。</div>';return}
+  LOG({ev:'question',a:t});var m=[];try{m=JSON.parse(localStorage.getItem(MYQ)||'[]')}catch(e){}m.unshift(t);try{localStorage.setItem(MYQ,JSON.stringify(m.slice(0,20)))}catch(e){}
+  $('#qT').value='';$('#fb').innerHTML='<div class="fb">已送出。'+(LOG_ENDPOINT?'講師會在課堂上回覆。':'')+'</div>';
+ });
+ if(tab==='ans'&&LOG_ENDPOINT)fetch(LOG_ENDPOINT+'?mode=faq&c='+encodeURIComponent(S.cls||'')).then(function(r){return r.json()}).then(function(list){
+  if(!$('#ansList'))return;
+  $('#ansList').innerHTML=list&&list.length?list.map(function(x){return '<details class="doc" open><summary>'+esc(x.q)+'</summary><p>'+esc(x.a)+'</p></details>'}).join(''):'<p>講師還沒有回覆任何問題。</p>';
+ }).catch(function(){if($('#ansList'))$('#ansList').innerHTML='<p>讀取失敗，請稍後再試。</p>'});
+}
+$('#bDesk').addEventListener('click',function(){openDesk('faq')});
+
+/* ---------- boot ---------- */
+refresh();
+if(window.innerWidth<520)setView('list');
+if(!S.role)intro();
+})();
+</script>
+</body>
+</html>

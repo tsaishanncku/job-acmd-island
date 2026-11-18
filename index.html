@@ -310,6 +310,24 @@ textarea{font:inherit;border:2px solid #d9d0b8;border-radius:10px;padding:8px 12
 .myq{padding-left:20px;font-size:14px}
 @media (max-width:520px){.tix{grid-template-columns:1fr}}
 .stn.desk .lab small{display:none}
+.stT{margin:2px 0 6px;font-size:22px;text-wrap:balance}
+.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px;margin:10px 0}
+.act{border:2px solid #d9d0b8;background:#fff;border-radius:12px;padding:6px 4px;display:grid;line-height:1.3;text-align:center}
+.act b{font-size:14px}.act small{font-size:11px;color:var(--muted)}
+.act.on{background:#2a1a3a;border-color:#2a1a3a;color:#ffd166}.act.on small{color:#f6dfa0}
+.act.past{background:#fbefe0;border-color:#e8b88f}
+.stg{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;align-items:start;background:#fff;border-radius:16px;padding:12px;border:2px solid #efe4cf}
+.scene{width:100%;height:auto;border-radius:12px;display:block;animation:fade .5s}
+.stTxt h3{margin:0 0 4px;font-size:19px}.stTxt p{margin:0 0 6px;font-size:14px}
+.stg .sec ul{font-size:14px;padding-left:18px}.fx li{margin:3px 0}
+.fx .chip{font-size:11px;padding:1px 8px;vertical-align:1px}
+.think{background:#fff7e0;border:2px dashed #f0b44c;border-radius:14px;padding:10px 14px;margin:10px 0}
+.think .q{margin-top:0}
+.res{background:#e6f6f3;border-radius:12px;padding:10px 14px}
+.tl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.tl div{background:#fff;border-radius:12px;padding:8px 10px;border-top:5px solid #2a1a3a;display:grid;gap:2px;font-size:13px}
+.tl b{color:var(--coral)}.tl span{font-weight:700;font-size:14px}.tl small{color:var(--muted)}
+@media (max-width:640px){.stg,.tl{grid-template-columns:1fr}.acts{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -1383,25 +1401,26 @@ function playCoaster(){
 function playTheater(){
  var score=0,head='<div class="curtain"><i></i><i></i><span>🎭 謝幕問答</span></div><div class="eyebrow">第 5 關　故事劇場</div>';
  openPanel('',false,'wide');
- runSteps(head,[{q:'案例一：不能負重的申請者，最後是怎麼改善的？',opts:[{t:'導入升降台車，並評估調整作業流程',ok:1},{t:'請他多練重量訓練',why:'職務再設計是調整工作來配合人。'},{t:'把他調到不用做事的位置',why:'目標是讓人留在崗位上發揮。'}],ex:'除了設備，訪視時也一併評估了整個作業流程。'}],function(r1){
+ runSteps(head,[{q:'案例一：主管希望小五「明天」就有輔具，但補助要經過審查。職再專員當時怎麼做？',opts:[{t:'從職務再設計的輔具回收庫存，隔天評估借用擴視機',ok:1},{t:'請小五先自費買一台',why:'剛出社會的小五負擔不起，也不需要先自費。'},{t:'請主管等審查核定後再說',why:'流程還是要走，但專員先找到了可以馬上使用的資源。'}],ex:'輔具回收庫存讓小五隔天就有擴視機可用，專員同時加上鍵盤貼紙、無線鍵盤和 27 吋螢幕。'}],function(r1){
   score+=r1;
-  var L=[['門禁管理','包覆式濾光眼鏡'],['中距離觀看','特製眼鏡'],['近距離閱讀','可攜式擴視機']],right=shuffle(L.map(function(x,i){return i})),sel=-1,err=0,done=0;
-  var p=setPC(head+dots(3,1)+'<p class="q">案例二：學校總務處的低視力同仁。把左邊的工作任務配上右邊的輔具。</p><div class="match"><div class="opts">'+L.map(function(x,i){return '<button class="opt ml" data-i="'+i+'">'+x[0]+'</button>'}).join('')+'</div><div class="opts">'+right.map(function(i){return '<button class="opt mr" data-i="'+i+'">'+L[i][1]+'</button>'}).join('')+'</div></div><div id="fb" aria-live="polite"></div>');
+  var L=[['門禁管理（畏光）','包覆式濾光眼鏡'],['中距離辨識訪客','特製眼鏡'],['文書閱讀','擴視機']],right=shuffle(L.map(function(x,i){return i})),sel=-1,err=0,done=0;
+  var p=setPC(head+dots(4,1)+'<p class="q">案例一第三幕：小五到學校總務處工作。把左邊的工作任務配上右邊的輔具。</p><div class="match"><div class="opts">'+L.map(function(x,i){return '<button class="opt ml" data-i="'+i+'">'+x[0]+'</button>'}).join('')+'</div><div class="opts">'+right.map(function(i){return '<button class="opt mr" data-i="'+i+'">'+L[i][1]+'</button>'}).join('')+'</div></div><div id="fb" aria-live="polite"></div>');
   p.querySelectorAll('.ml').forEach(function(b){b.addEventListener('click',function(){sel=+b.dataset.i;p.querySelectorAll('.ml').forEach(function(x){x.classList.toggle('pick',x===b)})})});
   p.querySelectorAll('.mr').forEach(function(b){b.addEventListener('click',function(){
    if(sel<0){$('#fb').innerHTML='<div class="fb bad">先點左邊的工作任務。</div>';return}
    if(+b.dataset.i===sel){var l=p.querySelector('.ml[data-i="'+sel+'"]');l.classList.remove('pick');l.classList.add('ok');b.classList.add('ok');l.disabled=b.disabled=true;sel=-1;done++;$('#fb').innerHTML='';
-    if(done===3){if(!err)score++;$('#fb').innerHTML='<div class="fb">'+(err?'配對完成。':'全部一次配對成功！')+'同一位個案，不同的工作任務需要不同的輔具。</div><div class="row"><button class="btn go" id="nx">下一題</button></div>';$('#nx').addEventListener('click',q3);$('#nx').focus()}
+    if(done===3){if(!err)score++;LOGA('案例一：工作任務配輔具',err?'配錯 '+err+' 次':'全部配對正確',!err);$('#fb').innerHTML='<div class="fb">'+(err?'配對完成。':'全部一次配對成功！')+'同一個人，不同的工作任務需要不同的輔具。特製眼鏡因為上下班都會用到，最後改由社會處申請。</div><div class="row"><button class="btn go" id="nx">下一題</button></div>';$('#nx').addEventListener('click',q3);$('#nx').focus()}
    }else{err++;b.classList.remove('no');void b.offsetWidth;b.classList.add('no');setTimeout(function(){b.classList.remove('no')},400)}
   })});
  });
  function q3(){
-  var p=setPC('');
-  runSteps(head,[{q:'案例三：膝上截肢的個人助理員需要義肢，經費怎麼處理？',opts:[{t:'由勞政與社政分攤',ok:1},{t:'全部由個案自費',why:'可以申請補助。'},{t:'由雇主全額負擔',why:'政府有補助資源。'}],ex:'義肢同時與生活、工作有關。2026 年 6 月修正後，補助以扣除社政實際補助額後的餘額作為評估基準。'}],function(r3){
-   score+=r3;var st=Math.max(1,score);parkDone('p5',st);endPanel('🎭 謝幕問答',st,'三題中有 '+score+' 題一次答對。三則案例分別用到設備與流程調整、多項視覺輔具、以及勞政社政分攤的義肢。',playTheater);
+  setPC('');
+  runSteps(head,[
+   {q:'案例二：取件的地方最後選了牙叉升降台車，主要原因是？',opts:[{t:'有沒有烏龜車都能用，能配合原本的出貨流程',ok:1},{t:'牙叉升降台車比較便宜',why:'選擇的理由是配合流程，不是價格。'},{t:'平面升降台車不能升降',why:'平面升降台車也能升降，但沒辦法直接抬起烏龜車。'}],ex:'設備方案要放進整個生產流程來看，最後是設備加上流程分工的折衷方案。'},
+   {q:'案例三：45 歲研發經理的久坐困擾看起來像老化，身障方案審查時看什麼？',opts:[{t:'障礙程度與工作問題的關聯性',ok:1},{t:'年齡有沒有超過 45 歲',why:'年齡不是身障方案的審查重點。'},{t:'是不是主管職',why:'職位高低不影響審查。'}],ex:'經訪視評估，升降工作桌、人體工學椅、人體工學滑鼠三項都獲得補助。'}
+  ],function(r3){
+   score+=r3;var st=score>=4?3:score>=2?2:1;parkDone('p5',st);endPanel('🎭 謝幕問答',st,'四題中有 '+score+' 題一次答對。三則案例分別用到多種視覺輔具與輔具回收庫存、配合生產流程的升降台車，以及看關聯性評估的辦公人體工學輔具。',playTheater);
   });
-  /* 單題流程的進度點改為第 3 題 */
-  var d=$('#pc .dots');if(d)d.outerHTML=dots(3,2);
  }
 }
 
@@ -1465,8 +1484,8 @@ openCenter=function(f){
  pc.querySelector('h2').insertAdjacentHTML('afterend','<div class="cta"><b>先看下面的說明，準備好就開始闖關。</b><button class="btn go" id="gGo">'+g[0]+'　開始</button></div>');
  $('#gGo').addEventListener('click',g[1]);
 };
-openStory=function(i){
- _os(i);if(view!=='park')return;
+openStory=function(i,a){
+ _os(i,a);if(view!=='park')return;
  $('#pc .tabs').insertAdjacentHTML('afterend','<div class="cta"><b>三則案例都看過了嗎？</b><button class="btn go" id="gGo">🎭 謝幕問答　開始</button></div>');
  $('#gGo').addEventListener('click',playTheater);
 };
@@ -1476,7 +1495,7 @@ openStory=function(i){
    留空時只記在這台裝置，不會上傳。 */
 var LOG_ENDPOINT='https://script.google.com/macros/s/AKfycbw7mKDQWSko4gRlhDHXLTlLd_ZUA4u7Xpw3kyoSdPtsfR2-ZFSld_9sBfldRzrKjqjl9Q/exec';
 /* 講師模式密碼：有設定 LOG_ENDPOINT 時，用 Code.gs 裡的講師密碼檢查；沒有設定時，用下面這組密碼 */
-var OFFLINE_TEACHER_PASS='1151118';
+var OFFLINE_TEACHER_PASS='0000';
 var GAME='',LQ='jr-log-q';
 if(!S.sid){S.sid='S'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);save()}
 try{var URLC=new URLSearchParams(location.search).get('c');if(URLC&&URLC!==S.cls){S.cls=URLC.slice(0,30);save()}}catch(e){}
@@ -1701,6 +1720,265 @@ function openDesk(tab){
  }).catch(function(){if($('#ansList'))$('#ansList').innerHTML='<p>讀取失敗，請稍後再試。</p>'});
 }
 $('#bDesk').addEventListener('click',function(){openDesk('faq')});
+
+/* ================= 故事劇場：分幕案例 ================= */
+function scnPerson(x,y,glasses){
+ return '<g transform="translate('+x+','+y+')"><path d="M-26,64 Q-26,30 0,28 Q26,30 26,64 Z" fill="#4f7cac"/><circle cx="0" cy="8" r="17" fill="#f2c9a5"/><path d="M-17,4 Q-14,-14 0,-12 Q16,-14 17,4 Q10,-4 0,-3 Q-10,-4 -17,4 Z" fill="#3a2a22"/>'+
+  (glasses==='wrap'?'<path d="M-18,4 Q0,0 18,4 L17,13 Q0,16 -17,13 Z" fill="#5a3f7a" opacity=".92"/>':glasses?'<circle cx="-7" cy="8" r="5.5" fill="none" stroke="#222" stroke-width="2"/><circle cx="7" cy="8" r="5.5" fill="none" stroke="#222" stroke-width="2"/><line x1="-1.5" y1="8" x2="1.5" y2="8" stroke="#222" stroke-width="2"/>':'<circle cx="-6" cy="8" r="1.8" fill="#222"/><circle cx="6" cy="8" r="1.8" fill="#222"/>')+
+  '<path d="M-5,18 Q0,21 5,18" fill="none" stroke="#a5604a" stroke-width="1.6"/></g>';
+}
+function scnBubble(x,y,w,t,flip){
+ return '<g transform="translate('+x+','+y+')"><rect x="0" y="0" width="'+w+'" height="34" rx="14" fill="#fff" stroke="#12313a" stroke-width="1.5"/><path d="M'+(flip?w-26:18)+',33 l'+(flip?10:-8)+',12 l'+(flip?2:12)+',-12" fill="#fff" stroke="#12313a" stroke-width="1.5"/><rect x="'+(flip?w-27:17)+'" y="30" width="12" height="5" fill="#fff"/><text x="'+(w/2)+'" y="22" font-size="14" font-weight="700" text-anchor="middle" fill="#12313a">'+t+'</text></g>';
+}
+var SCENES={
+ act1:function(){
+  var s='<rect width="520" height="280" fill="#fdf6e8"/><rect x="0" y="196" width="520" height="84" fill="#c99b6d"/><rect x="0" y="196" width="520" height="8" fill="#b4855a"/>';
+  s+='<rect x="380" y="22" width="110" height="84" rx="4" fill="#bfe3f5" stroke="#fff" stroke-width="5"/><circle cx="460" cy="48" r="14" fill="#ffd84d"/><line x1="435" y1="22" x2="435" y2="106" stroke="#fff" stroke-width="4"/>';
+  s+=scnPerson(90,118,true)+'<rect x="60" y="182" width="66" height="16" rx="6" fill="#4f7cac"/>';
+  s+='<g transform="translate(170,150) rotate(-4)"><rect width="170" height="104" fill="#fff" stroke="#d9d0b8"/>';
+  for(var i=0;i<6;i++)s+='<line x1="12" y1="'+(16+i*15)+'" x2="158" y2="'+(16+i*15)+'" stroke="#c8dbe8"/>';
+  s+='<path d="M14,30 q8,-6 16,0 t16,2 t16,-3 t16,5 t16,4 t16,6" fill="none" stroke="#2f4f7a" stroke-width="2"/>';
+  s+='<rect x="2" y="48" width="166" height="44" rx="4" fill="#1f2b33"/><rect x="10" y="62" width="150" height="14" rx="2" fill="#fff"/><path d="M14,72 q8,-5 16,0 t16,0 t16,0 t16,0" fill="none" stroke="#2f4f7a" stroke-width="2"/>';
+  s+='<rect x="140" y="58" width="6" height="26" rx="3" fill="#e8603c" transform="rotate(30 143 71)"/></g>';
+  s+='<text x="255" y="268" font-size="13" font-weight="700" text-anchor="middle" fill="#5a3518">閱讀規：黑色板子留一條縫，字就沿著縫寫</text>';
+  s+=scnBubble(330,118,150,'字越寫越歪了…',1);
+  return s;
+ },
+ act2:function(){
+  var s='<rect width="520" height="280" fill="#eef3f6"/><rect x="0" y="200" width="520" height="80" fill="#9fb3c2"/><rect x="0" y="200" width="520" height="7" fill="#8aa0b0"/>';
+  s+='<circle cx="470" cy="46" r="26" fill="#fff" stroke="#12313a" stroke-width="2.5"/><line x1="470" y1="46" x2="470" y2="30" stroke="#12313a" stroke-width="3" stroke-linecap="round"/><line x1="470" y1="46" x2="482" y2="52" stroke="#12313a" stroke-width="3" stroke-linecap="round"/><text x="470" y="88" font-size="12" font-weight="700" text-anchor="middle" fill="#5d7780">天天加班</text>';
+  s+='<rect x="236" y="34" width="176" height="112" rx="6" fill="#2a3540"/><rect x="244" y="42" width="160" height="96" fill="#fff"/><text x="324" y="102" font-size="42" font-weight="900" text-anchor="middle" fill="#12313a">公文</text><rect x="314" y="146" width="20" height="26" fill="#5d6873"/><rect x="290" y="170" width="68" height="8" rx="3" fill="#5d6873"/><text x="324" y="30" font-size="13" font-weight="700" text-anchor="middle" fill="#2f78c4">27 吋螢幕</text>';
+  s+='<rect x="120" y="70" width="10" height="120" fill="#5d6873"/><rect x="100" y="64" width="80" height="16" rx="6" fill="#3a4855"/><rect x="146" y="80" width="18" height="12" fill="#3a4855"/><rect x="92" y="176" width="110" height="10" rx="3" fill="#7d8b97"/><rect x="104" y="166" width="78" height="10" fill="#fff" stroke="#d9d0b8"/><text x="150" y="58" font-size="13" font-weight="700" text-anchor="middle" fill="#2f78c4">擴視機</text>';
+  s+='<g transform="translate(232,206)"><rect width="180" height="40" rx="6" fill="#3a4855"/>';
+  var z=['ㄅ','ㄉ','ˇ','ˋ','ㄓ','ˊ','˙','ㄚ'];for(var i=0;i<8;i++)s+='<rect x="'+(8+i*21)+'" y="7" width="17" height="15" rx="2" fill="#ffd84d"/><text x="'+(16.5+i*21)+'" y="19" font-size="11" font-weight="900" text-anchor="middle" fill="#12313a">'+z[i]+'</text>';
+  s+='<rect x="8" y="25" width="164" height="9" rx="2" fill="#5d6873"/></g><text x="322" y="266" font-size="13" font-weight="700" text-anchor="middle" fill="#12313a">無線鍵盤＋放大注音貼紙</text>';
+  for(var k=0;k<7;k++)s+='<rect x="'+(18+k*1.5)+'" y="'+(186-k*7)+'" width="62" height="10" fill="#fff" stroke="#d9d0b8"/>';
+  s+='<text x="50" y="132" font-size="14" font-weight="900" text-anchor="middle" fill="#b4570f">80 份</text>';
+  s+=scnPerson(470,150,true);
+  s+='<g transform="translate(14,226)"><rect width="190" height="34" rx="14" fill="#fff" stroke="#12313a" stroke-width="1.5"/><text x="95" y="22" font-size="14" font-weight="700" text-anchor="middle" fill="#12313a">主管：明天就要有輔具！</text></g>';
+  return s;
+ },
+ act3:function(){
+  var s='<rect width="520" height="280" fill="#e6f4ff"/><circle cx="476" cy="40" r="26" fill="#ffd84d"/>';
+  for(var i=0;i<10;i++){var a=Math.PI*.55+i*.11;s+='<line x1="'+(476+30*Math.cos(a)).toFixed(1)+'" y1="'+(40+30*Math.sin(a)).toFixed(1)+'" x2="'+(476+150*Math.cos(a)).toFixed(1)+'" y2="'+(40+150*Math.sin(a)).toFixed(1)+'" stroke="rgba(255,200,60,.45)" stroke-width="4"/>'}
+  s+='<rect x="0" y="210" width="520" height="70" fill="#c9d8a8"/><rect x="0" y="206" width="520" height="8" fill="#a9c07f"/>';
+  s+='<rect x="28" y="54" width="210" height="160" fill="#f3e3c8" stroke="#c99b6d" stroke-width="3"/><path d="M18,58 L133,20 L248,58 Z" fill="#c8553d"/><rect x="56" y="34" width="154" height="22" rx="4" fill="#fff"/><text x="133" y="50" font-size="14" font-weight="900" text-anchor="middle" fill="#8c2f39">警衛室・總務處</text>';
+  s+='<rect x="48" y="78" width="170" height="70" fill="#bfe3f5" stroke="#fff" stroke-width="4"/>';
+  s+=scnPerson(108,92,'wrap');
+  s+='<rect x="40" y="148" width="186" height="14" fill="#b4855a"/><rect x="150" y="110" width="8" height="40" fill="#5d6873"/><rect x="136" y="104" width="46" height="10" rx="4" fill="#3a4855"/><rect x="186" y="120" width="34" height="28" rx="2" fill="#2a3540"/><rect x="189" y="123" width="28" height="22" fill="#fff"/><text x="203" y="139" font-size="11" font-weight="900" text-anchor="middle" fill="#12313a">文</text>';
+  s+=scnPerson(380,150,false).replace('#4f7cac','#e8603c');
+  s+='<path d="M246,190 L350,190" stroke="#12313a" stroke-width="1.5" stroke-dasharray="5 5"/><text x="298" y="184" font-size="12" font-weight="700" text-anchor="middle" fill="#12313a">中距離</text>';
+  s+=scnBubble(332,92,104,'請問找誰？',0);
+  s+='<g transform="translate(30,228)"><rect width="150" height="26" rx="13" fill="#5a3f7a"/><text x="75" y="18" font-size="12" font-weight="700" text-anchor="middle" fill="#fff">包覆式濾光眼鏡</text></g><g transform="translate(190,228)"><rect width="110" height="26" rx="13" fill="#2f78c4"/><text x="55" y="18" font-size="12" font-weight="700" text-anchor="middle" fill="#fff">熟悉的擴視機</text></g>';
+  return s;
+ }
+};
+/* ---- 案例二的插畫元件 ---- */
+function sBox(x,y,w,h){return '<rect x="'+x+'" y="'+(y-h)+'" width="'+w+'" height="'+h+'" fill="#c99b6d" stroke="#8a6b4a" stroke-width="1.5"/><line x1="'+(x+w/2)+'" y1="'+(y-h)+'" x2="'+(x+w/2)+'" y2="'+y+'" stroke="#e8d3b0" stroke-width="3"/>'}
+function sTurtle(x,y,boxes){var s='<rect x="'+x+'" y="'+(y-12)+'" width="74" height="7" rx="2" fill="#2f78c4"/>';[8,66].forEach(function(d){s+='<circle cx="'+(x+d)+'" cy="'+(y-3)+'" r="4" fill="#3a4855"/>'});for(var i=0;i<(boxes||0);i++)s+=sBox(x+4+(i%2)*34,y-12-Math.floor(i/2)*22,32,22);return s}
+function sLift(x,y,h,col){col=col||'#e8603c';var s='<rect x="'+x+'" y="'+(y-14)+'" width="92" height="9" rx="2" fill="#5d6873"/>';[10,82].forEach(function(d){s+='<circle cx="'+(x+d)+'" cy="'+(y-3)+'" r="5" fill="#3a4855"/>'});
+ s+='<line x1="'+(x+10)+'" y1="'+(y-14)+'" x2="'+(x+82)+'" y2="'+(y-14-h)+'" stroke="'+col+'" stroke-width="4"/><line x1="'+(x+82)+'" y1="'+(y-14)+'" x2="'+(x+10)+'" y2="'+(y-14-h)+'" stroke="'+col+'" stroke-width="4"/>';
+ s+='<rect x="'+(x-4)+'" y="'+(y-22-h)+'" width="100" height="9" rx="2" fill="'+col+'"/><line x1="'+(x+92)+'" y1="'+(y-14)+'" x2="'+(x+104)+'" y2="'+(y-60-h)+'" stroke="#5d6873" stroke-width="4" stroke-linecap="round"/><line x1="'+(x+96)+'" y1="'+(y-62-h)+'" x2="'+(x+112)+'" y2="'+(y-58-h)+'" stroke="#5d6873" stroke-width="4" stroke-linecap="round"/>';return s}
+function sStacker(x,y,lift){var s='<rect x="'+(x+86)+'" y="'+(y-150)+'" width="12" height="140" fill="#f0a030"/><rect x="'+(x+98)+'" y="'+(y-150)+'" width="8" height="140" fill="#d9802a"/>';
+ s+='<rect x="'+x+'" y="'+(y-12)+'" width="110" height="8" rx="2" fill="#5d6873"/>';[8,100].forEach(function(d){s+='<circle cx="'+(x+d)+'" cy="'+(y-3)+'" r="5" fill="#3a4855"/>'});
+ s+='<rect x="'+(x+4)+'" y="'+(y-22-lift)+'" width="86" height="6" fill="#3a4855"/><rect x="'+(x+80)+'" y="'+(y-46-lift)+'" width="10" height="30" fill="#3a4855"/><line x1="'+(x+104)+'" y1="'+(y-150)+'" x2="'+(x+124)+'" y2="'+(y-176)+'" stroke="#5d6873" stroke-width="4" stroke-linecap="round"/>';return s}
+function sMachine(x,y){return '<rect x="'+x+'" y="'+(y-120)+'" width="120" height="120" rx="6" fill="#9fb3c2" stroke="#7d8b97" stroke-width="2"/><rect x="'+(x+14)+'" y="'+(y-104)+'" width="56" height="36" rx="3" fill="#2a3540"/><rect x="'+(x+19)+'" y="'+(y-99)+'" width="46" height="26" fill="#7be0b0"/><circle cx="'+(x+94)+'" cy="'+(y-84)+'" r="14" fill="none" stroke="#5d6873" stroke-width="6" stroke-dasharray="6 4"/><rect x="'+(x+10)+'" y="'+(y-50)+'" width="100" height="22" rx="3" fill="#7d8b97"/><text x="'+(x+60)+'" y="'+(y-34)+'" font-size="12" font-weight="700" text-anchor="middle" fill="#fff">加工機台</text>'}
+function sBend(x,y,col){col=col||'#4f7cac';return '<g transform="translate('+x+','+y+')"><line x1="-6" y1="0" x2="-4" y2="-40" stroke="#3a4855" stroke-width="8" stroke-linecap="round"/><line x1="6" y1="0" x2="4" y2="-40" stroke="#3a4855" stroke-width="8" stroke-linecap="round"/><path d="M-10,-42 Q0,-48 10,-42 L34,-74 Q30,-86 18,-84 Z" fill="'+col+'"/><circle cx="38" cy="-84" r="13" fill="#f2c9a5"/><path d="M28,-92 Q38,-102 50,-90 Q42,-90 36,-86 Z" fill="#3a2a22"/><line x1="26" y1="-70" x2="40" y2="-40" stroke="'+col+'" stroke-width="7" stroke-linecap="round"/></g>'}
+function sTruck(x,y){return '<rect x="'+x+'" y="'+(y-70)+'" width="110" height="58" rx="4" fill="#fff" stroke="#7d8b97" stroke-width="2"/><path d="M'+(x+110)+','+(y-56)+' h28 l18,22 v22 h-46 Z" fill="#2f78c4"/><rect x="'+(x+118)+'" y="'+(y-50)+'" width="18" height="14" fill="#bfe3f5"/><circle cx="'+(x+26)+'" cy="'+(y-8)+'" r="10" fill="#3a4855"/><circle cx="'+(x+130)+'" cy="'+(y-8)+'" r="10" fill="#3a4855"/>'}
+function sFloor(c){return '<rect x="0" y="232" width="520" height="48" fill="'+(c||'#c9c2b6')+'"/><rect x="0" y="228" width="520" height="6" fill="#b3ab9e"/>'}
+function sTag(x,y,w,t,c){return '<g transform="translate('+x+','+y+')"><rect width="'+w+'" height="24" rx="12" fill="'+c+'"/><text x="'+(w/2)+'" y="17" font-size="12" font-weight="700" text-anchor="middle" fill="#fff">'+t+'</text></g>'}
+SCENES.c2a=function(){
+ var s='<rect width="520" height="280" fill="#f3f0ff"/>'+sFloor('#d8cfee');
+ s+='<rect x="30" y="40" width="150" height="100" rx="6" fill="#fff" stroke="#c9bfe6" stroke-width="2"/><text x="105" y="62" font-size="13" font-weight="900" text-anchor="middle" fill="#4b3c9e">雇主座談會</text>';
+ for(var i=0;i<4;i++)s+='<circle cx="'+(56+i*32)+'" cy="96" r="9" fill="#f2c9a5"/><rect x="'+(47+i*32)+'" y="106" width="18" height="22" rx="6" fill="#a98bd6"/>';
+ s+='<rect x="210" y="120" width="130" height="110" fill="#b4855a"/><rect x="200" y="112" width="150" height="12" fill="#c99b6d"/>';
+ s+='<g transform="translate(232,58) rotate(-4)"><rect width="88" height="62" fill="#fff" stroke="#d9d0b8"/><text x="44" y="18" font-size="11" font-weight="900" text-anchor="middle" fill="#12313a">職務再設計</text><text x="44" y="32" font-size="11" font-weight="900" text-anchor="middle" fill="#12313a">申請書</text><line x1="12" y1="44" x2="76" y2="44" stroke="#c8dbe8" stroke-width="2"/><line x1="12" y1="53" x2="60" y2="53" stroke="#c8dbe8" stroke-width="2"/></g>';
+ s+=scnPerson(275,186,false).replace('#4f7cac','#2f4f7a');
+ s+='<rect x="372" y="60" width="8" height="172" fill="#8a6b4a"/>'+'<path d="M380,70 h112 l12,14 l-12,14 h-112 Z" fill="#e8603c"/><text x="440" y="89" font-size="12" font-weight="900" text-anchor="middle" fill="#fff">身障 → 縣市政府</text>'+'<path d="M372,112 h-0 h-0" />'+'<path d="M380,116 h112 l12,14 l-12,14 h-112 Z" fill="#2f78c4"/><text x="440" y="135" font-size="12" font-weight="900" text-anchor="middle" fill="#fff">中高齡 → 就服機構</text>';
+ s+=sTag(390,170,110,'員工 44 歲','#5a3f7a');
+ return s;
+};
+SCENES.c2b=function(){
+ var s='<rect width="520" height="280" fill="#eef3f6"/>'+sFloor();
+ s+=sMachine(200,230);
+ s+=sTurtle(70,232,2)+sBend(170,232).replace('translate(170,232)','translate(170,232) scale(-1,1)');
+ s+='<path d="M150,120 q-30,-8 -50,30" fill="none" stroke="#e8603c" stroke-width="2.5" stroke-dasharray="5 4"/><text x="104" y="112" font-size="13" font-weight="900" fill="#e8603c">彎腰送料</text>';
+ s+=sTurtle(400,232,1)+sBend(340,232,'#4f7cac');
+ s+='<path d="M360,120 q34,-6 54,34" fill="none" stroke="#e8603c" stroke-width="2.5" stroke-dasharray="5 4"/><text x="382" y="112" font-size="13" font-weight="900" fill="#e8603c">彎腰取件</text>';
+ s+=sTag(170,24,180,'一天彎腰的次數數不清','#b4570f');
+ return s;
+};
+SCENES.c2c=function(){
+ var s='<rect width="520" height="280" fill="#fff6ec"/>'+sFloor();
+ s+=scnPerson(40,166,false).replace('#4f7cac','#7d8b97')+sTurtle(64,232,4)+'<path d="M150,206 h40" stroke="#12313a" stroke-width="3" marker-end="url(#ar)"/><defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#12313a"/></marker></defs>';
+ s+=sLift(196,232,22)+'<text x="246" y="166" font-size="12" font-weight="700" text-anchor="middle" fill="#12313a">平面升降台車</text>';
+ s+=scnBubble(118,96,186,'要一箱一箱搬上去？',0);
+ s+=sTruck(340,232)+scnPerson(330,150,false).replace('#4f7cac','#12313a')+'<text x="330" y="254" font-size="12" font-weight="700" text-anchor="middle" fill="#12313a">廠長</text><text x="60" y="254" font-size="12" font-weight="700" text-anchor="middle" fill="#12313a">上一個工程的同事</text>';
+ s+=scnBubble(334,24,176,'出貨一定要烏龜車！',1);
+ s+=sTag(20,24,80,'烏龜車','#2f78c4');
+ return s;
+};
+SCENES.c2d=function(){
+ var s='<rect width="520" height="280" fill="#ecf8f3"/>'+sFloor('#c3d9cc');
+ s+=sLift(22,232,40,'#1f8f82')+sBox(32,170,36,26)+sBox(70,170,22,18);
+ s+=scnPerson(150,160,false).replace('#4f7cac','#7d8b97')+'<text x="150" y="252" font-size="11" font-weight="700" text-anchor="middle" fill="#12313a">同事協助搬上</text>';
+ s+='<text x="88" y="102" font-size="13" font-weight="900" text-anchor="middle" fill="#1f8f82">放料：平面升降台車</text>';
+ s+=sStacker(250,232,46)+sTurtle(256,184,2);
+ s+='<text x="320" y="62" font-size="13" font-weight="900" text-anchor="middle" fill="#d9802a">取件：牙叉升降台車</text><text x="320" y="80" font-size="11" font-weight="700" text-anchor="middle" fill="#12313a">連同烏龜車一起抬起</text>';
+ s+=sTag(392,110,118,'有烏龜車：直接抬','#2f78c4')+sTag(392,142,118,'沒有：用棧板高低差','#5d6873');
+ s+=sTag(392,174,118,'彎腰負重減少','#1f8f82');
+ return s;
+};
+/* ---- 案例三的插畫元件 ---- */
+function sDesk(x,y,top,w){w=w||170;return '<rect x="'+x+'" y="'+(y-top)+'" width="'+w+'" height="10" rx="3" fill="#c99b6d"/><rect x="'+(x+10)+'" y="'+(y-top+10)+'" width="10" height="'+(top-10)+'" fill="#7d8b97"/><rect x="'+(x+w-20)+'" y="'+(y-top+10)+'" width="10" height="'+(top-10)+'" fill="#7d8b97"/><rect x="'+x+'" y="'+(y-6)+'" width="40" height="6" rx="2" fill="#5d6873"/><rect x="'+(x+w-40)+'" y="'+(y-6)+'" width="40" height="6" rx="2" fill="#5d6873"/>'}
+function sCad(x,y){return '<rect x="'+x+'" y="'+(y-70)+'" width="96" height="62" rx="4" fill="#2a3540"/><rect x="'+(x+5)+'" y="'+(y-65)+'" width="86" height="52" fill="#eaf4ff"/><circle cx="'+(x+34)+'" cy="'+(y-40)+'" r="14" fill="none" stroke="#2f78c4" stroke-width="2"/><circle cx="'+(x+34)+'" cy="'+(y-40)+'" r="5" fill="none" stroke="#2f78c4" stroke-width="2"/><rect x="'+(x+54)+'" y="'+(y-56)+'" width="28" height="30" fill="none" stroke="#2f78c4" stroke-width="2"/><line x1="'+(x+48)+'" y1="'+(y-40)+'" x2="'+(x+54)+'" y2="'+(y-40)+'" stroke="#2f78c4" stroke-width="2"/><rect x="'+(x+42)+'" y="'+(y-8)+'" width="12" height="10" fill="#5d6873"/>'}
+function sChair(x,y,ergo){var c=ergo?'#1f8f82':'#7d8b97';return '<rect x="'+(x+2)+'" y="'+(y-98)+'" width="'+(ergo?14:10)+'" height="'+(ergo?62:46)+'" rx="5" fill="'+c+'"/>'+(ergo?'<rect x="'+x+'" y="'+(y-112)+'" width="18" height="16" rx="5" fill="'+c+'"/><path d="M'+(x+16)+','+(y-70)+' q10,6 0,14" stroke="#fff" stroke-width="2" fill="none"/>':'')+'<rect x="'+x+'" y="'+(y-44)+'" width="56" height="10" rx="4" fill="'+c+'"/><rect x="'+(x+26)+'" y="'+(y-34)+'" width="6" height="22" fill="#5d6873"/><path d="M'+(x+4)+','+(y-6)+' L'+(x+29)+','+(y-14)+' L'+(x+54)+','+(y-6)+'" stroke="#5d6873" stroke-width="4" fill="none"/>'}
+function sMouse(x,y){return '<path d="M'+x+','+y+' q4,-24 20,-26 q14,2 14,26 Z" fill="#1f8f82"/><line x1="'+(x+19)+'" y1="'+(y-26)+'" x2="'+(x+19)+'" y2="'+(y-14)+'" stroke="#fff" stroke-width="2"/>'}
+function sStand(x,y){return '<g transform="translate('+x+','+y+')"><rect x="-16" y="-62" width="12" height="62" rx="5" fill="#3a4855"/><rect x="4" y="-62" width="12" height="30" rx="5" fill="#3a4855"/><circle cx="10" cy="-30" r="5" fill="#9aa7b5"/><rect x="8" y="-28" width="4" height="24" fill="#b8c2cc"/><path d="M4,-4 h18 v4 h-18 Z" fill="#5d6873"/><path d="M-26,-60 Q-26,-104 0,-106 Q26,-104 26,-60 Z" fill="#4f7cac"/><circle cx="0" cy="-122" r="17" fill="#f2c9a5"/><path d="M-17,-126 Q-14,-144 0,-142 Q16,-144 17,-126 Q10,-134 0,-133 Q-10,-134 -17,-126 Z" fill="#3a2a22"/><circle cx="-6" cy="-122" r="1.8" fill="#222"/><circle cx="6" cy="-122" r="1.8" fill="#222"/><path d="M-5,-112 Q0,-109 5,-112" fill="none" stroke="#a5604a" stroke-width="1.6"/></g>'}
+SCENES.c3a=function(){
+ var s='<rect width="520" height="280" fill="#eef3f8"/>'+sFloor('#c9d3db');
+ s+='<rect x="320" y="30" width="170" height="96" rx="4" fill="#fff" stroke="#c9d3db" stroke-width="2"/><text x="405" y="52" font-size="12" font-weight="900" text-anchor="middle" fill="#4b3c9e">研發會議</text>';
+ for(var i=0;i<3;i++)s+='<circle cx="'+(360+i*44)+'" cy="82" r="9" fill="#f2c9a5"/><rect x="'+(351+i*44)+'" y="92" width="18" height="22" rx="6" fill="#a98bd6"/>';
+ s+=sDesk(70,232,92,190)+sCad(120,140)+sChair(20,232,false)+scnPerson(60,120,true);
+ s+='<path d="M40,170 l8,-6 l-6,-6 l8,-6 l-6,-6" stroke="#e8603c" stroke-width="3" fill="none" stroke-linecap="round"/><text x="8" y="94" font-size="12" font-weight="900" fill="#e8603c">腰痠背痛</text>';
+ s+='<circle cx="292" cy="170" r="22" fill="#fff" stroke="#12313a" stroke-width="2.5"/><line x1="292" y1="170" x2="292" y2="156" stroke="#12313a" stroke-width="3" stroke-linecap="round"/><line x1="292" y1="170" x2="302" y2="176" stroke="#12313a" stroke-width="3" stroke-linecap="round"/><text x="292" y="210" font-size="12" font-weight="700" text-anchor="middle" fill="#5d7780">久坐</text>';
+ s+=sTag(330,150,140,'45 歲・研發經理','#5a3f7a')+sTag(330,182,140,'膝上截肢','#2f78c4');
+ return s;
+};
+SCENES.c3b=function(){
+ var s='<rect width="520" height="280" fill="#fff8ec"/>'+sFloor('#e6d9bf');
+ s+='<rect x="254" y="60" width="12" height="150" fill="#8a6b4a"/><rect x="214" y="206" width="92" height="14" rx="4" fill="#8a6b4a"/><g transform="rotate(-6 260 66)"><rect x="120" y="62" width="280" height="8" rx="4" fill="#5d6873"/><line x1="150" y1="70" x2="130" y2="120" stroke="#5d6873" stroke-width="2"/><line x1="150" y1="70" x2="170" y2="120" stroke="#5d6873" stroke-width="2"/><path d="M118,120 h64 q-4,18 -32,18 q-28,0 -32,-18 Z" fill="#e8603c"/><text x="150" y="112" font-size="14" font-weight="900" text-anchor="middle" fill="#e8603c">截肢</text><line x1="370" y1="70" x2="350" y2="120" stroke="#5d6873" stroke-width="2"/><line x1="370" y1="70" x2="390" y2="120" stroke="#5d6873" stroke-width="2"/><path d="M338,120 h64 q-4,18 -32,18 q-28,0 -32,-18 Z" fill="#7d8b97"/><text x="370" y="112" font-size="14" font-weight="900" text-anchor="middle" fill="#5d6873">老化</text></g>';
+ s+='<circle cx="260" cy="50" r="22" fill="#ffd166"/><text x="260" y="59" font-size="24" font-weight="900" text-anchor="middle" fill="#12313a">?</text>';
+ s+=sTag(40,236,110,'升降工作桌？','#c99b6d')+sTag(206,236,110,'人體工學椅？','#1f8f82')+sTag(372,236,120,'人體工學滑鼠？','#2f78c4');
+ s+='<text x="260" y="24" font-size="14" font-weight="900" text-anchor="middle" fill="#12313a">和工作問題的關聯性，由訪視評估</text>';
+ return s;
+};
+SCENES.c3c=function(){
+ var s='<rect width="520" height="280" fill="#ecf8f3"/>'+sFloor('#c3d9cc');
+ s+=sDesk(150,232,128,200)+sCad(200,104)+sMouse(168,104)+sStand(330,232);
+ s+='<path d="M210,180 v-30 M204,156 l6,-8 l6,8 M204,174 l6,8 l6,-8" stroke="#1f8f82" stroke-width="3" fill="none" stroke-linecap="round"/><text x="222" y="170" font-size="12" font-weight="700" fill="#1f8f82">可升降</text>';
+ s+=sChair(40,232,true);
+ s+=sTag(390,60,110,'✓ 升降工作桌','#c99b6d')+sTag(390,92,110,'✓ 人體工學椅','#1f8f82')+sTag(390,124,110,'✓ 人體工學滑鼠','#2f78c4');
+ s+='<text x="445" y="176" font-size="13" font-weight="900" text-anchor="middle" fill="#12313a">坐站可以交替</text>';
+ return s;
+};
+function sceneSVG(k,label){return '<svg class="scene" viewBox="0 0 520 280" role="img" aria-label="'+label+'">'+SCENES[k]()+'</svg>'}
+
+CASES=[
+ {t:'低視能的小五：三份工作的職再之路',who:'小五，23 歲男性，雙眼低視能、畏光。透過就業中心媒合工作，之前沒有用過視覺輔具。',
+  acts:[
+   {k:'act1',n:'第一幕',t:'第一份工作：手寫文書',job:'就業中心媒合的第一份工作，需要大量手寫。',
+    hard:['沒有使用視覺輔具的經驗，不知道輔具能怎麼幫忙','手寫時字越寫越歪，雇主認為字跡無法改善'],
+    fix:[['閱讀規：協助定位、輔助寫字，避免越寫越歪','A'],['擴視機也能協助，但剛出社會負擔不起；評估生活輔具補助後仍不夠，生活中用到的機會也不高','A']],
+    result:'小五很快找到下一份工作：公部門的約用人員。',sum:'閱讀規',
+    think:{q:'小五寫字越寫越歪，下列哪個工具最簡單、最快上手？',opts:[{t:'閱讀規',ok:1},{t:'請同事幫他代寫',why:'代寫沒辦法讓小五自己完成工作。'},{t:'換一份完全不用寫字的工作',why:'先試簡單的輔具，就能保住工作機會。'}],ex:'閱讀規是一片留有開槽的板子，放在紙上幫助定位，字就不容易寫歪。'}},
+   {k:'act2',n:'第二幕',t:'公部門約用人員：公文登打',job:'處理局處室公文收發，要一邊看紙本、一邊登打到系統。',
+    hard:['主管要求半天登打約 80 份；一般同事約 50 份，小五約 30 份','看不清楚紙本資料，也看不清鍵盤上的注音','主管希望「明天」就有輔具'],
+    fix:[['從職務再設計的輔具回收庫存，隔天評估提供一台擴視機','A'],['鍵盤貼上放大的注音貼紙，改用無線鍵盤，必要時可以拉近看','A'],['螢幕從 22 吋換成 27 吋','B']],
+    sum:'回收庫存的擴視機、鍵盤貼紙、無線鍵盤、27 吋螢幕',result:'一週後，小五半天可以登打約 50 份，和同事差不多。但主管仍覺得太慢，小五天天加班、眼睛越來越疲勞，約兩個月後離職，擴視機依規定回收。',
+    note:'離職後輔具原則上要回收。生活上需要，可以另外申請生活輔具；換到下一份工作，也可以再申請職務再設計繼續使用。',
+    think:{q:'主管希望「明天」就有輔具，但補助要經過審查。職再專員當時怎麼做？',opts:[{t:'從職務再設計的輔具回收庫存，隔天評估借用擴視機',ok:1},{t:'請小五先自費買一台',why:'剛出社會的小五負擔不起，也不需要先自費。'},{t:'請主管等審查核定後再說',why:'流程還是要走，但專員先找到了可以馬上使用的資源。'}],ex:'輔具回收庫存讓小五隔天就有擴視機可用，專員同時加上鍵盤貼紙、無線鍵盤和 27 吋螢幕。'}},
+   {k:'act3',n:'第三幕',t:'學校總務處：門禁與文書',job:'學校把小五安排在用眼較少的職務：上午在警衛室協助門禁，其他時間登打簡單文書。',
+    hard:['文書作業仍然需要閱讀','中距離辨識訪客有困難','回診時醫師說視力惡化，眼鏡需要更換','陽光強的時候會畏光'],
+    fix:[['文書閱讀：繼續使用已經熟悉的那台擴視機','A'],['門禁管理：由職務再設計協助試用包覆式濾光眼鏡，依個人需求挑選鏡片顏色','A'],['中距離辨識：特製眼鏡上下班都會用到，討論後改由社會處申請','soc']],
+    result:'小五換到用眼較少、壓力較小的工作，輔具也依使用情境分別處理。',sum:'濾光眼鏡試用、繼續用擴視機；特製眼鏡改由社會處申請',
+    think:{q:'特製眼鏡上班、下班都會用到，小五最後從哪個管道申請？',opts:[{t:'社會處（生活輔具）',ok:1},{t:'職務再設計',why:'這副眼鏡生活中也常用，在職場使用的比例不高。'},{t:'請學校自行購買',why:'有公部門的資源可以申請。'}],ex:'和生活共用的輔具，要考量「職場使用時間比率」。特製眼鏡由社會處申請，職務再設計負責濾光眼鏡的試用。'}}
+  ],
+  points:['同一個人換了工作，需要的輔具也不一樣，要依工作任務重新評估。','遇到急迫需求，可以先運用職務再設計的輔具回收庫存。','輔具能提升效率，但工作量和工時也要一起看。（討論）','和生活共用的輔具，可以結合社政資源申請。'],
+  discuss:'如果你是第二份工作的主管，除了輔具，還可以調整什麼，讓小五留下來？'},
+ {t:'洗腎員工的上下料：升降台車怎麼選',who:'阿芳（化名），44 歲，生產線員工，正在洗腎。雇主參加過多場雇主座談會後，主動為她提出申請。',
+  acts:[
+   {k:'c2a',n:'第一幕',t:'熟門熟路的雇主來申請',job:'這家廠商參加過很多場雇主座談會，知道中高齡者和身心障礙者要找不同的窗口申請。',
+    hard:['員工 44 歲，還不是中高齡者（年滿 45 歲才算）','要先確認她的身分，才知道該向哪個窗口申請'],
+    fix:[['雇主為員工提出職務再設計申請',null]],sum:'雇主主動申請，先確認身分與窗口',
+    result:'申請受理後，職再專員安排到工廠現場訪視。',
+    think:{q:'阿芳 44 歲，還不是中高齡者。如果她領有身心障礙證明，雇主要向哪裡申請？',opts:[{t:'縣市政府勞工主管機關',ok:1},{t:'公立就業服務機構',why:'那是中高齡及高齡者的窗口；44 歲還不到中高齡的年齡。'},{t:'不能申請，要等她滿 45 歲',why:'領有身心障礙證明就可以申請，不必等到 45 歲。'}],ex:'身心障礙者由縣市政府勞工主管機關受理。年齡和身分不同，窗口就不同。'}},
+   {k:'c2b',n:'第二幕',t:'現場訪視：數不清的彎腰',job:'阿芳在加工機台工作：要把料送進機台，加工完成後再取件。',
+    hard:['送料到機台要彎腰，加工完成取件也要彎腰','一天彎腰的次數多到數不清','正在洗腎的她，經常彎腰負重，身體非常疲憊'],
+    fix:[['專員第一個想法：在放料處、取料處各放一台平面升降台車','B']],sum:'看見彎腰負重，初步想到兩台平面升降台車',
+    result:'訪視過程中，阿芳一直面有難色。',
+    think:{q:'訪視時，阿芳一直面有難色。專員下一步最該做什麼？',opts:[{t:'停下來問清楚她的顧慮，了解整個生產流程',ok:1},{t:'直接送出兩台升降台車的申請',why:'使用者最清楚實際流程，她的顧慮可能就是方案的盲點。'},{t:'請雇主說服她接受',why:'方案要讓使用者真的用得上，硬推容易閒置。'}],ex:'一問之下才發現，兩台平面升降台車放進整個生產流程裡，會出現新的問題。'}},
+   {k:'c2c',n:'第三幕',t:'卡關：烏龜車的難題',job:'上一個工程的同事，是用烏龜車或帶輪推車把加工件送過來。',
+    hard:['換成平面升降台車，阿芳要把料一箱一箱搬上台車，彎腰取件反而變成彎腰負重','同事送料後，有時會把推車帶走','廠長說出貨一定要用烏龜車：司機會連同烏龜車一起出貨，沒有烏龜車，司機到客戶廠區要一箱一箱搬'],
+    fix:[['專員問：整段流程能不能都用烏龜車運送？廠長沒有回答就離開了',null]],sum:'上下游與出貨都靠烏龜車，平面台車卡關',
+    result:'設備本身沒問題，但放進生產流程和出貨方式裡就卡住了。專員回頭和阿芳一起討論折衷的辦法。',
+    think:{q:'為什麼「放料、取料各一台平面升降台車」行不通？',opts:[{t:'上下游和出貨都用烏龜車，換成平面台車反而要一箱一箱搬',ok:1},{t:'升降台車太貴，超過補助上限',why:'問題不在價格，在於和生產流程接不起來。'},{t:'阿芳不喜歡新設備',why:'阿芳其實認為台車也能改善，她擔心的是流程。'}],ex:'設備方案要放進整個生產流程來看：上一個工程怎麼送料、下一步怎麼出貨，都會影響方案能不能用。'}},
+   {k:'c2d',n:'第四幕',t:'折衷方案：兩種台車各司其職',job:'專員和阿芳討論後，放料和取件分別選用不同的台車。',
+    hard:['放料時一次的重量可能比較重','取件後的出貨，有時有烏龜車、有時沒有'],
+    fix:[['放料：平面升降台車，載重比較穩','B'],['料需要搬上台車時，由同事協助搬運','E'],['取件：牙叉升降台車，有烏龜車時連同烏龜車一起抬起','B'],['沒有烏龜車時，出貨時司機可以利用棧板的高低差，把貨放上烏龜車','E']],sum:'放料用平面升降台車＋同事協助；取件用牙叉升降台車',
+    result:'不論有沒有烏龜車，取件都不必彎腰負重，也不影響原本的出貨方式。',
+    think:{q:'取件的地方為什麼選牙叉升降台車？',opts:[{t:'有沒有烏龜車都能用，能配合原本的出貨流程',ok:1},{t:'牙叉升降台車比較便宜',why:'選擇的理由是配合流程，不是價格。'},{t:'平面升降台車不能升降',why:'平面升降台車也能升降，但沒辦法直接抬起烏龜車。'}],ex:'牙叉可以伸到烏龜車或棧板下方直接抬起，不用一箱一箱搬。這是設備（改善工作設備）加上流程分工（調整工作方法）的折衷方案。'}}
+  ],
+  points:['設備方案要放進整個生產流程來看，上下游和出貨方式都會影響。','訪視時留意使用者的反應，她最清楚實際的工作流程。','好的方案常常是折衷：設備加上工作方法、同事分工一起調整。','雇主申請前要先確認年齡與身分：44 歲還不是中高齡者，窗口也不同。'],
+  discuss:'如果廠長同意整段流程都改用烏龜車，方案可以怎麼調整？'},
+ {t:'研發經理的升降桌：障礙還是老化？',who:'研發經理，45 歲，膝上截肢。工作要經常開會、看機構設計圖。',
+  acts:[
+   {k:'c3a',n:'第一幕',t:'久坐的研發經理',job:'他每天要開會、長時間盯著螢幕看機構設計圖。',
+    hard:['久坐','腰痠背痛','長時間看螢幕'],
+    fix:[['職務再設計最常見的改善：可升降的工作桌、人體工學椅、人體工學滑鼠','B']],sum:'久坐、腰痠背痛、看螢幕',
+    result:'但他 45 歲，這些困擾看起來很像中高齡的老化問題。',
+    think:{q:'針對久坐、腰痠背痛、長時間看螢幕，職務再設計最常見的改善組合是？',opts:[{t:'升降工作桌、人體工學椅、人體工學滑鼠',ok:1},{t:'減少開會的次數',why:'開會是研發經理的工作內容，重點是讓他做得舒服。'},{t:'改成全部居家上班',why:'困擾來自久坐，換地點不會改變工作姿勢。'}],ex:'這是辦公室久坐困擾最常見的改善組合。'}},
+   {k:'c3b',n:'第二幕',t:'換你判斷：障礙還是老化？',job:'他領有身心障礙證明，但困擾看起來像年齡造成的。身障方案還能補助嗎？',
+    hard:['困擾看起來像中高齡的老化問題','三項輔具和膝上截肢的關聯程度不一樣'],
+    fix:[['依審查面向判斷：障礙程度與工作問題之關聯性、就業需求性、迫切性、合理性、職場使用時間比率',null],['由職再專業人員到現場訪視評估，必要時邀請相關專業人員',null]],sum:'看關聯性，由訪視評估',
+    result:'這一幕適合分組討論：三項輔具各自和截肢有多少關聯？',
+    think:{q:'困擾看起來像老化，身障方案還能補助嗎？',opts:[{t:'要看障礙和工作問題的關聯性，由訪視評估',ok:1},{t:'一定不行，老化問題不補助',why:'看起來像老化，不代表和障礙無關，要評估了才知道。'},{t:'一定可以，有身障證明就補',why:'有證明也要評估障礙和工作問題的關聯性。'}],ex:'勞動部 2026 年 6 月公布的審查面向，第一項就是「障礙程度與工作問題之關聯性」。'}},
+   {k:'c3c',n:'第三幕',t:'結果：三項都補助',job:'經過訪視評估，升降工作桌、人體工學椅、人體工學滑鼠三項都獲得補助。',
+    hard:['坐太久會腰痠背痛','要長時間操作滑鼠看設計圖'],
+    fix:[['可升降的工作桌，坐站可以交替','B'],['人體工學椅','A'],['人體工學滑鼠','A']],sum:'升降桌、人體工學椅、人體工學滑鼠都補助',
+    result:'他可以坐站交替工作，減少久坐造成的不適。',
+    think:{q:'這三項最後的評估結果是？',opts:[{t:'三項都獲得補助',ok:1},{t:'只補助升降工作桌',why:'實際評估結果是三項都補助。'},{t:'都不補助，因為是老化問題',why:'評估後認為和工作問題有關聯，三項都補助了。'}],ex:'看起來像老化的困擾，不一定和障礙無關。不要先下結論，交給訪視評估。'}}
+  ],
+  points:['看起來像老化的困擾，不代表和障礙無關，不要先下結論。','身障方案的審查重點之一是「障礙程度與工作問題之關聯性」。','模糊的案子交給現場訪視和專業人員評估。','辦公室久坐困擾常見的改善：升降桌、人體工學椅、人體工學滑鼠。'],
+  discuss:'如果同樣的困擾發生在一位沒有身障證明的 45 歲員工身上，可以從哪個方案申請？評估重點會有什麼不同？'}
+];
+function openStory(i,a){
+ i=i||0;a=a||0;var c=CASES[i];
+ var head='<div class="eyebrow">第 5 關　故事劇場</div><h2>🎭 案例分享</h2><div class="tabs">'+CASES.map(function(x,k){return '<button class="tab'+(k===i?' on':'')+'" data-k="'+k+'">案例 '+(k+1)+'</button>'}).join('')+'</div>';
+ var body;
+ if(c.acts){
+  var n=c.acts.length,isEnd=a>=n,A=c.acts[a];
+  body='<h3 class="stT">'+c.t+'</h3><div class="who"><i>🧑</i><div>'+c.who+'</div></div>'+
+   '<div class="acts">'+c.acts.map(function(x,k){return '<button class="act'+(k===a?' on':k<a?' past':'')+'" data-a="'+k+'"><b>'+x.n+'</b><small>'+x.t.split('：')[0]+'</small></button>'}).join('')+'<button class="act'+(isEnd?' on':'')+'" data-a="'+n+'"><b>謝幕</b><small>回顧與討論</small></button></div>';
+  if(!isEnd){
+   body+='<div class="stg"><div class="stImg">'+sceneSVG(A.k,A.t+' 示意圖')+'</div><div class="stTxt"><div class="eyebrow">'+A.n+'</div><h3>'+A.t+'</h3><p>'+A.job+'</p>'+
+    '<div class="sec"><h4>遇到的困難</h4><ul>'+A.hard.map(function(h){return '<li>'+h+'</li>'}).join('')+'</ul></div>'+
+    '<div class="sec"><h4>職務再設計怎麼做</h4><ul class="fx">'+A.fix.map(function(f){return '<li>'+f[0]+(f[1]==='soc'?' <span class="chip" style="--c:#7d8b97">社政資源</span>':f[1]?' <span class="chip" style="--c:'+CATCOL[f[1]]+'">'+CATS[f[1]].n+'</span>':'')+'</li>'}).join('')+'</ul></div></div></div>'+
+    '<div class="think"><p class="q">🤔 換你想想：'+A.think.q+'</p><div class="opts">'+shuffle(A.think.opts).map(function(o){return '<button class="opt" data-ok="'+(o.ok?1:0)+'" data-why="'+esc(o.why||'')+'">'+o.t+'</button>'}).join('')+'</div><div id="thk" aria-live="polite"></div></div>'+
+    '<div class="sec res" id="res" hidden><h4>結果</h4><p>'+A.result+'</p>'+(A.note?'<div class="fb">'+A.note+'</div>':'')+'</div>';
+  }else{
+   body+='<div class="sec"><h4>三份工作，三種安排</h4><div class="tl">'+c.acts.map(function(x){return '<div><b>'+x.n+'</b><span>'+x.t+'</span><small>'+x.sum+'</small></div>'}).join('')+'</div></div>'+
+    '<div class="sec"><h4>學習重點</h4><ol>'+c.points.map(function(p){return '<li>'+p+'</li>'}).join('')+'</ol></div>'+
+    '<div class="fb"><b>課堂討論：</b>'+c.discuss+'</div>';
+  }
+  body+='<div class="row"><button class="btn" id="ap"'+(a===0?' disabled':'')+'>上一幕</button><button class="btn go" id="an">'+(isEnd?(i<CASES.length-1?'下一則案例':'回到園區'):a===n-1?'謝幕回顧':'下一幕')+'</button></div>';
+ }else{
+  body='<h3 class="stT">'+c.t+'</h3><div class="imgs">'+c.img.map(function(src,k){return '<img src="'+src+'" alt="案例 '+(i+1)+' 圖片 '+(k+1)+'" data-src="'+src+'">'}).join('')+'</div>'+
+   '<div class="sec"><h4>遇到的困難</h4><p>'+c.hard+'</p></div><div class="sec"><h4>訪視評估</h4><p>'+c.ev+'</p></div>'+
+   '<div class="sec"><h4>改善方式</h4><ul>'+c.fix.map(function(f){return '<li>'+f+'</li>'}).join('')+'</ul></div>'+
+   '<p>'+c.cats.map(function(k){return '<span class="chip" style="--c:'+CATCOL[k]+'">'+CATS[k].icon+' '+CATS[k].n+'</span>'}).join(' ')+'</p>'+(c.note?'<div class="fb">'+c.note+'</div>':'')+
+   '<div class="row"><button class="btn" id="sp"'+(i===0?' disabled':'')+'>上一則</button><button class="btn go" id="sn">'+(i<CASES.length-1?'下一則':'回到園區')+'</button></div>';
+ }
+ var p=openPanel(head+body,false,'wide');
+ p.querySelectorAll('.imgs img').forEach(function(im){im.addEventListener('error',function(){var d=document.createElement('div');d.className='ph';d.innerHTML='圖片位置<br><b>'+im.dataset.src+'</b>';im.replaceWith(d)})});
+ p.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){openStory(+b.dataset.k,0)})});
+ if(c.acts){
+  p.querySelectorAll('.act').forEach(function(b){b.addEventListener('click',function(){openStory(i,+b.dataset.a)})});
+  $('#ap').addEventListener('click',function(){openStory(i,a-1)});
+  $('#an').addEventListener('click',function(){if(a<c.acts.length)openStory(i,a+1);else if(i<CASES.length-1)openStory(i+1,0);else closePanel()});
+  var first=true;
+  p.querySelectorAll('.think .opt').forEach(function(b){b.addEventListener('click',function(){
+   var ok=b.dataset.ok==='1';
+   if(first)LOG({ev:'answer',game:'故事劇場｜案例閱讀',q:A.think.q,a:b.textContent,ok:ok});
+   if(!ok){first=false;b.classList.add('no');b.disabled=true;$('#thk').innerHTML='<div class="fb bad">'+b.dataset.why+'</div>';return}
+   b.classList.add('ok');p.querySelectorAll('.think .opt').forEach(function(x){x.disabled=true});
+   $('#thk').innerHTML='<div class="fb">'+A.think.ex+'</div>';$('#res').hidden=false;
+  })});
+ }else{
+  $('#sp').addEventListener('click',function(){openStory(i-1,0)});
+  $('#sn').addEventListener('click',function(){if(i<CASES.length-1)openStory(i+1,0);else closePanel()});
+ }
+}
 
 /* ---------- boot ---------- */
 refresh();
